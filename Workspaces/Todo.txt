@@ -1,0 +1,147 @@
+-Get everything compiling with gcc
+--------------
+-Types
+--Create color, angle, percentage, euler types
+--Create vector and quaternion types
+--Create guid
+--Create half float
+--Hashed file name
+--Localized string token
+--proper 128 bit types
+--can I get the compiler to fit Hash64 into a single register
+--Need better string types
+---Too many stack strings with hardcoded values
+--------------
+-flesh out reflection more
+--Predefined hashes for all of the types
+--Unit tests all around
+--versioning
+---Members
+----Type conversion
+****Renamed enums
+****Rename
+---Classes
+----Versioned loading with complicated conversion using multiple members
+****Rename
+--Can I eliminate virtuals in ReflClass base?
+---Yes with template functions
+---alternatively if each instance just had a 32 bit hash in the base class I could do everything as a c interface! :)
+----If I go this route I need to be sure this makes sense with virtuals
+----Especially for ref-counted assets
+---Useful for classes I don't control, however can't access private members
+--How do I return loaded data to outside world
+---Think about use cases for how loaded data will be used
+---All handled through the resource manager
+---Need the ability to safely cast to the appropriate type
+--Add safe cast functions
+---Why not use RTTI???, inconsistent between platforms, not serializable, requires virtuals, very limited for what I need, effectively redundant
+---Test RTTI
+--instead of doing all initialization in global contructors, just register functions and then call them all at the beginning of main
+--handle all types
+---guid
+---bitfield
+---half float
+---128 bit types
+---euler angles, vectors and quaternions
+---hashed files name, with file type filter
+---Localized string
+***Add support for enum type
+***Add support for class types
+****Need to handle offset correctly for non-pod data members
+--need to handle returns from stream i/o
+--need to handle multiple classes serialized into a single text file
+--binary serialization
+---Need to write out type hash and size
+--implement template version and test performance when reading binary data
+--Test
+---Need to test all types
+---Need to test missing/extra types
+----Need to log these
+---Missing aliases
+----Need to log these
+***Multiple aliases
+--Need to remove strings in "gold" builds
+--add code to finalize entire reflection library
+---Finalize when reflection library is initialized
+---Verify that every member of type "class" has a registered ReflClassDesc
+---Verify that every parent class has a registered ReflClassDesc
+---Verify that members are the correct size
+---make sure that there are no duplicate class names, include aliases
+---If using 32 bit hashes, verify that there are no collisions
+--Improve upon embedded class reading(would be nice to have one function that reads single classes, subclasses and embedded classes out of a file)
+--Need to support deserializing reflected classes that are embedded in other xml
+---Really just need to return multiple ReflClasses from Deserialize function.
+--Add support for constraints on members
+--Add support for documentation on members
+--Endian swapping
+--Think about whether things like maps, textures, geometry buffers, etc use reflection or more manual system
+---I think it really depends on how good I can make the versioning
+-*Need to handle varargs and scanf(not perfect, but it works for the moment)
+**Add code for finalizing reflected data after it's been deserialized
+**Need to write data member value
+**64 & 128 bit types
+**need boolean type
+**Need to clarify type size
+**need to read data back in
+**Rename read/write on ReflClassDesc to serialize/deserialize
+**Need to verify type when reading in structured text values
+**Sort members based on order
+**partial specialization on string functions for types that need special handling
+**need to handle class inheiritance
+***embed base class members in a sub-node??
+***Support virtual inheritance? NO!
+***need to test complicated inheiritance
+***need to test inheiritance in class data members
+***multiple inheiritance
+***Need to store offset of base classes to support multiple inheiritance
+***Need to use offset
+***Basic inheiritance
+**Need to test that namespaces work
+***Add support for namespaces
+----------
+-Create tools platform
+--Layer tools functionality on top of platform
+--Add string class under tools platform?
+----------
+-Improve hash system
+--Compile time hashing
+--associate string with hash
+----------
+-Containers
+--Bit field
+--Array(fixed, dynamic)
+--hash
+--test against STL
+----------
+-Ref counted type
+----------
+-Flesh out memory manager
+--memory leak checker
+----------
+-logging
+----------
+-exception handler
+----------
+-very fast curve evaluation lib
+----------
+-job manager
+----------
+-tools framework(javascript?)
+----------
+-Fix up unit tests?
+----------
+----------
+*convert asserts to wide char
+*rename types/functions away from UL
+*flags to MemFlags for whether allocation can fail or not
+*copyright notices
+*compiler assert
+*TESTME
+*Str version of scanf
+*nammespace internals
+*come up with better xml deserialization method(deal with const cast)
+xxIterators with explicit control over going to siblings and children
+xxHow to create a pure virtual iterator that doesn't require memory allocation
+*switch radian conversion functions to use PI
+*Check UL standard to see what I say about spaces between while(
+

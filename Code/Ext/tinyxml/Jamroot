@@ -1,0 +1,10 @@
+lib tinyxml 
+            : 
+                tinystr.cpp 
+                tinyxml.cpp 
+                tinystr.cpp 
+                tinyxml.cpp 
+                tinyxmlerror.cpp 
+                tinyxmlparser.cpp 
+            :   <link>static 
+            ;

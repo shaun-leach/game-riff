@@ -1,0 +1,141 @@
+[Global]
+CurrentProject=Core.vpj
+[ActiveConfig]
+Libs.vpj=Debug
+Ext.vpj=Debug
+[ProjectDates]
+Core.vpj=20110528190034081
+Libs.vpj=20110504015405865
+Ext.vpj=20110506152859902
+[TreeExpansion2]
+- Core.vpj
+  - ..\Code
+    - Core
+      - UnitTests
+      - Windows
+- Ext.vpj
+  + ..\Code
+    - Ext
+      + gtest
+        + include
+          + gtest
+            + internal
+        + src
+      - lz4
+      + Src
+        + gtest-1.6.0
+          + fused-src
+            + gtest
+          + include
+            + gtest
+              + internal
+          + samples
+          + src
+          + test
+          + xcode
+            + Samples
+              + FrameworkSample
+      - tinyxml
+- Libs.vpj
+  - ..\Code
+    - Libs
+      + Hash
+        - UnitTests
+      + Math
+        + Windows
+      + Reflection
+        - UnitTests
+      + Stream
+        + UnitTests
+scroll:0
+[State]
+SCREEN: 1920 1200 4 3 1022 726 0 0 M 0 0 0 0 1534 702 0
+CWD: \projects\Workspaces
+BUFFER: BN="..\Code\Libs\Stream\Stream.h"
+BI: MA=1 74 1  TABS=1 5  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=C/C++	HM=0 MF=0 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1 CL="" SC="" SCE= SCU=
+VIEW: LN=.2734 CL=1 LE=0 CX=1 CY=6 WI=5 BI=22 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="..\Code\Core\Windows\AssertGRWin.cpp"
+BI: MA=1 74 1  TABS=1 5  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=C/C++	HM=0 MF=0 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=1 CL="" SC="" SCE= SCU=
+VIEW: LN=.2448 CL=48 LE=0 CX=48 CY=24 WI=5 BI=24 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="..\Code\Tests\Pch.h"
+BI: MA=1 74 1  TABS=1 5  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=C/C++	HM=0 MF=864 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=1 CL="" SC="" SCE= SCU=
+VIEW: LN=.20 CL=17 LE=0 CX=17 CY=1 WI=5 BI=42 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="..\Code\Tests\ULTest.cpp"
+BI: MA=1 74 1  TABS=1 4  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=C/C++	HM=0 MF=608 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=1 CL="" SC="" SCE= SCU=
+VIEW: LN=.5393 CL=57 LE=0 CX=57 CY=27 WI=5 BI=27 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="ULTest\test.xml"
+BI: MA=1 74 1  TABS=1 5  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=XML	HM=0 MF=131936 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=70 ESBU2=2 CL="" SC="" SCE= SCU=
+VIEW: LN=.1099 CL=41 LE=0 CX=41 CY=20 WI=5 BI=23 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="Todo.txt"
+BI: MA=1 74 1  TABS=1 5  WWS=1 IWT=0 ST=0 IN=1 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Plain Text	HM=0 MF=0 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1 CL="" SC="" SCE= SCU=
+VIEW: LN=.529 CL=18 LE=0 CX=18 CY=13 WI=5 BI=28 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="..\Code\Libs\Reflection\Reflection.cpp"
+BI: MA=1 74 1  TABS=1 5  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=C/C++	HM=0 MF=1180264 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1 CL="" SC="" SCE= SCU=
+VIEW: LN=.0 CL=1 LE=0 CX=1 CY=0 WI=5 BI=25 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="..\Code\Core\UnitTests\Mem_unittest.cpp"
+BI: MA=1 74 1  TABS=1 5  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=C/C++	HM=0 MF=608 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=1 CL="" SC="" SCE= SCU=
+VIEW: LN=.0 CL=1 LE=0 CX=1 CY=0 WI=5 BI=31 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="..\Code\Libs\Math\Math.h"
+BI: MA=1 74 1  TABS=1 5  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=C/C++	HM=0 MF=32 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=1 CL="" SC="" SCE= SCU=
+VIEW: LN=.0 CL=1 LE=0 CX=1 CY=0 WI=5 BI=36 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="..\Code\Libs\Math\Windows\MathWin.h"
+BI: MA=1 74 1  TABS=1 5  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=C/C++	HM=0 MF=544 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=1 CL="" SC="" SCE= SCU=
+VIEW: LN=.0 CL=1 LE=0 CX=1 CY=0 WI=5 BI=43 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="..\Code\Libs\Reflection\Reflection.h"
+BI: MA=1 74 1  TABS=1 5  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=C/C++	HM=0 MF=3342440 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1 CL="" SC="" SCE= SCU=
+VIEW: LN=.4749 CL=5 LE=0 CX=5 CY=30 WI=5 BI=26 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="..\Code\Core\Types.h"
+BI: MA=1 74 1  TABS=1 5  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=C/C++	HM=0 MF=1048872 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=1 CL="" SC="" SCE= SCU=
+VIEW: LN=.2098 CL=1 LE=0 CX=1 CY=6 WI=5 BI=29 HT=0 HN=0 HF=0 HC=4
+WINDOW: 0 0 1188 491 -1 -1 N  WF=0 WT=1 ",,,"
+BUFFER: BN="..\Code\Libs\Reflection\Reflection.h"
+VIEW: LN=.4749 CL=5 LE=0 CX=5 CY=30 WI=190 BI=26 HT=0 HN=0 HF=0 HC=4
+WINDOW: 0 0 1188 491 -1 -1 N  WF=0 WT=8 ",,,"
+BUFFER: BN="..\Code\Core\Types.h"
+VIEW: LN=.2195 CL=1 LE=0 CX=1 CY=21 WI=202 BI=29 HT=0 HN=0 HF=0 HC=4
+WINDOW: 100 125 1188 491 -1 -1 N  WF=0 WT=4 ",,,"
+BUFFER: BN="..\Code\Libs\Stream\Stream.h"
+VIEW: LN=.1740 CL=35 LE=0 CX=35 CY=2 WI=182 BI=22 HT=0 HN=0 HF=0 HC=4
+WINDOW: 40 50 1188 491 -1 -1 N  WF=0 WT=7 ",,,"
+BUFFER: BN="..\Code\Core\Windows\AssertGRWin.cpp"
+VIEW: LN=.2448 CL=48 LE=0 CX=48 CY=24 WI=186 BI=24 HT=0 HN=0 HF=0 HC=4
+WINDOW: 20 25 1188 491 -1 -1 N  WF=0 WT=9 ",,,"
+BUFFER: BN="..\Code\Tests\Pch.h"
+VIEW: LN=.20 CL=17 LE=0 CX=17 CY=1 WI=198 BI=42 HT=0 HN=0 HF=0 HC=4
+WINDOW: 20 25 1188 491 -1 -1 N  WF=0 WT=6 ",,,"
+BUFFER: BN="..\Code\Tests\ULTest.cpp"
+VIEW: LN=.5393 CL=57 LE=0 CX=57 CY=27 WI=192 BI=27 HT=0 HN=0 HF=0 HC=4
+WINDOW: 0 0 1188 491 -1 -1 N  WF=0 WT=5 "Default Unicode Font,10,0,1"
+BUFFER: BN="ULTest\test.xml"
+VIEW: LN=.1099 CL=41 LE=0 CX=41 CY=20 WI=184 BI=23 HT=0 HN=0 HF=0 HC=4
+WINDOW: 40 50 1188 491 -1 -1 N  WF=0 WT=3 ",,,"
+BUFFER: BN="Todo.txt"
+VIEW: LN=.529 CL=18 LE=0 CX=18 CY=13 WI=194 BI=28 HT=0 HN=0 HF=0 HC=4
+WINDOW: 20 25 1188 491 -1 -1 N  WF=0 WT=2 ",,,"
+BUFFER: BN="..\Code\Libs\Reflection\Reflection.cpp"
+VIEW: LN=.0 CL=1 LE=0 CX=1 CY=0 WI=188 BI=25 HT=0 HN=0 HF=0 HC=4
+WINDOW: 40 50 1188 491 -1 -1 N  WF=0 WT=10 ",,,"
+BUFFER: BN="..\Code\Core\UnitTests\Mem_unittest.cpp"
+VIEW: LN=.0 CL=1 LE=0 CX=1 CY=0 WI=224 BI=31 HT=0 HN=0 HF=0 HC=4
+WINDOW: 60 75 1188 491 -1 -1 N  WF=0 WT=11 ",,,"
+BUFFER: BN="..\Code\Libs\Math\Math.h"
+VIEW: LN=.0 CL=1 LE=0 CX=1 CY=0 WI=228 BI=36 HT=0 HN=0 HF=0 HC=4
+WINDOW: 80 100 1188 491 -1 -1 M  WF=0 WT=13 ",,,"
+BUFFER: BN="..\Code\Libs\Math\Windows\MathWin.h"
+VIEW: LN=.1412 CL=72 LE=0 CX=72 CY=26 WI=230 BI=43 HT=0 HN=0 HF=0 HC=4
+FILEHIST: 9
+ULTest\test.xml
+..\Code\Tests\Pch.h
+..\Code\Libs\Reflection\Reflection.h
+..\Code\Tests\ULTest.cpp
+Todo.txt
+..\Code\Libs\Reflection\Reflection.cpp
+..\Code\Core\UnitTests\Mem_unittest.cpp
+..\Code\Libs\Math\Math.h
+..\Code\Libs\Math\Windows\MathWin.h
+DEBUG: 0 0 0 0 3 0 gdb
+printf
+strcpy
+std::*
+DEBUG2: 0
+TBCLASS: 0 0
