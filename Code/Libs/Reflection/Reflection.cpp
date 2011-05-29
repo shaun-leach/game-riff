@@ -255,24 +255,32 @@ bool ReflMember::ConvertClassMember(
     ReflClass             * inst, 
     EReflType               oldType
 ) const {
-    if (stream->ReadChildNode() == STREAM_ERROR_NODEDOESNTEXIST) {
-        ASSERTMSGGR(false, "Need to log an error here");
+    if (stream->ReadChildNode() == STREAM_ERROR_NODEDOESNTEXIST) 
         return true;
-    }
-    chargr nodeName[64];
-    stream->ReadNodeName(nodeName, 64);
-    if (StrICmp(nodeName, L"Class", 5) != 0) {
-        ASSERTMSGGR(false, "Need to log an error here");
-        return true;
-    }
 
-    chargr typeName[256];
-    if (stream->ReadNodeAttribute(L"Type", typeName, 256) == STREAM_ERROR_OK) {
-        if (Hash64(typeName) == m_typeHash) 
-            ;//subClass->Deserialize(stream, inst, offset + m_offset);
-    }
-    else 
-        ASSERTMSGGR(false, "Need to log this error message");
+    do {
+        chargr nodeName[64];
+        stream->ReadNodeName(nodeName, 64);
+
+        if (StrICmp(nodeName, L"DataMember", 10) == 0) {
+            chargr name[256];
+            EStreamError result = stream->ReadNodeAttribute(L"Name", name, 256);
+            ASSERTMSGGR(result == STREAM_ERROR_OK, "Need to log this error message");
+            Hash64 nameHash(name);
+
+            chargr type[256];
+            result = stream->ReadNodeAttribute(L"Type", type, 256);
+            ASSERTMSGGR(result == STREAM_ERROR_OK, "Need to log this error message");
+            Hash64 typeHash(type);
+
+            EReflType oldType = DetermineType(typeHash);
+
+            ConvertDataMember(stream, nameHash, inst, oldType);
+        }
+        else if (StrICmp(nodeName, L"BaseClass", 9) == 0) {
+            ConvertClassMember(stream, nameHash, inst, oldType);
+        }
+    } while (stream->ReadNextNode() != STREAM_ERROR_NODEDOESNTEXIST);
 
     stream->ReadParentNode();
 
@@ -322,20 +330,17 @@ bool ReflMember::Deserialize(
         }
     }
     else if (m_convFunc != NULL) {
-        EReflType oldType = REFL_TYPE_ENDTYPE;
-        for (unsigned i = 0; i < REFL_TYPE_ENDTYPE; i++) {
-            if (s_typeDesc[i].typeHash == typeHash) {
-                oldType = static_cast<EReflType>(i);
-                break;
-            }
-        }
-        ASSERTMSGGR(oldType != REFL_TYPE_ENDTYPE, "Log: Unsupported type?");
-        ASSERTMSGGR(oldType != REFL_TYPE_CLASS, "Need to handle this type");
+        EReflType oldType = DetermineType(typeHash);
 
-        if (oldType != REFL_TYPE_CLASS) 
-            retResult = ConvertDataMember(stream, nameHash, inst, oldType);
-        else 
+        if (oldType == REFL_TYPE_CLASS) {
+            if (stream->ReadChildNode() == STREAM_ERROR_NODEDOESNTEXIST) 
+                return true;
             retResult = ConvertClassMember(stream, nameHash, inst, oldType);
+            stream->ReadParentNode();
+        }
+        else {
+            retResult = ConvertDataMember(stream, nameHash, inst, oldType);
+        }
     }
     
     return retResult;
@@ -372,6 +377,20 @@ bool ReflMember::DeserializeClassMember(IStructuredTextStream * stream, ReflClas
     }
 
     return true;
+}
+
+//====================================================
+EReflType ReflMember::DetermineType(Hash64 typeHash) const {
+    EReflType type = REFL_TYPE_ENDTYPE;
+    for (unsigned i = 0; i < REFL_TYPE_ENDTYPE; i++) {
+        if (s_typeDesc[i].typeHash == typeHash) {
+            type = static_cast<EReflType>(i);
+            break;
+        }
+    }
+    ASSERTMSGGR(type != REFL_TYPE_ENDTYPE, "Log: Unsupported type?");
+
+    return type;
 }
 
 //====================================================
