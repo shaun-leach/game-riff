@@ -40,12 +40,12 @@
 #define DEGREE_PER_RAD (180.0f / PI)
 
 //====================================================
-inline float RadiansToDegrees(float radians) {
+inline float MathRadiansToDegrees(float radians) {
     return (DEGREE_PER_RAD * radians);
 }
 
 //====================================================
-inline float DegreesToRadians(float degrees) {
+inline float MathDegreesToRadians(float degrees) {
     return (RAD_PER_DEGREE * degrees);
 }
 
