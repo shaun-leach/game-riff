@@ -42,8 +42,10 @@ unit-test reflection-test :
                           [ glob UnitTests/*.cpp ]
                           Reflection
                           ../Hash
+                          ../Stream
                           ../../Core
                           ../../Ext/gtest
+                          ../../Ext/tinyxml
                         : 
                           <include>../../Ext/gtest/include 
                           <include>../../Core

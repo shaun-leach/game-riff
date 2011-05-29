@@ -86,10 +86,10 @@ void DestroyObjects () {
 }
 
 // by default, goes into a read only section
-#pragma init_seg(".mine$m", myexit)
+/*#pragma init_seg(".mine$m", myexit)
 
 A bbbb; 
-A cccc;
+A cccc;*/
 
 class BaseClass : public ReflClass {
 public:
