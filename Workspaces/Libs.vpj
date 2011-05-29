@@ -161,8 +161,7 @@
                 <F
                     N="../Code/Libs/*Jamroot*"
                     Recurse="1"
-                    Refilter="0"
-                    Excludes=""/>
+                    Excludes="*.svn-*"/>
             </Folder>
         </Folder>
     </Files>
