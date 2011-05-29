@@ -14,14 +14,15 @@
 --------------
 -flesh out reflection more
 --Predefined hashes for all of the types
+---Would prefer to use precompiled hashes but need a preprocessor
 --Unit tests all around
 --versioning
----Members
-----Type conversion
-****Renamed enums
-****Rename
 ---Classes
 ----Versioned loading with complicated conversion using multiple members
+****Rename
+***Members
+****Type conversion
+****Renamed enums
 ****Rename
 --Can I eliminate virtuals in ReflClass base?
 ---Yes with template functions
@@ -98,6 +99,10 @@
 ***Basic inheiritance
 **Need to test that namespaces work
 ***Add support for namespaces
+**Replace all Hash64's with a type
+**Change EReflType to be EReflTypeIndex
+***Change enum to typedef'd unsigned
+***Move enum internal to reflection
 ----------
 -Create tools platform
 --Layer tools functionality on top of platform
