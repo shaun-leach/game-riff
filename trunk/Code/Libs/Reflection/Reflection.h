@@ -144,6 +144,8 @@ private:
         EReflType               oldType
     ) const;
 
+    EReflType DetermineType(Hash64 typeHash) const;
+
 private:
     Hash64          m_nameHash;
     Hash64          m_typeHash;

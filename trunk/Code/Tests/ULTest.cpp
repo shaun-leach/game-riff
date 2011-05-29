@@ -179,6 +179,7 @@ public:
         i32test(4),
         f32test(10.9f),
         i8test('b'),
+        class_alias_test(0),
         btest(true),
         etest(INTERNAL_VALUE1),
         pertest(1.0f),
@@ -218,6 +219,21 @@ public:
        }
     }
 
+    static void ConvertClassTest(
+       ReflClass   * inst, 
+       Hash64        name, 
+       Hash64        oldType, 
+       void        * data
+    ) {
+       Dummy * dummy = dynamic_cast<Dummy *>(inst);
+       if (dummy != NULL) {
+          if (name == Hash64(L"basesubitest") && oldType == Hash64(L"int32")) {
+             int32 * idata = reinterpret_cast<int32 *>(data);
+
+             dummy->class_alias_test = (*idata);
+          }
+       }
+    }
 private:
     enum EInternal {
         INTERNAL_VALUE1,
@@ -227,6 +243,7 @@ private:
     int32       i32test;
     float32     f32test;
     int8        i8test;
+    int32       class_alias_test;
     bool        btest;
     EInternal   etest;
     float       pertest;
@@ -241,6 +258,8 @@ REFL_IMPL_CLASS_BEGIN(BaseClass, Dummy);
     REFL_ADD_MEMBER_ALIAS_W_CONVERSION(i32test, itest, ConvertITest);
     REFL_MEMBER(Dummy, f32test, float32);
     REFL_MEMBER(Dummy, i8test, int8);
+    REFL_MEMBER(Dummy, class_alias_test, int32);
+    REFL_ADD_MEMBER_ALIAS_W_CONVERSION(class_alias_test, mcTest, ConvertClassTest);
     REFL_MEMBER(Dummy, btest, bool);
     REFL_ADD_MEMBER_CONVERSION(btest, Convert);
     REFL_MEMBER(Dummy, etest, enum);
