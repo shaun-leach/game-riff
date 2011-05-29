@@ -81,6 +81,7 @@ struct TypeDesc {
         // Empty constructor seen as the table will have already 
         //   been initialized in the function below by the time
         //   the global constructor is called.
+        typeHash = ReflToken(typeName);
     }
 
     TypeDesc(
@@ -205,8 +206,8 @@ void ConvertFromString<REFL_INDEX_CHAR>(byte * data, const chargr * string, unsi
 //====================================================
 void InitializeTypeTable() {
     s_typeDesc[REFL_INDEX_BOOL        ] = TypeDesc(L"bool",            sizeof(bool),         NULL,      &ConvertToString<REFL_INDEX_BOOL,           bool>, &ConvertFromString<REFL_INDEX_BOOL,           bool>);
-    s_typeDesc[REFL_INDEX_INT8        ] = TypeDesc(L"int8",            sizeof(int8),         L"%c",     &ConvertToString<REFL_INDEX_INT8,           int8>, &ConvertFromString<REFL_INDEX_INT8,           int8>);
-    s_typeDesc[REFL_INDEX_UINT8       ] = TypeDesc(L"uint8",           sizeof(uint8),        L"%c",     &ConvertToString<REFL_INDEX_UINT8,         uint8>, &ConvertFromString<REFL_INDEX_UINT8,         uint8>);
+    s_typeDesc[REFL_INDEX_INT8        ] = TypeDesc(L"int8",            sizeof(int8),         L"%d",     &ConvertToString<REFL_INDEX_INT8,           int8>, &ConvertFromString<REFL_INDEX_INT8,           int8>);
+    s_typeDesc[REFL_INDEX_UINT8       ] = TypeDesc(L"uint8",           sizeof(uint8),        L"%u",     &ConvertToString<REFL_INDEX_UINT8,         uint8>, &ConvertFromString<REFL_INDEX_UINT8,         uint8>);
     s_typeDesc[REFL_INDEX_INT16       ] = TypeDesc(L"int16",           sizeof(int16),        L"%hd",    &ConvertToString<REFL_INDEX_INT16,         int16>, &ConvertFromString<REFL_INDEX_INT16,         int16>);
     s_typeDesc[REFL_INDEX_UINT16      ] = TypeDesc(L"uint16",          sizeof(uint16),       L"%hu",    &ConvertToString<REFL_INDEX_UINT16,       uint16>, &ConvertFromString<REFL_INDEX_UINT16,       uint16>);
     s_typeDesc[REFL_INDEX_INT32       ] = TypeDesc(L"int32",           sizeof(int32),        L"%d",     &ConvertToString<REFL_INDEX_INT32,         int32>, &ConvertFromString<REFL_INDEX_INT32,         int32>);

@@ -1,4 +1,5 @@
 -Get everything compiling with gcc
+-Move compilation files out of the source tree
 --------------
 -Types
 --Create color, angle, percentage, euler types
@@ -13,9 +14,10 @@
 ---Too many stack strings with hardcoded values
 --------------
 -flesh out reflection more
+--Unit tests all around
+--Rename ReflToken to something that makes more sense
 --Predefined hashes for all of the types
 ---Would prefer to use precompiled hashes but need a preprocessor
---Unit tests all around
 --versioning
 ---Classes
 ----Versioned loading with complicated conversion using multiple members
@@ -39,6 +41,7 @@
 ---Test RTTI
 --instead of doing all initialization in global contructors, just register functions and then call them all at the beginning of main
 --handle all types
+---remove basic string type, should either be a hashed file name, or localized string
 ---guid
 ---bitfield
 ---half float
@@ -56,6 +59,9 @@
 --implement template version and test performance when reading binary data
 --Test
 ---Need to test all types
+----Test that int8 deserialization works if the member is packed
+----Test currently unimplemented types
+****Currently implemented types
 ---Need to test missing/extra types
 ----Need to log these
 ---Missing aliases

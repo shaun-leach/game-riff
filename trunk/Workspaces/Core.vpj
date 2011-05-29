@@ -30,7 +30,7 @@
                 MenuCaption="&amp;Build"
                 CaptureOutputWith="ProcessBuffer"
                 SaveOption="SaveWorkspaceFiles"
-                RunFromDir="c:\projects\Code">
+                RunFromDir="..\Code">
                 <Exec CmdLine="c:\projects\bin\bjam"/>
             </Target>
             <Target
@@ -87,7 +87,7 @@
                 MenuCaption="&amp;Build"
                 CaptureOutputWith="ProcessBuffer"
                 SaveOption="SaveWorkspaceFiles"
-                RunFromDir="c:\projects\Code">
+                RunFromDir="..\Code">
                 <Exec CmdLine="c:\projects\bin\bjam"/>
             </Target>
             <Target
