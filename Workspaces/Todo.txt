@@ -62,11 +62,17 @@
 ----Test that int8 deserialization works if the member is packed
 ----Test currently unimplemented types
 ****Currently implemented types
+***multiple inheritance
+---Simple aliasing
+---Conversion
+---Aliasing with conversion
 ---Need to test missing/extra types
 ----Need to log these
 ---Missing aliases
 ----Need to log these
+---Complex inheritance
 ***Multiple aliases
+***Simple class hierarchy
 --Need to remove strings in "gold" builds
 --add code to finalize entire reflection library
 ---Finalize when reflection library is initialized

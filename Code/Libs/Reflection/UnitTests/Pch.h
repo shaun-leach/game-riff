@@ -29,6 +29,7 @@
 
 #pragma once
 
+#define USES_LIBS_MATH
 #define USES_LIBS_REFLECTION
 #define USES_LIBS_STREAM
 

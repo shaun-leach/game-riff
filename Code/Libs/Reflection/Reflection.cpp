@@ -149,7 +149,7 @@ void ConvertToString<REFL_INDEX_PERCENTAGE, float>(const ReflMember * , const by
 template<>
 void ConvertToString<REFL_INDEX_ANGLE, float>(const ReflMember * , const byte * data, const chargr * format, chargr * string, unsigned len) {
     float * fdata = (float *) data;
-    StrPrintf(string, len, L"%3.3f", RadiansToDegrees(*fdata));
+    StrPrintf(string, len, L"%3.3f", MathRadiansToDegrees(*fdata));
 }
 
 //====================================================
@@ -194,7 +194,7 @@ template<>
 void ConvertFromString<REFL_INDEX_ANGLE, float>(const ReflMember * , byte * data, const chargr * , const chargr * string, unsigned len) {
     float * fdata = (float *) data;
     StrReadValue(string, len, L"%f", fdata);
-    *fdata = DegreesToRadians(*fdata);
+    *fdata = MathDegreesToRadians(*fdata);
 }
 
 //====================================================

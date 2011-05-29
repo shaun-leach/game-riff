@@ -31,25 +31,28 @@
 
 #include "Pch.h"
 
-/*
-    REFL_INDEX_BOOL,
-    REFL_INDEX_INT8,
-    REFL_INDEX_UINT8,
-    REFL_INDEX_INT16,
-    REFL_INDEX_UINT16,
-    REFL_INDEX_INT32,
-    REFL_INDEX_UINT32,
-    REFL_INDEX_INT64,
-    REFL_INDEX_UINT64,
-    REFL_INDEX_INT128,
-    REFL_INDEX_UINT128,
-    REFL_INDEX_FLOAT16,
-    REFL_INDEX_FLOAT32,
-    REFL_INDEX_CLASS,
-    REFL_INDEX_ENUM,
-    REFL_INDEX_ANGLE,
-    REFL_INDEX_PERCENTAGE,
-*/
+//////////////////////////////////////////////////////
+//
+// Internal constants
+//
+static const bool      s_boolValue       =  true;
+static const int8      s_int8Value       = -8;
+static const uint8     s_uint8Value      =  8;
+static const int16     s_int16Value      = -1600;
+static const uint16    s_uint16Value     =  1600;
+static const int32     s_int32Value      = -320000;
+static const uint32    s_uint32Value     =  320000;
+static const int64     s_int64Value      = -640000000LL;
+static const uint64    s_uint64Value     =  640000000ULL;
+static const float32   s_float32Value    =  32.32f;
+static const float     s_angleValue      =  MathDegreesToRadians(30.0f);
+static const float     s_percentValue    = 0.20f;
+
+//////////////////////////////////////////////////////
+//
+// Test simple types
+//
+
 class TestBaseTypes : public ReflClass {
 public:
     REFL_DEFINE_CLASS(TestBaseTypes);
@@ -63,7 +66,10 @@ public:
         uint32Test(0),
         int64Test(0), 
         uint64Test(0),
-        float32Test(0)
+        float32Test(0),
+        enumTest(TEST_ENUM_VALUE1),
+        angleTest(0.0f),
+        percentTest(0.0f)
     {
     }
     
@@ -85,7 +91,16 @@ public:
     //float16   float16Test;
     float32     float32Test;
 
-    enum, angles, percentage
+    enum ETestEnum {
+        TEST_ENUM_VALUE1,
+        TEST_ENUM_VALUE2,
+        TEST_ENUM_VALUE3
+    };
+
+    ETestEnum   enumTest;
+
+    float       angleTest;
+    float       percentTest;
 };
 
 REFL_IMPL_CLASS_BEGIN(ReflClass, TestBaseTypes);
@@ -99,19 +114,17 @@ REFL_IMPL_CLASS_BEGIN(ReflClass, TestBaseTypes);
     REFL_MEMBER(TestBaseTypes, int64Test,    int64);
     REFL_MEMBER(TestBaseTypes, uint64Test,   uint64);
     REFL_MEMBER(TestBaseTypes, float32Test,  float32);
+    REFL_MEMBER(TestBaseTypes, enumTest,     enum);
+        REFL_ENUM_VALUE(enumTest, TEST_ENUM_VALUE1);
+        REFL_ENUM_VALUE(enumTest, TEST_ENUM_VALUE2);
+        REFL_ENUM_VALUE(enumTest, TEST_ENUM_VALUE3);
+    REFL_MEMBER(TestBaseTypes, angleTest,    angle);
+    REFL_MEMBER(TestBaseTypes, percentTest,  percentage);
 REFL_IMPL_CLASS_END(TestBaseTypes);
 
-static const bool      s_boolValue       =  true;
-static const int8      s_int8Value       = -8;
-static const uint8     s_uint8Value      =  8;
-static const int16     s_int16Value      = -1600;
-static const uint16    s_uint16Value     =  1600;
-static const int32     s_int32Value      = -320000;
-static const uint32    s_uint32Value     =  320000;
-static const int64     s_int64Value      = -6400000;
-static const uint64    s_uint64Value     =  6400000;
-static const float32   s_float32Value    =  32.32f;
+static const TestBaseTypes::ETestEnum   s_enumValue    =  TestBaseTypes::TEST_ENUM_VALUE2;
 
+//====================================================
 TEST(ReflectionTest, TestBaseTypes) {
     TestBaseTypes testTypes;
     testTypes.boolTest      = s_boolValue;
@@ -124,6 +137,9 @@ TEST(ReflectionTest, TestBaseTypes) {
     testTypes.int64Test     = s_int64Value;
     testTypes.uint64Test    = s_uint64Value;
     testTypes.float32Test   = s_float32Value;
+    testTypes.enumTest      = s_enumValue;
+    testTypes.angleTest     = s_angleValue;
+    testTypes.percentTest   = s_percentValue;
 
     IStructuredTextStream * testStream = StreamCreateXML(L"testBaseTypes.xml");
     ASSERT_TRUE(testStream != NULL);
@@ -151,6 +167,328 @@ TEST(ReflectionTest, TestBaseTypes) {
     EXPECT_EQ(s_int64Value,     loadTypes->int64Test);
     EXPECT_EQ(s_uint64Value,    loadTypes->uint64Test);
     EXPECT_EQ(s_float32Value,   loadTypes->float32Test);
+    EXPECT_EQ(s_enumValue,      loadTypes->enumTest);
+    EXPECT_EQ(s_angleValue,     loadTypes->angleTest);
+    EXPECT_EQ(s_percentValue,   loadTypes->percentTest);
+
+    delete loadTypes;
+    loadTypes = NULL;
+}
+
+//////////////////////////////////////////////////////
+//
+// Test member types
+//
+
+class MemberClass : public ReflClass {
+public:
+    REFL_DEFINE_CLASS(MemberClass);
+    MemberClass() :
+        memberUint32Test(0),
+        memberFloat32Test(0.0f)
+    {
+    }
+
+//private:
+    uint32      memberUint32Test;
+    float32     memberFloat32Test;
+};
+
+REFL_IMPL_CLASS_BEGIN(ReflClass, MemberClass);
+    REFL_MEMBER(MemberClass, memberUint32Test,     uint32);
+    REFL_MEMBER(MemberClass, memberFloat32Test,    float32);
+REFL_IMPL_CLASS_END(MemberClass);
+
+class TestMemberClass : public ReflClass {
+public:
+    REFL_DEFINE_CLASS(TestMemberClass);
+    TestMemberClass() :
+        containerUint16Test(0),
+        containerBoolTest(false)
+    {
+    }
+
+// private:
+    uint16      containerUint16Test;
+    bool        containerBoolTest;
+    MemberClass classMemberTest;
+};
+
+REFL_IMPL_CLASS_BEGIN(ReflClass, TestMemberClass);
+    REFL_MEMBER(TestMemberClass, containerUint16Test,  uint16);
+    REFL_MEMBER(TestMemberClass, containerBoolTest,    bool);
+    REFL_MEMBER(TestMemberClass, classMemberTest,      MemberClass);
+REFL_IMPL_CLASS_END(TestMemberClass);
+
+//====================================================
+TEST(ReflectionTest, TestMemberClass) {
+    TestMemberClass testClassMember;
+    testClassMember.containerUint16Test                 = s_uint16Value;
+    testClassMember.containerBoolTest                   = s_boolValue;
+    testClassMember.classMemberTest.memberUint32Test    = s_uint32Value;
+    testClassMember.classMemberTest.memberFloat32Test   = s_float32Value;
+
+    IStructuredTextStream * testStream = StreamCreateXML(L"testMemberClass.xml");
+    ASSERT_TRUE(testStream != NULL);
+    bool result = testClassMember.Serialize(testStream);
+    EXPECT_EQ(true, result);
+    testStream->Save();
+    delete testStream;
+    testStream = NULL;
+
+    testStream = StreamOpenXML(L"testMemberClass.xml");
+    ASSERT_TRUE(testStream != NULL);
+
+    ReflClass * inst = ReflLibrary::Deserialize(testStream, MemFlags(MEM_ARENA_DEFAULT, MEM_CAT_TEST));
+    ASSERT_TRUE(inst != NULL);
+    TestMemberClass * loadTypes = dynamic_cast<TestMemberClass *>(inst);
+    ASSERT_TRUE(loadTypes != NULL);
+
+    EXPECT_EQ(s_uint16Value,    loadTypes->containerUint16Test);
+    EXPECT_EQ(s_boolValue,      loadTypes->containerBoolTest);
+    EXPECT_EQ(s_uint32Value,    loadTypes->classMemberTest.memberUint32Test);
+    EXPECT_EQ(s_float32Value,   loadTypes->classMemberTest.memberFloat32Test);
+
+    delete loadTypes;
+    loadTypes = NULL;
+}
+
+//////////////////////////////////////////////////////
+//
+// Test simple inheritance
+//
+
+class SimpleBaseClass : public ReflClass {
+public:
+    REFL_DEFINE_CLASS(SimpleBaseClass);
+    SimpleBaseClass() :
+        baseUint32Test(0),
+        baseFloat32Test(0.0f)
+    {
+    }
+
+//private:
+    uint32      baseUint32Test;
+    float32     baseFloat32Test;
+};
+
+REFL_IMPL_CLASS_BEGIN(ReflClass, SimpleBaseClass);
+    REFL_MEMBER(SimpleBaseClass, baseUint32Test, uint32);
+    REFL_MEMBER(SimpleBaseClass, baseFloat32Test, float32);
+REFL_IMPL_CLASS_END(SimpleBaseClass);
+
+class SimpleDerivedClass : public SimpleBaseClass {
+public:
+    REFL_DEFINE_CLASS(SimpleDerivedClass);
+    SimpleDerivedClass() :
+        derivedBoolTest(false),
+        derivedInt16Test(0),
+        derivedInt16Test2(0)
+    {
+    }
+
+//private:
+    bool        derivedBoolTest;
+    int16       derivedInt16Test;
+    int16       derivedInt16Test2;
+};
+
+REFL_IMPL_CLASS_BEGIN(SimpleBaseClass, SimpleDerivedClass);
+    REFL_ADD_PARENT(SimpleDerivedClass, SimpleBaseClass);
+    REFL_MEMBER(SimpleDerivedClass, derivedBoolTest, bool);
+    REFL_MEMBER(SimpleDerivedClass, derivedInt16Test, int16);
+    REFL_MEMBER(SimpleDerivedClass, derivedInt16Test2, int16);
+REFL_IMPL_CLASS_END(SimpleDerivedClass);
+
+//====================================================
+TEST(ReflectionTest, TestSimpleInheritance) {
+    SimpleDerivedClass testInheritance;
+    testInheritance.baseUint32Test      = s_uint32Value;
+    testInheritance.baseFloat32Test     = s_float32Value;
+    testInheritance.derivedBoolTest     = s_boolValue;
+    testInheritance.derivedInt16Test    = s_int16Value;
+    testInheritance.derivedInt16Test2   = s_int16Value;
+
+    IStructuredTextStream * testStream = StreamCreateXML(L"testSimpleInheritance.xml");
+    ASSERT_TRUE(testStream != NULL);
+    bool result = testInheritance.Serialize(testStream);
+    EXPECT_EQ(true, result);
+    testStream->Save();
+    delete testStream;
+    testStream = NULL;
+
+    testStream = StreamOpenXML(L"testSimpleInheritance.xml");
+    ASSERT_TRUE(testStream != NULL);
+
+    ReflClass * inst = ReflLibrary::Deserialize(testStream, MemFlags(MEM_ARENA_DEFAULT, MEM_CAT_TEST));
+    ASSERT_TRUE(inst != NULL);
+    SimpleDerivedClass * loadTypes = dynamic_cast<SimpleDerivedClass *>(inst);
+    ASSERT_TRUE(loadTypes != NULL);
+
+    EXPECT_EQ(s_uint32Value,      loadTypes->baseUint32Test);
+    EXPECT_EQ(s_float32Value,     loadTypes->baseFloat32Test);
+    EXPECT_EQ(s_boolValue,        loadTypes->derivedBoolTest);
+    EXPECT_EQ(s_int16Value,       loadTypes->derivedInt16Test);
+    EXPECT_EQ(s_int16Value,       loadTypes->derivedInt16Test2);
+
+    delete loadTypes;
+    loadTypes = NULL;
+}
+
+//////////////////////////////////////////////////////
+//
+// Test class hierarchy
+//
+
+class MoreDerivedClass : public SimpleDerivedClass {
+public:
+    REFL_DEFINE_CLASS(MoreDerivedClass);
+    MoreDerivedClass() :
+        moreDerivedBoolTest(false),
+        moreDerivedFloat32Test(0.0f),
+        moreDerivedBoolTest2(false)
+    {
+    }
+
+//private:
+    bool        moreDerivedBoolTest;
+    float32     moreDerivedFloat32Test;
+    bool        moreDerivedBoolTest2;
+};
+
+REFL_IMPL_CLASS_BEGIN(SimpleDerivedClass, MoreDerivedClass);
+    REFL_ADD_PARENT(MoreDerivedClass, SimpleDerivedClass);
+    REFL_MEMBER(MoreDerivedClass, moreDerivedBoolTest, bool);
+    REFL_MEMBER(MoreDerivedClass, moreDerivedFloat32Test, float32);
+    REFL_MEMBER(MoreDerivedClass, moreDerivedBoolTest2, bool);
+REFL_IMPL_CLASS_END(MoreDerivedClass);
+
+//====================================================
+TEST(ReflectionTest, TestClassHierarchy) {
+    MoreDerivedClass testInheritance;
+    testInheritance.baseUint32Test          = s_uint32Value;
+    testInheritance.baseFloat32Test         = s_float32Value;
+    testInheritance.derivedBoolTest         = s_boolValue;
+    testInheritance.derivedInt16Test        = s_int16Value;
+    testInheritance.derivedInt16Test2       = s_int16Value;
+    testInheritance.moreDerivedBoolTest     = s_boolValue;
+    testInheritance.moreDerivedFloat32Test  = s_float32Value;
+    testInheritance.moreDerivedBoolTest2    = s_boolValue;
+
+    IStructuredTextStream * testStream = StreamCreateXML(L"testClassHierarchy.xml");
+    ASSERT_TRUE(testStream != NULL);
+    bool result = testInheritance.Serialize(testStream);
+    EXPECT_EQ(true, result);
+    testStream->Save();
+    delete testStream;
+    testStream = NULL;
+
+    testStream = StreamOpenXML(L"testClassHierarchy.xml");
+    ASSERT_TRUE(testStream != NULL);
+
+    ReflClass * inst = ReflLibrary::Deserialize(testStream, MemFlags(MEM_ARENA_DEFAULT, MEM_CAT_TEST));
+    ASSERT_TRUE(inst != NULL);
+    MoreDerivedClass * loadTypes = dynamic_cast<MoreDerivedClass *>(inst);
+    ASSERT_TRUE(loadTypes != NULL);
+
+    EXPECT_EQ(s_uint32Value,      loadTypes->baseUint32Test);
+    EXPECT_EQ(s_float32Value,     loadTypes->baseFloat32Test);
+    EXPECT_EQ(s_boolValue,        loadTypes->derivedBoolTest);
+    EXPECT_EQ(s_int16Value,       loadTypes->derivedInt16Test);
+    EXPECT_EQ(s_int16Value,       loadTypes->derivedInt16Test2);
+    EXPECT_EQ(s_boolValue,        loadTypes->moreDerivedBoolTest);
+    EXPECT_EQ(s_float32Value,     loadTypes->moreDerivedFloat32Test);
+    EXPECT_EQ(s_boolValue,        loadTypes->moreDerivedBoolTest2);
+
+    delete loadTypes;
+    loadTypes = NULL;
+}
+
+//////////////////////////////////////////////////////
+//
+// Test multiple inheritance
+//
+
+class SimpleBaseClass2 : public ReflClass {
+public:
+    REFL_DEFINE_CLASS(SimpleBaseClass2);
+    SimpleBaseClass2() :
+        base2Uint32Test(0),
+        base2Float32Test(0.0f)
+    {
+    }
+
+//private:
+    uint32      base2Uint32Test;
+    float32     base2Float32Test;
+};
+
+REFL_IMPL_CLASS_BEGIN(ReflClass, SimpleBaseClass2);
+    REFL_MEMBER(SimpleBaseClass2, base2Uint32Test, uint32);
+    REFL_MEMBER(SimpleBaseClass2, base2Float32Test, float32);
+REFL_IMPL_CLASS_END(SimpleBaseClass2);
+
+class MultipleInheritanceClass : public SimpleBaseClass, public SimpleBaseClass2 {
+public:
+    REFL_DEFINE_CLASS(MultipleInheritanceClass);
+    MultipleInheritanceClass() :
+        derivedBoolTest(false),
+        derivedInt16Test(0),
+        derivedInt16Test2(0)
+    {
+    }
+
+//private:
+    bool        derivedBoolTest;
+    int16       derivedInt16Test;
+    int16       derivedInt16Test2;
+};
+
+REFL_IMPL_CLASS_BEGIN(SimpleBaseClass, MultipleInheritanceClass);
+    REFL_ADD_PARENT(MultipleInheritanceClass, SimpleBaseClass);
+    REFL_ADD_PARENT(MultipleInheritanceClass, SimpleBaseClass2);
+    REFL_MEMBER(MultipleInheritanceClass, derivedBoolTest, bool);
+    REFL_MEMBER(MultipleInheritanceClass, derivedInt16Test, int16);
+    REFL_MEMBER(MultipleInheritanceClass, derivedInt16Test2, int16);
+REFL_IMPL_CLASS_END(MultipleInheritanceClass);
+
+//====================================================
+TEST(ReflectionTest, TestMultipleInheritance) {
+    MultipleInheritanceClass testInheritance;
+    testInheritance.baseUint32Test      = s_uint32Value;
+    testInheritance.baseFloat32Test     = s_float32Value;
+    testInheritance.base2Uint32Test     = 310000;
+    testInheritance.base2Float32Test    = 31.31f;
+    testInheritance.derivedBoolTest     = s_boolValue;
+    testInheritance.derivedInt16Test    = s_int16Value;
+    testInheritance.derivedInt16Test2   = s_uint16Value;
+
+    IStructuredTextStream * testStream = StreamCreateXML(L"testMultipleInheritance.xml");
+    ASSERT_TRUE(testStream != NULL);
+    bool result = testInheritance.Serialize(testStream);
+    EXPECT_EQ(true, result);
+    testStream->Save();
+    delete testStream;
+    testStream = NULL;
+
+    testStream = StreamOpenXML(L"testMultipleInheritance.xml");
+    ASSERT_TRUE(testStream != NULL);
+
+    ReflClass * inst = ReflLibrary::Deserialize(testStream, MemFlags(MEM_ARENA_DEFAULT, MEM_CAT_TEST));
+    ASSERT_TRUE(inst != NULL);
+    MultipleInheritanceClass * loadTypes = dynamic_cast<MultipleInheritanceClass *>(inst);
+    ASSERT_TRUE(loadTypes != NULL);
+
+    EXPECT_EQ(s_uint32Value,      loadTypes->baseUint32Test);
+    EXPECT_EQ(s_float32Value,     loadTypes->baseFloat32Test);
+    EXPECT_EQ(310000,             loadTypes->base2Uint32Test);
+    EXPECT_EQ(31.31f,             loadTypes->base2Float32Test);
+    EXPECT_EQ(s_boolValue,        loadTypes->derivedBoolTest);
+    EXPECT_EQ(s_int16Value,       loadTypes->derivedInt16Test);
+    EXPECT_EQ(s_uint16Value,      loadTypes->derivedInt16Test2);
+
+    delete loadTypes;
+    loadTypes = NULL;
 }
 
 
