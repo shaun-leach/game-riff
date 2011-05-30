@@ -50,7 +50,7 @@ static const float     s_percentValue    = 0.20f;
 
 //////////////////////////////////////////////////////
 //
-// Test simple aliasing
+// Test simple class aliasing
 //
 
 class SimpleAliasingClass : public ReflClass {
@@ -85,6 +85,98 @@ TEST(ReflectionTest, TestSimpleClassAliasing) {
 
     EXPECT_EQ(s_uint32Value,      loadTypes->baseUint32Test);
     EXPECT_EQ(s_float32Value,     loadTypes->baseFloat32Test);
+
+    delete loadTypes;
+    loadTypes = NULL;
+}
+
+//////////////////////////////////////////////////////
+//
+// Test simple member aliasing
+//
+
+class SimpleMemberAliasingClass : public ReflClass {
+public:
+    REFL_DEFINE_CLASS(SimpleMemberAliasingClass);
+    SimpleMemberAliasingClass() :
+        baseUint32Test(0),
+        baseFloat32Test(0.0f)
+    {
+    }
+
+//private:
+    uint32      baseUint32Test;
+    float32     baseFloat32Test;
+};
+
+REFL_IMPL_CLASS_BEGIN(ReflClass, SimpleMemberAliasingClass);
+    REFL_MEMBER(SimpleMemberAliasingClass, baseUint32Test, uint32);
+    REFL_ADD_MEMBER_ALIAS(baseUint32Test, uint32Test);
+    REFL_MEMBER(SimpleMemberAliasingClass, baseFloat32Test, float32);
+REFL_IMPL_CLASS_END(SimpleMemberAliasingClass);
+
+//====================================================
+TEST(ReflectionTest, TestSimpleMemberAliasing) {
+    IStructuredTextStream * testStream = StreamOpenXML(L"testSimpleMemberAliasing.xml");
+    ASSERT_TRUE(testStream != NULL);
+
+    ReflClass * inst = ReflLibrary::Deserialize(testStream, MemFlags(MEM_ARENA_DEFAULT, MEM_CAT_TEST));
+    ASSERT_TRUE(inst != NULL);
+    SimpleMemberAliasingClass * loadTypes = dynamic_cast<SimpleMemberAliasingClass *>(inst);
+    EXPECT_EQ(true, loadTypes != NULL);
+
+    EXPECT_EQ(s_uint32Value,      loadTypes->baseUint32Test);
+    EXPECT_EQ(s_float32Value,     loadTypes->baseFloat32Test);
+
+    delete loadTypes;
+    loadTypes = NULL;
+}
+
+//////////////////////////////////////////////////////
+//
+// Test simple enum aliasing
+//
+
+class SimpleEnumAliasingClass : public ReflClass {
+public:
+    REFL_DEFINE_CLASS(SimpleEnumAliasingClass);
+    SimpleEnumAliasingClass() :
+        baseEnumTest(ALIAS_VALUE_1),
+        baseUint32Test(0)
+    {
+    }
+
+//private:
+    enum EAliasValue {
+        ALIAS_VALUE_1,
+        ALIAS_VALUE_2,
+        ALIAS_VALUE_3
+    };
+    EAliasValue baseEnumTest;
+    uint32      baseUint32Test;
+};
+
+REFL_IMPL_CLASS_BEGIN(ReflClass, SimpleEnumAliasingClass);
+    REFL_MEMBER(SimpleEnumAliasingClass, baseEnumTest, enum);
+        REFL_ENUM_VALUE(baseEnumTest, ALIAS_VALUE_1);
+        REFL_ENUM_VALUE(baseEnumTest, ALIAS_VALUE_2);
+        REFL_ENUM_VALUE(baseEnumTest, ALIAS_VALUE_3);
+            REFL_ENUM_ALIAS(baseEnumTest, ALIAS_VALUE_3, ALIAS_VALUE_4);
+    REFL_MEMBER(SimpleEnumAliasingClass, baseUint32Test, uint32);
+REFL_IMPL_CLASS_END(SimpleEnumAliasingClass);
+
+//====================================================
+TEST(ReflectionTest, TestSimpleEnumAliasing) {
+    IStructuredTextStream * testStream = StreamOpenXML(L"testSimpleEnumAliasing.xml");
+    ASSERT_TRUE(testStream != NULL);
+
+    ReflClass * inst = ReflLibrary::Deserialize(testStream, MemFlags(MEM_ARENA_DEFAULT, MEM_CAT_TEST));
+    ASSERT_TRUE(inst != NULL);
+    SimpleEnumAliasingClass * loadTypes = dynamic_cast<SimpleEnumAliasingClass *>(inst);
+    EXPECT_EQ(true, loadTypes != NULL);
+
+    EXPECT_EQ(s_uint32Value,                                loadTypes->baseUint32Test);
+    EXPECT_EQ(SimpleEnumAliasingClass::ALIAS_VALUE_3,       loadTypes->baseEnumTest);
 
     delete loadTypes;
     loadTypes = NULL;
