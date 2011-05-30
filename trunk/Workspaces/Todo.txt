@@ -55,6 +55,7 @@
 --need to handle returns from stream i/o
 --need to handle multiple classes serialized into a single text file
 --binary serialization
+---Always embed a version #
 ---Need to write out type hash and size
 --implement template version and test performance when reading binary data
 --Test
@@ -63,12 +64,12 @@
 ----Test currently unimplemented types
 ****Currently implemented types
 ***multiple inheritance
----Simple aliasing
+***Simple aliasing
 ---Conversion
 ---Aliasing with conversion
 ---Need to test missing/extra types
 ----Need to log these
----Missing aliases
+---Missing aliases(this is really just a extra type)
 ----Need to log these
 ---Complex inheritance
 ***Multiple aliases
