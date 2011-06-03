@@ -33,19 +33,19 @@ class DataStream;
 class IStructuredTextStream;
 
 typedef unsigned    ReflIndex;
-typedef Hash64      ReflToken;
+typedef Hash64      ReflHash;
 
 typedef ReflClass * (*CreateFunc)(unsigned count, MemFlags memFlags);
 typedef void (*FinalizationFunc)(ReflClass * inst);
-typedef void (*ConversionFunc)(ReflClass * inst, ReflToken name, ReflToken oldType, void * data);
+typedef void (*ConversionFunc)(ReflClass * inst, ReflHash name, ReflHash oldType, void * data);
 
-const ReflToken ReflTypeBool(L"bool");
-const ReflToken ReflTypeInt32(L"int32");
+const ReflHash ReflTypeBool(L"bool");
+const ReflHash ReflTypeInt32(L"int32");
 
 struct ReflAlias {
     ReflAlias *             next;
-    ReflToken               oldHash;
-    ReflToken               newHash;
+    ReflHash                oldHash;
+    ReflHash                newHash;
 };
 
 class ReflMember {
@@ -66,9 +66,9 @@ public:
         return m_name;
     }
 
-    bool Matches(ReflToken hash) const;
+    bool Matches(ReflHash hash) const;
 
-    ReflToken NameHash() const {
+    ReflHash NameHash() const {
         return m_nameHash;
     }
 
@@ -86,16 +86,16 @@ public:
     bool ConvertFromString(const byte * data, chargr * str, unsigned len) const;
 
     bool Serialize(IStructuredTextStream * stream, const ReflClass * inst, unsigned offset) const;
-    bool Deserialize(IStructuredTextStream * stream, ReflToken nameHash, ReflClass * inst, unsigned offset) const;
+    bool Deserialize(IStructuredTextStream * stream, ReflHash nameHash, ReflClass * inst, unsigned offset) const;
 
     bool Serialize(DataStream * stream, const ReflClass * inst, unsigned offset) const;
-    bool Deserialize(DataStream * stream, ReflToken nameHash, ReflClass * inst, unsigned offset) const;
+    bool Deserialize(DataStream * stream, ReflHash nameHash, ReflClass * inst, unsigned offset) const;
 
     struct EnumValue {
         EnumValue     * next;
         unsigned        value;
         const chargr  * name;
-        ReflToken       nameHash;
+        ReflHash        nameHash;
     };
 
     void RegisterEnumValue(EnumValue * value);
@@ -109,22 +109,22 @@ private:
     bool DeserializeClassMember(IStructuredTextStream * stream, ReflClass * inst, unsigned offset) const;
     bool ConvertDataMember(
         IStructuredTextStream * stream, 
-        ReflToken               nameHash,
+        ReflHash                nameHash,
         ReflClass             * inst, 
         ReflIndex               oldType
     ) const;
     bool ConvertClassMember(
         IStructuredTextStream * stream, 
-        ReflToken               nameHash, 
+        ReflHash                nameHash, 
         ReflClass             * inst, 
         ReflIndex               oldType
     ) const;
 
-    ReflIndex DetermineType(ReflToken typeHash) const;
+    ReflIndex DetermineType(ReflHash typeHash) const;
 
 private:
-    ReflToken       m_nameHash;
-    ReflToken       m_typeHash;
+    ReflHash        m_nameHash;
+    ReflHash        m_typeHash;
 
     const chargr  * m_name;
     ReflIndex       m_index;
@@ -151,13 +151,13 @@ public:
     unsigned            NumMembers() const;
     const ReflMember  & GetMember(unsigned index) const;
     const ReflMember  * FindMember(const chargr * name, unsigned * offset) const;
-    const ReflMember  * FindMember(ReflToken name, unsigned * offset) const;
+    const ReflMember  * FindMember(ReflHash name, unsigned * offset) const;
 
     void RegisterMember(ReflMember * member);
 
     void RegisterFinalizationFunc(FinalizationFunc finalFunc);
 
-    bool NameMatches(const ReflToken rhs) const {
+    bool NameMatches(const ReflHash rhs) const {
         return m_nameHash == rhs;
     }
 
@@ -179,7 +179,7 @@ public:
     struct Parent {
         Parent    * next;
         unsigned    offset;
-        ReflToken   parentHash;
+        ReflHash    parentHash;
     };
     void AddParent(Parent * parent);
 
@@ -188,7 +188,7 @@ public:
     }
     void SetNext(ReflClassDesc * next);
 
-    ReflToken GetHash() const {
+    ReflHash GetHash() const {
         return m_nameHash;
     }
 
@@ -198,11 +198,11 @@ private:
 
     bool SerializeMembers(IStructuredTextStream * stream, const ReflClass * inst, unsigned offset) const;
     void FinalizeInst(ReflClass * inst) const;
-    const ReflMember  * FindLocalMember(ReflToken name) const;
-    Parent * FindParent(ReflToken parentHash) const;
+    const ReflMember  * FindLocalMember(ReflHash name) const;
+    Parent * FindParent(ReflHash parentHash) const;
 
 private:
-    ReflToken         m_nameHash;
+    ReflHash          m_nameHash;
     const chargr    * m_name;
 
     unsigned          m_size;
@@ -231,7 +231,7 @@ private:
 
 class ReflLibrary {
 public:
-    static const ReflClassDesc * GetClassDesc(ReflToken nameHash);
+    static const ReflClassDesc * GetClassDesc(ReflHash nameHash);
 
     static void RegisterClassDesc(ReflClassDesc * classDesc);
     static void RegisterClassDescAlias(ReflAlias * classDescAlias);
@@ -241,7 +241,7 @@ public:
 
 #define REFL_DEFINE_CLASS(name)                                             \
     private:                                                                \
-        static ReflToken s_className;                                       \
+        static ReflHash s_className;                                        \
     public:                                                                 \
         static ReflClass * Create(unsigned count, MemFlags memFlags);       \
         bool Serialize(IStructuredTextStream * stream);                     \
@@ -249,7 +249,7 @@ public:
         static const ReflClassDesc & GetReflectionInfo();                   \
         static ReflClassDesc * CreateReflClassDesc()
 
-#define REFL_IMPL_CLASS_INTERNAL(base, name)                                \
+#define REFL_IMPL_CLASS_INTERNAL(base, name, nameStr)                       \
     ReflClass * name::Create(unsigned count, MemFlags memFlags) {           \
         return static_cast<base *>(new(memFlags) name[count]);              \
     }                                                                       \
@@ -261,10 +261,10 @@ public:
         const ReflClassDesc * desc = ReflLibrary::GetClassDesc(s_className);\
         return desc->Deserialize(stream, static_cast<base *>(this));        \
     }                                                                       \
-    ReflToken name::s_className = ReflToken(TOWSTR(name))
+    ReflHash name::s_className = ReflHash(nameStr)
 
 #define REFL_IMPL_CLASS_BEGIN(base, name)                                   \
-    REFL_IMPL_CLASS_INTERNAL(base, name);                                   \
+    REFL_IMPL_CLASS_INTERNAL(base, name, TOWSTR(name));                     \
     ReflClassDesc * name::CreateReflClassDesc() {                           \
         static ReflClassDesc s_reflInfo(                                    \
             TOWSTR(name),                                                   \
@@ -273,7 +273,7 @@ public:
     )
                                 
 #define REFL_IMPL_CLASS_BEGIN_NAMESPACE(base, ns, name)                     \
-    REFL_IMPL_CLASS_INTERNAL(base, name);                                   \
+    REFL_IMPL_CLASS_INTERNAL(base, name, TOWSTR(ns::name));                 \
     ReflClassDesc * name::CreateReflClassDesc() {                           \
         static ReflClassDesc s_reflInfo(                                    \
             TOWSTR(ns::name),                                               \
@@ -295,16 +295,16 @@ public:
 #define REFL_ADD_CLASS_ALIAS(name, alias)                                   \
             static ReflAlias s_alias##alias = {                             \
                 NULL,                                                       \
-                ReflToken(TOWSTR(alias)),                                   \
-                ReflToken(TOWSTR(name))                                     \
+                ReflHash(TOWSTR(alias)),                                    \
+                ReflHash(TOWSTR(name))                                      \
             };                                                              \
             ReflLibrary::RegisterClassDescAlias(&s_alias##alias)
 
 #define REFL_ADD_CLASS_ALIAS_NAMESPACE(name, ns, alias)                     \
-            static ReflClassDescAlias s_alias##alias = {                    \
+            static ReflAlias s_alias##alias = {                             \
                 NULL,                                                       \
-                ReflToken(TOWSTR(ns::alias)),                               \
-                ReflToken(TOWSTR(name))                                     \
+                ReflHash(TOWSTR(ns::alias)),                                \
+                ReflHash(TOWSTR(name))                                      \
             };                                                              \
             ReflLibrary::RegisterClassDescAlias(&s_alias##alias)
 
@@ -312,7 +312,7 @@ public:
             static ReflClassDesc::Parent s_parent##parent = {               \
                 NULL,                                                       \
                 CLASSOFFSETOF(parent, derived),                             \
-                ReflToken(TOWSTR(parent))                                   \
+                ReflHash(TOWSTR(parent))                                    \
             };                                                              \
             s_reflInfo.AddParent(&s_parent##parent)
 
@@ -320,7 +320,7 @@ public:
             static ReflClassDesc::Parent s_parent##parent = {               \
                 NULL,                                                       \
                 CLASSOFFSETOF(parent, derived),                             \
-                ReflToken(TOWSTR(ns::parent))                               \
+                ReflHash(TOWSTR(ns::parent))                                \
             };                                                              \
             s_reflInfo.AddParent(&s_parent##parent)
 
@@ -342,8 +342,8 @@ public:
 #define REFL_ADD_MEMBER_ALIAS(name, alias)                                  \
             static ReflAlias s_alias##alias = {                             \
                 NULL,                                                       \
-                ReflToken(TOWSTR(alias)),                                   \
-                ReflToken(TOWSTR(name))                                     \
+                ReflHash(TOWSTR(alias)),                                    \
+                ReflHash(TOWSTR(name))                                      \
             };                                                              \
             s_reflInfo.RegisterMemberAlias(&s_alias##alias)
 
@@ -353,13 +353,19 @@ public:
 
 #define REFL_ENUM_VALUE(enumName, value)                                    \
             static ReflMember::EnumValue s_enumValue##value = {             \
-                NULL, value, TOWSTR(value), ReflToken(TOWSTR(value))        \
+                NULL,                                                       \
+                value,                                                      \
+                TOWSTR(value),                                              \
+                ReflHash(TOWSTR(value))                                     \
             };                                                              \
             s_member##enumName.RegisterEnumValue(&s_enumValue##value)
 
 #define REFL_ENUM_ALIAS(enumName, value, oldValue)                          \
             static ReflMember::EnumValue s_enumValue##oldValue = {          \
-                NULL, value, TOWSTR(oldValue), ReflToken(TOWSTR(oldValue))  \
+                NULL,                                                       \
+                value,                                                      \
+                TOWSTR(oldValue),                                           \
+                ReflHash(TOWSTR(oldValue))                                  \
             };                                                              \
             s_member##enumName.RegisterEnumValue(&s_enumValue##oldValue)
 

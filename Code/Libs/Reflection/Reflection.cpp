@@ -81,7 +81,7 @@ struct TypeDesc {
         // Empty constructor seen as the table will have already 
         //   been initialized in the function below by the time
         //   the global constructor is called.
-        typeHash = ReflToken(typeName);
+        typeHash = ReflHash(typeName);
     }
 
     TypeDesc(
@@ -92,6 +92,7 @@ struct TypeDesc {
         FromStringFunc    fromStr
     ) :
         typeName(name),
+        typeSize(size),
         typeHash(name),
         format(inFormat),
         toString(toStr),
@@ -99,8 +100,8 @@ struct TypeDesc {
     {
     }
     const chargr  * typeName;
-    ReflToken       typeHash;
-    unsigned        size;
+    ReflHash        typeHash;
+    unsigned        typeSize;
     const chargr  * format;
     ToStringFunc    toString;
     FromStringFunc  fromString;
@@ -124,6 +125,20 @@ void ConvertToString(const ReflMember * , const byte * data, const chargr * form
 template<>
 void ConvertToString<REFL_INDEX_BOOL, bool>(const ReflMember * , const byte * data, const chargr * format, chargr * string, unsigned len) {
     StrPrintf(string, len, L"%s", *((bool *) data) ? L"true" : L"false");
+}
+
+//====================================================
+template<>
+void ConvertToString<REFL_INDEX_INT8, int8>(const ReflMember * , const byte * data, const chargr * format, chargr * string, unsigned len) {
+    int value = *(reinterpret_cast<const int8 *>(data));
+    StrPrintf(string, len, L"%d", value);
+}
+
+//====================================================
+template<>
+void ConvertToString<REFL_INDEX_UINT8, uint8>(const ReflMember * , const byte * data, const chargr * format, chargr * string, unsigned len) {
+    unsigned value = *(reinterpret_cast<const uint8 *>(data));
+    StrPrintf(string, len, L"%u", value);
 }
 
 //====================================================
@@ -170,6 +185,22 @@ void ConvertFromString<REFL_INDEX_BOOL, bool>(const ReflMember * , byte * data, 
 
 //====================================================
 template<>
+void ConvertFromString<REFL_INDEX_INT8, int8>(const ReflMember * , byte * data, const chargr * , const chargr * string, unsigned len) {
+    int value;
+    StrReadValue(string, len, L"%d", &value);
+    *(reinterpret_cast<int8 *>(data)) = value;
+}
+
+//====================================================
+template<>
+void ConvertFromString<REFL_INDEX_UINT8, uint8>(const ReflMember * , byte * data, const chargr * , const chargr * string, unsigned len) {
+    unsigned value;
+    StrReadValue(string, len, L"%u", &value);
+    *(reinterpret_cast<uint8 *>(data)) = value;
+}
+
+//====================================================
+template<>
 void ConvertFromString<REFL_INDEX_ENUM, char>(const ReflMember * memberDesc, byte * data, const chargr * , const chargr * string, unsigned len) {
     const ReflMember::EnumValue * value = memberDesc->GetEnumValue(string, len);
     if (value != NULL) {
@@ -206,8 +237,8 @@ void ConvertFromString<REFL_INDEX_CHAR>(byte * data, const chargr * string, unsi
 //====================================================
 void InitializeTypeTable() {
     s_typeDesc[REFL_INDEX_BOOL        ] = TypeDesc(L"bool",            sizeof(bool),         NULL,      &ConvertToString<REFL_INDEX_BOOL,           bool>, &ConvertFromString<REFL_INDEX_BOOL,           bool>);
-    s_typeDesc[REFL_INDEX_INT8        ] = TypeDesc(L"int8",            sizeof(int8),         L"%d",     &ConvertToString<REFL_INDEX_INT8,           int8>, &ConvertFromString<REFL_INDEX_INT8,           int8>);
-    s_typeDesc[REFL_INDEX_UINT8       ] = TypeDesc(L"uint8",           sizeof(uint8),        L"%u",     &ConvertToString<REFL_INDEX_UINT8,         uint8>, &ConvertFromString<REFL_INDEX_UINT8,         uint8>);
+    s_typeDesc[REFL_INDEX_INT8        ] = TypeDesc(L"int8",            sizeof(int8),         NULL,      &ConvertToString<REFL_INDEX_INT8,           int8>, &ConvertFromString<REFL_INDEX_INT8,           int8>);
+    s_typeDesc[REFL_INDEX_UINT8       ] = TypeDesc(L"uint8",           sizeof(uint8),        NULL,      &ConvertToString<REFL_INDEX_UINT8,         uint8>, &ConvertFromString<REFL_INDEX_UINT8,         uint8>);
     s_typeDesc[REFL_INDEX_INT16       ] = TypeDesc(L"int16",           sizeof(int16),        L"%hd",    &ConvertToString<REFL_INDEX_INT16,         int16>, &ConvertFromString<REFL_INDEX_INT16,         int16>);
     s_typeDesc[REFL_INDEX_UINT16      ] = TypeDesc(L"uint16",          sizeof(uint16),       L"%hu",    &ConvertToString<REFL_INDEX_UINT16,       uint16>, &ConvertFromString<REFL_INDEX_UINT16,       uint16>);
     s_typeDesc[REFL_INDEX_INT32       ] = TypeDesc(L"int32",           sizeof(int32),        L"%d",     &ConvertToString<REFL_INDEX_INT32,         int32>, &ConvertFromString<REFL_INDEX_INT32,         int32>);
@@ -231,6 +262,7 @@ void InitializeTypeTable() {
     s_typeDesc[REFL_INDEX_VEC3        ] = TypeDesc(L"vec3",            sizeof(vec3),         NULL,      &ConvertToString<REFL_INDEX_VEC3,          float>, &ConvertFromString<REFL_INDEX_VEC3,          float>);
     s_typeDesc[REFL_INDEX_VEC4        ] = TypeDesc(L"vec4",            sizeof(vec4),         NULL,      &ConvertToString<REFL_INDEX_VEC4,          float>, &ConvertFromString<REFL_INDEX_VEC4,          float>);
     s_typeDesc[REFL_INDEX_QUATERNION  ] = TypeDesc(L"quaternion",      sizeof(quaternion),   NULL,      &ConvertToString<REFL_INDEX_QUATERNION,    float>, &ConvertFromString<REFL_INDEX_QUATERNION,    float>);
+
 };
 
 //////////////////////////////////////////////////////
@@ -261,10 +293,9 @@ ReflMember::ReflMember(
         InitializeTypeTable();
         s_typeTableInitialized = true;
     }
-    ReflToken typeHash(tname);
 
     for(unsigned i = 0; i < REFL_INDEX_ENDTYPE; i++) {
-        if (typeHash == s_typeDesc[i].typeHash) {
+        if (m_typeHash == s_typeDesc[i].typeHash) {
             m_index = i;
             break;
         }
@@ -282,7 +313,7 @@ ReflMember::ReflMember(
 //====================================================
 bool ReflMember::ConvertClassMember(
     IStructuredTextStream * stream, 
-    ReflToken               nameHash,
+    ReflHash                nameHash,
     ReflClass             * inst, 
     ReflIndex               oldType
 ) const {
@@ -297,12 +328,12 @@ bool ReflMember::ConvertClassMember(
             chargr name[256];
             EStreamError result = stream->ReadNodeAttribute(L"Name", name, 256);
             ASSERTMSGGR(result == STREAM_ERROR_OK, "Need to log this error message");
-            ReflToken nameHash(name);
+            ReflHash nameHash(name);
 
             chargr type[256];
             result = stream->ReadNodeAttribute(L"Type", type, 256);
             ASSERTMSGGR(result == STREAM_ERROR_OK, "Need to log this error message");
-            ReflToken typeHash(type);
+            ReflHash typeHash(type);
 
             ReflIndex oldType = DetermineType(typeHash);
 
@@ -321,14 +352,14 @@ bool ReflMember::ConvertClassMember(
 //====================================================
 bool ReflMember::ConvertDataMember(
     IStructuredTextStream * stream, 
-    ReflToken               nameHash,
+    ReflHash                nameHash,
     ReflClass             * inst, 
     ReflIndex               oldType
 ) const {
     chargr value[256];
     stream->ReadNodeValue(value, 256);
     byte container[16];
-    ASSERTMSGGR(sizeof(container) <= s_typeDesc[oldType].size, "Array is too small");
+    ASSERTMSGGR(sizeof(container) >= s_typeDesc[oldType].typeSize, "Array is too small");
     s_typeDesc[oldType].fromString(this, container, s_typeDesc[oldType].format, value, 255);
     m_convFunc(inst, nameHash, s_typeDesc[oldType].typeHash, container);
 
@@ -338,14 +369,14 @@ bool ReflMember::ConvertDataMember(
 //====================================================
 bool ReflMember::Deserialize(
     IStructuredTextStream * stream, 
-    ReflToken               nameHash, 
+    ReflHash                nameHash, 
     ReflClass             * inst, 
     unsigned                offset
 ) const {
     chargr type[256];
     EStreamError result = stream->ReadNodeAttribute(L"Type", type, 256);
     ASSERTMSGGR(result == STREAM_ERROR_OK, "Need to log this error message");
-    ReflToken typeHash(type);
+    ReflHash typeHash(type);
 
     bool retResult = true;
     if (typeHash == s_typeDesc[Type()].typeHash) {
@@ -394,7 +425,7 @@ bool ReflMember::DeserializeClassMember(IStructuredTextStream * stream, ReflClas
 
         chargr typeName[256];
         if (stream->ReadNodeAttribute(L"Type", typeName, 256) == STREAM_ERROR_OK) {
-            if (ReflToken(typeName) == m_typeHash) 
+            if (ReflHash(typeName) == m_typeHash) 
                 subClass->Deserialize(stream, inst, offset + m_offset);
         }
         else 
@@ -411,7 +442,7 @@ bool ReflMember::DeserializeClassMember(IStructuredTextStream * stream, ReflClas
 }
 
 //====================================================
-ReflIndex ReflMember::DetermineType(ReflToken typeHash) const {
+ReflIndex ReflMember::DetermineType(ReflHash typeHash) const {
     ReflIndex type = REFL_INDEX_ENDTYPE;
     for (unsigned i = 0; i < REFL_INDEX_ENDTYPE; i++) {
         if (s_typeDesc[i].typeHash == typeHash) {
@@ -464,7 +495,7 @@ const ReflMember::EnumValue * ReflMember::GetEnumValue(const chargr * str, unsig
 }
 
 //====================================================
-bool ReflMember::Matches(ReflToken hash) const {
+bool ReflMember::Matches(ReflHash hash) const {
     return m_nameHash == hash;
 }
 
@@ -549,7 +580,7 @@ bool ReflClassDesc::Deserialize(IStructuredTextStream * stream, ReflClass * inst
             chargr name[256];
             EStreamError result = stream->ReadNodeAttribute(L"Name", name, 256);
             ASSERTMSGGR(result == STREAM_ERROR_OK, "Need to log this error message");
-            ReflToken nameHash(name);
+            ReflHash nameHash(name);
             unsigned memberOffset = 0;
             const ReflMember * member = FindMember(nameHash, &memberOffset);
             if (member != NULL) {
@@ -566,7 +597,7 @@ bool ReflClassDesc::Deserialize(IStructuredTextStream * stream, ReflClass * inst
             EStreamError result = stream->ReadNodeAttribute(L"Type", baseClassName, 256);
             ASSERTMSGGR(result == STREAM_ERROR_OK, "Need to log this error message");
 
-            const ReflClassDesc * parentDesc = ReflLibrary::GetClassDesc(ReflToken(baseClassName));
+            const ReflClassDesc * parentDesc = ReflLibrary::GetClassDesc(ReflHash(baseClassName));
             if (parentDesc != NULL) {
                 Parent * parent = FindParent(parentDesc->GetHash());
                 if (parent != NULL) 
@@ -614,7 +645,7 @@ void ReflClassDesc::FinalizeInst(ReflClass * inst) const {
 
 //====================================================
 const ReflMember * ReflClassDesc::FindMember(const chargr * name, unsigned * offset) const {
-    ReflToken nameHash(name);
+    ReflHash nameHash(name);
 
     const ReflMember * member = FindMember(nameHash, offset);
 
@@ -622,7 +653,7 @@ const ReflMember * ReflClassDesc::FindMember(const chargr * name, unsigned * off
 }
 
 //====================================================
-const ReflMember * ReflClassDesc::FindMember(ReflToken nameHash, unsigned * offset) const {
+const ReflMember * ReflClassDesc::FindMember(ReflHash nameHash, unsigned * offset) const {
     ASSERTGR(offset != NULL);
     const ReflMember * member = NULL;
     if (m_parents != NULL) {
@@ -639,13 +670,11 @@ const ReflMember * ReflClassDesc::FindMember(ReflToken nameHash, unsigned * offs
         member = FindLocalMember(nameHash);
 
     if (member == NULL) {
-        ReflAlias * alias = m_memberAliases;
-        while (alias != NULL) {
+        for (ReflAlias * alias = m_memberAliases; alias != NULL; alias = alias->next) {
             if (nameHash == alias->oldHash) {
                 member = FindLocalMember(alias->newHash);
                 break;
             }
-            alias = alias->next;
         }
     }
 
@@ -653,7 +682,7 @@ const ReflMember * ReflClassDesc::FindMember(ReflToken nameHash, unsigned * offs
 }
 
 //====================================================
-const ReflMember * ReflClassDesc::FindLocalMember(ReflToken nameHash) const {
+const ReflMember * ReflClassDesc::FindLocalMember(ReflHash nameHash) const {
     const ReflMember * member = m_members;
     while (member != NULL) {
         if (member->Matches(nameHash)) {
@@ -665,7 +694,7 @@ const ReflMember * ReflClassDesc::FindLocalMember(ReflToken nameHash) const {
 }
 
 //====================================================
-ReflClassDesc::Parent * ReflClassDesc::FindParent(ReflToken parentHash) const {
+ReflClassDesc::Parent * ReflClassDesc::FindParent(ReflHash parentHash) const {
     Parent * parent = m_parents;
     for (; parent != NULL; parent = parent->next) {
         if (parent->parentHash == parentHash) {
@@ -782,7 +811,7 @@ ReflClass::ReflClass() {
 //
 
 //====================================================
-const ReflClassDesc * ReflLibrary::GetClassDesc(ReflToken nameHash) {
+const ReflClassDesc * ReflLibrary::GetClassDesc(ReflHash nameHash) {
     const ReflClassDesc * classDesc = s_descHead;
     while(classDesc != NULL) {
         if (classDesc->NameMatches(nameHash))
@@ -792,7 +821,7 @@ const ReflClassDesc * ReflLibrary::GetClassDesc(ReflToken nameHash) {
 
     if (classDesc == NULL) {
         const ReflAlias * alias = s_classAliasHead;
-        while(alias != NULL) {
+        for (; alias != NULL; alias = alias->next) {
             if (alias->oldHash == nameHash) {
                 classDesc = GetClassDesc(alias->newHash);
                 break;
@@ -828,7 +857,7 @@ ReflClass * ReflLibrary::Deserialize(IStructuredTextStream * stream, MemFlags me
 
         chargr typeName[256];
         if (stream->ReadNodeAttribute(L"Type", typeName, 256) == STREAM_ERROR_OK) {
-            const ReflClassDesc * desc = GetClassDesc(ReflToken(typeName));
+            const ReflClassDesc * desc = GetClassDesc(ReflHash(typeName));
 
             if (desc != NULL) {
                 ret = desc->Create(1, memFlags);

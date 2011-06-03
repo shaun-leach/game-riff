@@ -27,6 +27,11 @@
    OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
+#define HASH64(token, value)     Hash64(TOWSTR(token), value##ULL)
+#define HASH32(token, value)     Hash32(TOWSTR(token), value##ULL)
+#define CHASH64(token, value)    (value##ULL)
+#define CHASH32(token, value)    (value##ULL)
+
 class Hash64 {
 public:
     Hash64() :
@@ -35,6 +40,8 @@ public:
     }
     Hash64(const chargr * str);
     Hash64(const charsys * str);
+    Hash64(const chargr * str, uint64 hash);
+    Hash64(const charsys * str, uint64 hash);
     Hash64(const void * data, unsigned length);
 
     bool operator == (const Hash64 rhs) const {
@@ -55,6 +62,8 @@ public:
     }
     Hash32(const chargr * str);
     Hash32(const charsys * str);
+    Hash32(const chargr * str, uint32 hash);
+    Hash32(const charsys * str, uint32 hash);
     Hash32(const void * data, unsigned length);
 
     bool operator == (const Hash32 rhs) const {

@@ -1,5 +1,6 @@
 -Get everything compiling with gcc
 -Move compilation files out of the source tree
+-Wrap system math functions and call those
 --------------
 -Types
 --Create color, angle, percentage, euler types
@@ -14,10 +15,9 @@
 ---Too many stack strings with hardcoded values
 --------------
 -flesh out reflection more
+--Prep everything for precompiled hashes
 --Unit tests all around
---Rename ReflToken to something that makes more sense
---Predefined hashes for all of the types
----Would prefer to use precompiled hashes but need a preprocessor
+--Switch to 32 bit tokens
 --versioning
 ---Classes
 ----Versioned loading with complicated conversion using multiple members
@@ -60,13 +60,10 @@
 --implement template version and test performance when reading binary data
 --Test
 ---Need to test all types
-----Test that int8 deserialization works if the member is packed
 ----Test currently unimplemented types
 ****Currently implemented types
-***multiple inheritance
-***Simple aliasing
----Conversion
----Aliasing with conversion
+****Test that int8 deserialization works if the member is packed
+---Namespaces
 ---Need to test missing/extra types
 ----Need to log these
 ---Missing aliases(this is really just a extra type)
@@ -74,6 +71,10 @@
 ---Complex inheritance
 ***Multiple aliases
 ***Simple class hierarchy
+***multiple inheritance
+***Simple aliasing
+***Aliasing with conversion
+***Conversion
 --Need to remove strings in "gold" builds
 --add code to finalize entire reflection library
 ---Finalize when reflection library is initialized
@@ -116,6 +117,10 @@
 **Change EReflType to be EReflTypeIndex
 ***Change enum to typedef'd unsigned
 ***Move enum internal to reflection
+**Rename ReflToken to something that makes more sense
+**Predefined hashes for all of the types, no causes assymmetry for non-pod types
+***Would prefer to use precompiled hashes but need a preprocessor pass
+**Override int8 string functions and print them as ints
 ----------
 -Create tools platform
 --Layer tools functionality on top of platform

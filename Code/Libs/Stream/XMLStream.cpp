@@ -117,9 +117,11 @@ EStreamError XMLTextStream::Open(const chargr *fileName) {
         result = DecodeTiXmlError();
     }
 
-    m_currentNode = m_document->FirstChild();
-    while(m_currentNode != NULL && m_currentNode->Type() == TiXmlNode::DECLARATION) {
-        m_currentNode = m_currentNode->NextSibling();
+    if (result == STREAM_ERROR_OK) {
+        m_currentNode = m_document->FirstChild();
+        while(m_currentNode != NULL && m_currentNode->Type() == TiXmlNode::DECLARATION) {
+            m_currentNode = m_currentNode->NextSibling();
+        }
     }
 
     return result;
