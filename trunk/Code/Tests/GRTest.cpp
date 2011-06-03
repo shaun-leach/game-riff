@@ -218,13 +218,13 @@ public:
 
     static void Convert(
        ReflClass   * inst, 
-       Hash64        name, 
-       Hash64        oldType, 
+       ReflHash      name, 
+       ReflHash      oldType, 
        void        * data
     ) {
        Dummy * dummy = dynamic_cast<Dummy *>(inst);
        if (dummy != NULL) {
-          if (name == Hash64(L"btest") && oldType == ReflTypeInt32) {
+          if (name == ReflHash(L"btest") && oldType == ReflTypeInt32) {
              int32 * idata = reinterpret_cast<int32 *>(data);
              
              dummy->btest = *idata > 0 ? true : false;
@@ -234,13 +234,13 @@ public:
 
     static void ConvertITest(
        ReflClass   * inst, 
-       Hash64        name, 
-       Hash64        oldType, 
+       ReflHash      name, 
+       ReflHash      oldType, 
        void        * data
     ) {
        Dummy * dummy = dynamic_cast<Dummy *>(inst);
        if (dummy != NULL) {
-          if (name == Hash64(L"itest") && oldType == Hash64(L"float32")) {
+          if (name == ReflHash(L"itest") && oldType == ReflHash(L"float32")) {
              float32 * fdata = reinterpret_cast<float32 *>(data);
 
              dummy->i32test = (int32) ceilf(*fdata);
@@ -250,13 +250,13 @@ public:
 
     static void ConvertClassTest(
        ReflClass   * inst, 
-       Hash64        name, 
-       Hash64        oldType, 
+       ReflHash      name, 
+       ReflHash      oldType, 
        void        * data
     ) {
        Dummy * dummy = dynamic_cast<Dummy *>(inst);
        if (dummy != NULL) {
-          if (name == Hash64(L"basesubitest") && oldType == ReflTypeInt32) {
+          if (name == ReflHash(L"basesubitest") && oldType == ReflTypeInt32) {
              int32 * idata = reinterpret_cast<int32 *>(data);
 
              dummy->class_alias_test = (*idata);

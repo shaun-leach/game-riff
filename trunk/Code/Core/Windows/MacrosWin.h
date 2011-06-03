@@ -57,10 +57,21 @@
 
 //////////////////////////////////////////////////////
 //
-// Convert convert a symbol to a string
+// Convert a symbol to a string
 //
 
 #define TOWSTR(str)    TOWCHAR(#str)
+
+//////////////////////////////////////////////////////
+//
+// Convert a symbol to a string for non-release builds
+//
+
+#ifdef RELEASE
+    #define TOWSTR_NORELEASE(str)    NULL
+#else
+    #define TOWSTR_NORELEASE(str)    TOWCHAR(#str)
+#endif
 
 //////////////////////////////////////////////////////
 //

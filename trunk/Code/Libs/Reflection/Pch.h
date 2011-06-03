@@ -31,6 +31,7 @@
 
 #include <stdlib.h>
 #include <wchar.h>
+#include <stdio.h>
 
 #define USES_LIBS_MATH
 #define USES_LIBS_REFLECTION

@@ -53,6 +53,30 @@ Hash64::Hash64(const chargr * str) {
 }
 
 //====================================================
+Hash64::Hash64(const charsys * str, uint64 hash) {
+    if (hash != 0) {
+        ASSERTMSGGR_DBG(str == NULL || Hash64(str).m_hash == hash, "Precompiled hash does not match");
+        m_hash = hash;
+    }
+    else {
+        ASSERTGR(str != NULL);
+        m_hash = NSLookup3::Lookup3HashString64(str, INIT_A, INIT_B);
+    }
+}
+
+//====================================================
+Hash64::Hash64(const chargr * str, uint64 hash) {
+    if (hash != 0) {
+        ASSERTMSGGR_DBG(str == NULL || Hash64(str).m_hash == hash, "Precompiled hash does not match");
+        m_hash = hash;
+    }
+    else {
+        ASSERTGR(str != NULL);
+        m_hash = NSLookup3::Lookup3HashString64(str, INIT_A, INIT_B);
+    }
+}
+
+//====================================================
 Hash64::Hash64(const void * data, unsigned length) {
     m_hash = NSLookup3::Lookup3Hash64(data, length, INIT_A, INIT_B);
 }
@@ -65,6 +89,30 @@ Hash32::Hash32(const charsys * str) {
 //====================================================
 Hash32::Hash32(const chargr * str) {
     m_hash = NSLookup3::Lookup3HashString32(str, INIT_A);
+}
+
+//====================================================
+Hash32::Hash32(const charsys * str, uint32 hash) {
+    if (hash != 0) {
+        ASSERTMSGGR_DBG(str == NULL || Hash32(str).m_hash == hash, "Precompiled hash does not match");
+        m_hash = hash;
+    }
+    else {
+        ASSERTGR(str != NULL);
+        m_hash = NSLookup3::Lookup3HashString32(str, INIT_A);
+    }
+}
+
+//====================================================
+Hash32::Hash32(const chargr * str, uint32 hash) {
+    if (hash != 0) {
+        ASSERTMSGGR_DBG(str == NULL || Hash32(str).m_hash == hash, "Precompiled hash does not match");
+        m_hash = hash;
+    }
+    else {
+        ASSERTGR(str != NULL);
+        m_hash = NSLookup3::Lookup3HashString32(str, INIT_A);
+    }
 }
 
 //====================================================

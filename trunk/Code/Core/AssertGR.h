@@ -56,10 +56,10 @@ void AssertHandler(
 
 #ifdef _DEBUG
     #define ASSERTGR_DGB(exp)           ASSERTGR(exp)
-    #define ASSERTMSGGR_DGB(exp, msg)   ASSERTMSGGR(exp, msg)
+    #define ASSERTMSGGR_DBG(exp, msg)   ASSERTMSGGR(exp, msg)
 #else
     #define ASSERTGR_DGB(exp)
-    #define ASSERTMSGGR_DGB(exp, msg)
+    #define ASSERTMSGGR_DBG(exp, msg)
 #endif
 
 #define COMPILERASSERTGR(exp) typedef int UNIQUEFY_SYMBOL(COMPILERASSERTIMP_) [(exp) ? 1 : 0]
