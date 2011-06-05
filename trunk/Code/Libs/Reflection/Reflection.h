@@ -33,11 +33,12 @@ class DataStream;
 class IStructuredTextStream;
 
 typedef unsigned    ReflIndex;
-typedef Hash64      ReflHash;
+typedef Hash32      ReflHash;
 
 typedef ReflClass * (*CreateFunc)(unsigned count, MemFlags memFlags);
 typedef void (*FinalizationFunc)(ReflClass * inst);
 typedef void (*ConversionFunc)(ReflClass * inst, ReflHash name, ReflHash oldType, void * data);
+typedef void (*LoadFunc)(IStructuredTextStream * stream, const ReflClassDesc * desc, unsigned version, ReflClass * inst);
 
 const ReflHash ReflTypeBool(L"bool");
 const ReflHash ReflTypeInt32(L"int32");
@@ -52,7 +53,7 @@ class ReflMember {
 public:
     ReflMember(
         ReflClassDesc * container,
-        const chargr  * typeName,
+        ReflHash        typeHash,
         const chargr  * name, 
         unsigned        size,
         unsigned        offset
@@ -156,6 +157,7 @@ public:
     void RegisterMember(ReflMember * member);
 
     void RegisterFinalizationFunc(FinalizationFunc finalFunc);
+    void RegisterLoadFunc(LoadFunc loadFunc, unsigned currentVersion);
 
     bool NameMatches(const ReflHash rhs) const {
         return m_nameHash == rhs;
@@ -192,6 +194,10 @@ public:
         return m_nameHash;
     }
 
+    unsigned GetVersion() const {
+        return m_version;
+    }
+
     void RegisterMemberAlias(ReflAlias * alias);
 
 private:
@@ -202,21 +208,23 @@ private:
     Parent * FindParent(ReflHash parentHash) const;
 
 private:
-    ReflHash          m_nameHash;
-    const chargr    * m_name;
+    ReflHash            m_nameHash;
+    const chargr      * m_name;
 
-    unsigned          m_size;
+    unsigned            m_version;
+    unsigned            m_size;
 
-    CreateFunc        m_creationFunc;
-    FinalizationFunc  m_finalizeFunc;
+    CreateFunc          m_creationFunc;
+    FinalizationFunc    m_finalizeFunc;
+    LoadFunc            m_loadFunc;
 
-    ReflClassDesc   * m_next;
+    ReflClassDesc     * m_next;
 
-    Parent          * m_parents;
+    Parent            * m_parents;
 
-    ReflMember      * m_members;
+    ReflMember        * m_members;
 
-    ReflAlias       * m_memberAliases;
+    ReflAlias         * m_memberAliases;
 };
 
 class ReflClass {
@@ -229,6 +237,9 @@ public:
 private:
 };
 
+template<typename t_Type>
+    ReflHash ReflGetTypeHash(const t_Type & reflType);
+
 class ReflLibrary {
 public:
     static const ReflClassDesc * GetClassDesc(ReflHash nameHash);
@@ -238,6 +249,14 @@ public:
 
     static ReflClass * Deserialize(IStructuredTextStream * stream, MemFlags memFlags);
 };
+
+#define REFL_DEFINE_USER_TYPE(type)                                         \
+    template<typename t_Type>                                               \
+        ReflHash ReflGetTypeHash(const t_Type & reflType);                  \
+    template<>                                                              \
+    inline ReflHash ReflGetTypeHash<type>(const type & reflType) {          \
+        return ReflHash(TOWSTR(type));                                      \
+    }
 
 #define REFL_DEFINE_CLASS(name)                                             \
     private:                                                                \
@@ -264,6 +283,7 @@ public:
     ReflHash name::s_className = ReflHash(nameStr)
 
 #define REFL_IMPL_CLASS_BEGIN(base, name)                                   \
+    REFL_DEFINE_USER_TYPE(name);                                            \
     REFL_IMPL_CLASS_INTERNAL(base, name, TOWSTR(name));                     \
     ReflClassDesc * name::CreateReflClassDesc() {                           \
         static ReflClassDesc s_reflInfo(                                    \
@@ -273,6 +293,9 @@ public:
     )
                                 
 #define REFL_IMPL_CLASS_BEGIN_NAMESPACE(base, ns, name)                     \
+    }                                                                       \
+    REFL_DEFINE_USER_TYPE(ns::name);                                        \
+    namespace ns {                                                          \
     REFL_IMPL_CLASS_INTERNAL(base, name, TOWSTR(ns::name));                 \
     ReflClassDesc * name::CreateReflClassDesc() {                           \
         static ReflClassDesc s_reflInfo(                                    \
@@ -327,14 +350,28 @@ public:
 #define REFL_FINALIZATION_FUNC(func)                                        \
             s_reflInfo.RegisterFinalizationFunc(func)
 
-#define REFL_MEMBER(parent, name, type)                                     \
+#define REFL_MEMBER_INTERNAL(parent, name, typeHash)                        \
             static ReflMember s_member##name(                               \
                 &s_reflInfo,                                                \
-                TOWSTR(type),                                               \
+                typeHash,                                                   \
                 TOWSTR(name),                                               \
                 SIZEOF(parent, name),                                       \
                 OFFSETOF(parent, name)                                      \
             )
+
+#define REFL_MEMBER(parent, name)                                           \
+            REFL_MEMBER_INTERNAL(                                           \
+                parent,                                                     \
+                name,                                                       \
+                ReflGetTypeHash((((parent *)(0x0))->name))                  \
+            )                           
+
+#define REFL_MEMBER_ENUM(parent, name)                                      \
+            REFL_MEMBER_INTERNAL(                                           \
+                parent,                                                     \
+                name,                                                       \
+                ReflHash(TOWSTR(enum))                                      \
+            )                           
 
 #define REFL_ADD_MEMBER_CONVERSION(name, conv)                              \
             s_member##name.RegisterConversionFunc(conv)
@@ -368,4 +405,31 @@ public:
                 ReflHash(TOWSTR(oldValue))                                  \
             };                                                              \
             s_member##enumName.RegisterEnumValue(&s_enumValue##oldValue)
+
+REFL_DEFINE_USER_TYPE(bool);
+REFL_DEFINE_USER_TYPE(int8);
+REFL_DEFINE_USER_TYPE(uint8);
+REFL_DEFINE_USER_TYPE(int16);
+REFL_DEFINE_USER_TYPE(uint16);
+REFL_DEFINE_USER_TYPE(int32);
+REFL_DEFINE_USER_TYPE(uint32);
+REFL_DEFINE_USER_TYPE(int64);
+REFL_DEFINE_USER_TYPE(uint64);
+//REFL_DEFINE_USER_TYPE(int128);
+//REFL_DEFINE_USER_TYPE(uint128);
+//REFL_DEFINE_USER_TYPE(float16);
+REFL_DEFINE_USER_TYPE(float32);
+//REFL_DEFINE_USER_TYPE();//REFL_INDEX_STRING,
+//REFL_DEFINE_USER_TYPE();//REFL_INDEX_ENUM,
+//REFL_DEFINE_USER_TYPE();//REFL_INDEX_FIXED_ARRAY,
+//REFL_DEFINE_USER_TYPE();//REFL_INDEX_VAR_ARRAY,
+//REFL_DEFINE_USER_TYPE();//REFL_INDEX_POINTER,
+//REFL_DEFINE_USER_TYPE(color);
+//REFL_DEFINE_USER_TYPE(angle);
+//REFL_DEFINE_USER_TYPE(percentage);
+//REFL_DEFINE_USER_TYPE(eulers);
+//REFL_DEFINE_USER_TYPE(vec3);
+//REFL_DEFINE_USER_TYPE(vec4);
+//REFL_DEFINE_USER_TYPE(quaternion);
+
 

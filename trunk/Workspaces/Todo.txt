@@ -1,6 +1,7 @@
 -Get everything compiling with gcc
 -Move compilation files out of the source tree
 -Wrap system math functions and call those
+-Clean up system headers
 --------------
 -Types
 --Create color, angle, percentage, euler types
@@ -10,14 +11,12 @@
 --Hashed file name
 --Localized string token
 --proper 128 bit types
---can I get the compiler to fit Hash64 into a single register
+--can I get the compiler to fit Hash64 into a single register?
 --Need better string types
 ---Too many stack strings with hardcoded values
 --------------
 -flesh out reflection more
 --Prep everything for precompiled hashes
---Unit tests all around
---Switch to 32 bit tokens
 --versioning
 ---Classes
 ----Versioned loading with complicated conversion using multiple members
@@ -63,7 +62,6 @@
 ----Test currently unimplemented types
 ****Currently implemented types
 ****Test that int8 deserialization works if the member is packed
----Namespaces
 ---Need to test missing/extra types
 ----Need to log these
 ---Missing aliases(this is really just a extra type)
@@ -75,12 +73,14 @@
 ***Simple aliasing
 ***Aliasing with conversion
 ***Conversion
+***Namespaces
 --Need to remove strings in "gold" builds
 --add code to finalize entire reflection library
 ---Finalize when reflection library is initialized
 ---Verify that every member of type "class" has a registered ReflClassDesc
 ---Verify that every parent class has a registered ReflClassDesc
 ---Verify that members are the correct size
+---Verify that member offsets are monotonic
 ---make sure that there are no duplicate class names, include aliases
 ---If using 32 bit hashes, verify that there are no collisions
 --Improve upon embedded class reading(would be nice to have one function that reads single classes, subclasses and embedded classes out of a file)
@@ -121,6 +121,9 @@
 **Predefined hashes for all of the types, no causes assymmetry for non-pod types
 ***Would prefer to use precompiled hashes but need a preprocessor pass
 **Override int8 string functions and print them as ints
+**Unit tests all around
+**Switch to 32 bit tokens
+**Auto determine types
 ----------
 -Create tools platform
 --Layer tools functionality on top of platform

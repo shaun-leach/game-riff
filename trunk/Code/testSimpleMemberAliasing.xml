@@ -1,5 +1,5 @@
 <?xml version="1.0" ?>
-<Class Type="SimpleMemberAliasingClass">
+<Class Type="SimpleMemberAliasingClass" Version="0x0">
     <DataMember Name="uint32Test" Type="uint32">320000</DataMember>
     <DataMember Name="baseFloat32Test" Type="float32">32.32f</DataMember>
 </Class>

@@ -69,8 +69,8 @@ public:
 
 REFL_IMPL_CLASS_BEGIN(ReflClass, SimpleAliasingClass);
     REFL_ADD_CLASS_ALIAS(SimpleAliasingClass, OldAliasingClass);
-    REFL_MEMBER(SimpleAliasingClass, baseUint32Test, uint32);
-    REFL_MEMBER(SimpleAliasingClass, baseFloat32Test, float32);
+    REFL_MEMBER(SimpleAliasingClass, baseUint32Test);
+    REFL_MEMBER(SimpleAliasingClass, baseFloat32Test);
 REFL_IMPL_CLASS_END(SimpleAliasingClass);
 
 //====================================================
@@ -110,9 +110,9 @@ public:
 };
 
 REFL_IMPL_CLASS_BEGIN(ReflClass, SimpleMemberAliasingClass);
-    REFL_MEMBER(SimpleMemberAliasingClass, baseUint32Test, uint32);
+    REFL_MEMBER(SimpleMemberAliasingClass, baseUint32Test);
     REFL_ADD_MEMBER_ALIAS(baseUint32Test, uint32Test);
-    REFL_MEMBER(SimpleMemberAliasingClass, baseFloat32Test, float32);
+    REFL_MEMBER(SimpleMemberAliasingClass, baseFloat32Test);
 REFL_IMPL_CLASS_END(SimpleMemberAliasingClass);
 
 //====================================================
@@ -157,12 +157,12 @@ public:
 };
 
 REFL_IMPL_CLASS_BEGIN(ReflClass, SimpleEnumAliasingClass);
-    REFL_MEMBER(SimpleEnumAliasingClass, baseEnumTest, enum);
+    REFL_MEMBER_ENUM(SimpleEnumAliasingClass, baseEnumTest);
         REFL_ENUM_VALUE(baseEnumTest, ALIAS_VALUE_1);
         REFL_ENUM_VALUE(baseEnumTest, ALIAS_VALUE_2);
         REFL_ENUM_VALUE(baseEnumTest, ALIAS_VALUE_3);
             REFL_ENUM_ALIAS(baseEnumTest, ALIAS_VALUE_3, ALIAS_VALUE_4);
-    REFL_MEMBER(SimpleEnumAliasingClass, baseUint32Test, uint32);
+    REFL_MEMBER(SimpleEnumAliasingClass, baseUint32Test);
 REFL_IMPL_CLASS_END(SimpleEnumAliasingClass);
 
 //====================================================
