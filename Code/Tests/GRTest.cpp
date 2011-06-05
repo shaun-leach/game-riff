@@ -109,9 +109,9 @@ private:
 
 REFL_IMPL_CLASS_BEGIN(ReflClass, BaseClass);
     REFL_ADD_CLASS_ALIAS(BaseClass, OldBaseClass);
-    REFL_MEMBER(BaseClass, basei32test, int32);
-    REFL_MEMBER(BaseClass, basef32test, float32);
-    REFL_MEMBER(BaseClass, basei16test, int16);
+    REFL_MEMBER(BaseClass, basei32test);
+    REFL_MEMBER(BaseClass, basef32test);
+    REFL_MEMBER(BaseClass, basei16test);
 REFL_IMPL_CLASS_END(BaseClass);
 
 class BaseBaseClass2 : public ReflClass {
@@ -131,9 +131,9 @@ private:
 };
 
 REFL_IMPL_CLASS_BEGIN(ReflClass, BaseBaseClass2);
-    REFL_MEMBER(BaseBaseClass2, basebase2i32test, int32);
-    REFL_MEMBER(BaseBaseClass2, basebase2f32test, float32);
-    REFL_MEMBER(BaseBaseClass2, basebase2u16test, uint16);
+    REFL_MEMBER(BaseBaseClass2, basebase2i32test);
+    REFL_MEMBER(BaseBaseClass2, basebase2f32test);
+    REFL_MEMBER(BaseBaseClass2, basebase2u16test);
 REFL_IMPL_CLASS_END(BaseBaseClass2);
 
 class BaseClass2 : public BaseBaseClass2 {
@@ -154,9 +154,9 @@ private:
 
 REFL_IMPL_CLASS_BEGIN(BaseBaseClass2, BaseClass2);
     REFL_ADD_PARENT(BaseClass2, BaseBaseClass2);
-    REFL_MEMBER(BaseClass2, base2i32test, int32);
-    REFL_MEMBER(BaseClass2, base2f32test, float32);
-    REFL_MEMBER(BaseClass2, base2u16test, uint16);
+    REFL_MEMBER(BaseClass2, base2i32test);
+    REFL_MEMBER(BaseClass2, base2f32test);
+    REFL_MEMBER(BaseClass2, base2u16test);
 REFL_IMPL_CLASS_END(BaseClass2);
 
 namespace SubNameSpace {
@@ -176,8 +176,8 @@ private:
 };
 
 REFL_IMPL_CLASS_BEGIN_NAMESPACE(ReflClass, SubNameSpace, BaseSubClass);
-    REFL_MEMBER(BaseSubClass, basesubitest, int32);
-    REFL_MEMBER(BaseSubClass, basesubftest, float32);
+    REFL_MEMBER(BaseSubClass, basesubitest);
+    REFL_MEMBER(BaseSubClass, basesubftest);
 REFL_IMPL_CLASS_END(BaseSubClass);
 
 class SubClass : public BaseSubClass {
@@ -196,8 +196,8 @@ private:
 
 REFL_IMPL_CLASS_BEGIN_NAMESPACE(BaseSubClass, SubNameSpace, SubClass);
     REFL_ADD_PARENT_NAMESPACE(SubClass, SubNameSpace, BaseSubClass);
-    REFL_MEMBER(SubClass, subitest, int32);
-    REFL_MEMBER(SubClass, subftest, float32);
+    REFL_MEMBER(SubClass, subitest);
+    REFL_MEMBER(SubClass, subftest);
 REFL_IMPL_CLASS_END(SubClass);
 }
 
@@ -283,22 +283,22 @@ private:
 REFL_IMPL_CLASS_BEGIN(BaseClass, Dummy);
     REFL_ADD_PARENT(Dummy, BaseClass);
     REFL_ADD_PARENT(Dummy, BaseClass2);
-    REFL_MEMBER(Dummy, i32test, int32);
+    REFL_MEMBER(Dummy, i32test);
     REFL_ADD_MEMBER_ALIAS_W_CONVERSION(i32test, itest, ConvertITest);
-    REFL_MEMBER(Dummy, f32test, float32);
-    REFL_MEMBER(Dummy, i8test, int8);
-    REFL_MEMBER(Dummy, class_alias_test, int32);
+    REFL_MEMBER(Dummy, f32test);
+    REFL_MEMBER(Dummy, i8test);
+    REFL_MEMBER(Dummy, class_alias_test);
     REFL_ADD_MEMBER_ALIAS_W_CONVERSION(class_alias_test, mcTest, ConvertClassTest);
-    REFL_MEMBER(Dummy, btest, bool);
+    REFL_MEMBER(Dummy, btest);
     REFL_ADD_MEMBER_CONVERSION(btest, Convert);
-    REFL_MEMBER(Dummy, etest, enum);
+    REFL_MEMBER_ENUM(Dummy, etest);
         REFL_ENUM_VALUE(etest, INTERNAL_VALUE1);
         REFL_ENUM_VALUE(etest, INTERNAL_VALUE2);
         REFL_ENUM_ALIAS(etest, INTERNAL_VALUE2, INTERNAL_VALUE3);
-    REFL_MEMBER(Dummy, pertest, percentage);
-    REFL_MEMBER(Dummy, angtest, angle);
+    REFL_MEMBER(Dummy, pertest);
+    REFL_MEMBER(Dummy, angtest);
     REFL_ADD_MEMBER_ALIAS(angtest, atest);
-    REFL_MEMBER(Dummy, ctest, SubNameSpace::SubClass);
+    REFL_MEMBER(Dummy, ctest);
 REFL_IMPL_CLASS_END(Dummy);
 
 int main(int argc,  char * argv[]) {

@@ -273,7 +273,7 @@ void InitializeTypeTable() {
 //====================================================
 ReflMember::ReflMember(
     ReflClassDesc * container,
-    const chargr  * tname, 
+    ReflHash        typeHash, 
     const chargr  * name, 
     unsigned        size,
     unsigned        offset
@@ -281,7 +281,7 @@ ReflMember::ReflMember(
     m_nameHash(name),
     m_name(name),
     m_index(REFL_INDEX_ENDTYPE),
-    m_typeHash(tname),
+    m_typeHash(typeHash),
     m_size(size),
     m_offset(offset),
     m_enumValues(NULL),
@@ -551,9 +551,11 @@ ReflClassDesc::ReflClassDesc(
 ) :
     m_name(name),
     m_nameHash(name),
-    m_size(size),   
+    m_version(0),
+    m_size(size),
     m_creationFunc(creationFunc),
     m_finalizeFunc(NULL),
+    m_loadFunc(NULL),
     m_members(NULL),
     m_next(NULL),
     m_parents(NULL)
@@ -568,45 +570,62 @@ void ReflClassDesc::AddParent(Parent * parent) {
 
 //====================================================
 bool ReflClassDesc::Deserialize(IStructuredTextStream * stream, ReflClass * inst, unsigned offset) const {
-    if (stream->ReadChildNode() == STREAM_ERROR_NODEDOESNTEXIST) 
-        return true;
+    if (m_loadFunc != NULL) {
+        m_loadFunc(stream, this, 0/* version*/, inst);
+    }
+    else {
+        if (stream->ReadChildNode() == STREAM_ERROR_NODEDOESNTEXIST) 
+            return true;
 
-    do {
-        chargr nodeName[64];
-        stream->ReadNodeName(nodeName, 64);
+        do {
+            chargr nodeName[64];
+            stream->ReadNodeName(nodeName, 64);
 
-        if (StrICmp(nodeName, L"DataMember", 10) == 0) {
+            if (StrICmp(nodeName, L"DataMember", 10) == 0) {
 
-            chargr name[256];
-            EStreamError result = stream->ReadNodeAttribute(L"Name", name, 256);
-            ASSERTMSGGR(result == STREAM_ERROR_OK, "Need to log this error message");
-            ReflHash nameHash(name);
-            unsigned memberOffset = 0;
-            const ReflMember * member = FindMember(nameHash, &memberOffset);
-            if (member != NULL) {
-                member->Deserialize(
-                    stream, 
-                    nameHash,
-                    inst, 
-                    offset + memberOffset
-                );
+                chargr name[256];
+                EStreamError result = stream->ReadNodeAttribute(L"Name", name, 256);
+                ASSERTMSGGR(result == STREAM_ERROR_OK, "Need to log this error message");
+                ReflHash nameHash(name);
+                unsigned memberOffset = 0;
+                const ReflMember * member = FindMember(nameHash, &memberOffset);
+                if (member != NULL) {
+                    member->Deserialize(
+                        stream, 
+                        nameHash,
+                        inst, 
+                        offset + memberOffset
+                    );
+                }
             }
-        }
-        else if (StrICmp(nodeName, L"BaseClass", 9) == 0) {
-            chargr baseClassName[256];
-            EStreamError result = stream->ReadNodeAttribute(L"Type", baseClassName, 256);
-            ASSERTMSGGR(result == STREAM_ERROR_OK, "Need to log this error message");
+            else if (StrICmp(nodeName, L"BaseClass", 9) == 0) {
+                chargr baseClassName[256];
+                EStreamError result = stream->ReadNodeAttribute(L"Type", baseClassName, 256);
+                if (result == STREAM_ERROR_OK) {
+                    chargr versionStr[32];
+                    unsigned version = 0;
+                    if (stream->ReadNodeAttribute(L"Version", versionStr, 32) == STREAM_ERROR_OK) {
+                        StrReadValue(versionStr, 32, L"%x", &version);
 
-            const ReflClassDesc * parentDesc = ReflLibrary::GetClassDesc(ReflHash(baseClassName));
-            if (parentDesc != NULL) {
-                Parent * parent = FindParent(parentDesc->GetHash());
-                if (parent != NULL) 
-                    parentDesc->Deserialize(stream, inst, offset + parent->offset);
+                        const ReflClassDesc * parentDesc = ReflLibrary::GetClassDesc(ReflHash(baseClassName));
+                        if (parentDesc != NULL) {
+                            Parent * parent = FindParent(parentDesc->GetHash());
+                            if (parent != NULL) 
+                                parentDesc->Deserialize(stream, inst, offset + parent->offset);
+                        }
+                    }
+                    else {
+                        ASSERTMSGGR(false, "Need to log this error message");
+                    }
+                }
+                else {
+                    ASSERTMSGGR(result == STREAM_ERROR_OK, "Need to log this error message");
+                }
             }
-        }
-    } while (stream->ReadNextNode() != STREAM_ERROR_NODEDOESNTEXIST);
+        } while (stream->ReadNextNode() != STREAM_ERROR_NODEDOESNTEXIST);
 
-    stream->ReadParentNode();
+        stream->ReadParentNode();
+    }
 
     FinalizeInst(inst);
 
@@ -745,6 +764,14 @@ void ReflClassDesc::RegisterFinalizationFunc(FinalizationFunc func) {
 }
 
 //====================================================
+void ReflClassDesc::RegisterLoadFunc(LoadFunc func, unsigned currentVersion) {
+    ASSERTGR(m_loadFunc == NULL);
+    m_loadFunc = func;
+
+    m_version = currentVersion;
+}
+
+//====================================================
 void ReflClassDesc::RegisterMember(ReflMember * member) {
     member->SetNext(m_members);
     m_members = member;
@@ -763,6 +790,9 @@ bool ReflClassDesc::SerializeMembers(
             ASSERTMSGGR(parentDesc != NULL, "Missing parent descriptor");
             stream->WriteNode(L"BaseClass");
             stream->WriteNodeAttribute(L"Type", parentDesc->m_name);
+            chargr versionStr[32];
+            StrPrintf(versionStr, 32, L"0x%x", parentDesc->GetVersion());
+            stream->WriteNodeAttribute(L"Version", versionStr);
             parentDesc->SerializeMembers(stream, inst, offset + parent->offset);
             stream->EndNode();
         }
@@ -786,6 +816,9 @@ bool ReflClassDesc::Serialize(
 ) const {
     stream->WriteNode(L"Class");
     stream->WriteNodeAttribute(L"Type", this->m_name);
+    chargr versionStr[32];
+    StrPrintf(versionStr, 32, L"0x%x", m_version);
+    stream->WriteNodeAttribute(L"Version", versionStr);
 
     SerializeMembers(stream, inst, offset);
 
@@ -860,9 +893,17 @@ ReflClass * ReflLibrary::Deserialize(IStructuredTextStream * stream, MemFlags me
             const ReflClassDesc * desc = GetClassDesc(ReflHash(typeName));
 
             if (desc != NULL) {
-                ret = desc->Create(1, memFlags);
+                chargr versionStr[32];
+                unsigned version = 0;
+                if (stream->ReadNodeAttribute(L"Version", versionStr, 32) == STREAM_ERROR_OK) {
+                    StrReadValue(versionStr, 32, L"%x", &version);
 
-                desc->Deserialize(stream, ret, 0);
+                    ret = desc->Create(1, memFlags);
+
+                    desc->Deserialize(stream, ret, 0);
+                }
+                else 
+                    ASSERTMSGGR(false, "Need to log this error");
             }
         }
         else

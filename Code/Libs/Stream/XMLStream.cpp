@@ -287,6 +287,8 @@ EStreamError XMLTextStream::ReadNodeValue(chargr * value, unsigned len) const {
 
 //====================================================
 EStreamError XMLTextStream::ReadNodeAttribute(const chargr * name, chargr * value, unsigned len) const {
+    value[0] = L'\0';
+
     if (m_document == NULL || m_currentNode == NULL) 
         return STREAM_ERROR_FILENOTOPENED;
 
@@ -294,14 +296,15 @@ EStreamError XMLTextStream::ReadNodeAttribute(const chargr * name, chargr * valu
 
     TiXmlElement * node = m_currentNode->ToElement();
 
+    EStreamError result = STREAM_ERROR_OK;
     StrStackConverter sysName(name);
     const char * attr = node->Attribute(sysName);
     if (attr != NULL) 
         StrUtf8ConvertToCharGr(attr, value, len);
-    else
-        value[0] = L'\0';
+    else 
+        result = STREAM_ERROR_BADDATA;
 
-    return STREAM_ERROR_OK;
+    return result;
 }
 
 //====================================================
