@@ -224,7 +224,7 @@ public:
     ) {
        Dummy * dummy = dynamic_cast<Dummy *>(inst);
        if (dummy != NULL) {
-          if (name == ReflHash(L"btest") && oldType == ReflTypeInt32) {
+          if (name == ReflHash(L"btest") && oldType == ReflHash(L"int32")) {
              int32 * idata = reinterpret_cast<int32 *>(data);
              
              dummy->btest = *idata > 0 ? true : false;
@@ -256,7 +256,7 @@ public:
     ) {
        Dummy * dummy = dynamic_cast<Dummy *>(inst);
        if (dummy != NULL) {
-          if (name == ReflHash(L"basesubitest") && oldType == ReflTypeInt32) {
+          if (name == ReflHash(L"basesubitest") && oldType == ReflHash(L"int32")) {
              int32 * idata = reinterpret_cast<int32 *>(data);
 
              dummy->class_alias_test = (*idata);

@@ -1,12 +1,12 @@
 <?xml version="1.0" ?>
-<Class Type="Dummy" Version="0x0">
-    <BaseClass Type="OldBaseClass" Version="0x0">
+<Class Type="Dummy" Version="0x1">
+    <BaseClass Type="OldBaseClass" Version="0x1">
         <DataMember Name="basei32test" Type="int32">876</DataMember>
         <DataMember Name="basef32test" Type="float32">8.76</DataMember>
         <DataMember Name="basei16test" Type="int16">-678</DataMember>
     </BaseClass>
-    <BaseClass Type="BaseClass2" Version="0x0">
-        <BaseClass Type="BaseBaseClass2" Version="0x0">
+    <BaseClass Type="BaseClass2" Version="0x1">
+        <BaseClass Type="BaseBaseClass2" Version="0x1">
             <DataMember Name="basebase2i32test" Type="int32">400</DataMember>
             <DataMember Name="basebase2f32test" Type="float32">-127.000000</DataMember>
             <DataMember Name="basebase2u16test" Type="uint16">17</DataMember>
@@ -19,8 +19,8 @@
     <DataMember Name="f32test" Type="float32">10.900000</DataMember>
     <DataMember Name="i8test" Type="int8">b</DataMember>
     <DataMember Name="mcTest" Type="class">
-        <Class Type="SubNameSpace::SubClass" Version="0x0">
-            <BaseClass Type="SubNameSpace::BaseSubClass" Version="0x0">
+        <Class Type="SubNameSpace::SubClass" Version="0x1">
+            <BaseClass Type="SubNameSpace::BaseSubClass" Version="0x1">
                 <DataMember Name="basesubitest" Type="int32">778899</DataMember>
                 <DataMember Name="basesubftest" Type="float32">77.8899</DataMember>
             </BaseClass>
@@ -33,8 +33,8 @@
     <DataMember Name="ptest" Type="percentage">40.000</DataMember>
     <DataMember Name="atest" Type="angle">45.0</DataMember>
     <DataMember Name="ctest" Type="class">
-        <Class Type="SubNameSpace::SubClass" Version="0x0">
-            <BaseClass Type="SubNameSpace::BaseSubClass" Version="0x0">
+        <Class Type="SubNameSpace::SubClass" Version="0x1">
+            <BaseClass Type="SubNameSpace::BaseSubClass" Version="0x1">
                 <DataMember Name="basesubitest" Type="int32">778899</DataMember>
                 <DataMember Name="basesubftest" Type="float32">77.8899</DataMember>
             </BaseClass>
@@ -42,4 +42,5 @@
             <DataMember Name="subftest" Type="float32">-15.678</DataMember>
         </Class>
     </DataMember>
+    <DataMember Name="oldValue" Type="int32">45.0</DataMember>
 </Class>

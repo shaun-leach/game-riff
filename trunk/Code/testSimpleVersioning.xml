@@ -1,0 +1,5 @@
+<?xml version="1.0" ?>
+<Class Type="SimpleVersioningClass" Version="0x1">
+    <DataMember Name="oldUint32Test" Type="uint32">320000</DataMember>
+    <DataMember Name="oldFloat32Test" Type="float32">16.16</DataMember>
+</Class>

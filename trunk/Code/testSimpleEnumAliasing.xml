@@ -1,5 +1,5 @@
 <?xml version="1.0" ?>
-<Class Type="SimpleEnumAliasingClass" Version="0x0">
+<Class Type="SimpleEnumAliasingClass" Version="0x1">
     <DataMember Name="baseEnumTest" Type="enum">ALIAS_VALUE_4</DataMember>
     <DataMember Name="baseUint32Test" Type="uint32">320000</DataMember>
 </Class>

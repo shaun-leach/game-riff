@@ -35,10 +35,10 @@ class IStructuredTextStream;
 typedef unsigned    ReflIndex;
 typedef Hash32      ReflHash;
 
-typedef ReflClass * (*CreateFunc)(unsigned count, MemFlags memFlags);
-typedef void (*FinalizationFunc)(ReflClass * inst);
-typedef void (*ConversionFunc)(ReflClass * inst, ReflHash name, ReflHash oldType, void * data);
-typedef void (*LoadFunc)(IStructuredTextStream * stream, const ReflClassDesc * desc, unsigned version, ReflClass * inst);
+typedef ReflClass * (*ReflCreateFunc)(unsigned count, MemFlags memFlags);
+typedef void (*ReflFinalizationFunc)(ReflClass * inst);
+typedef void (*ReflConversionFunc)(ReflClass * inst, ReflHash name, ReflHash oldType, void * data);
+typedef void (*ReflVersioningFunc)(IStructuredTextStream * stream, ReflClassDesc * desc, unsigned version, ReflClass * inst);
 
 const ReflHash ReflTypeBool(L"bool");
 const ReflHash ReflTypeInt32(L"int32");
@@ -59,9 +59,13 @@ public:
         unsigned        offset
     );
 
-    ReflIndex Type() const {
-        return m_index;
-    }
+    ReflMember(
+        ReflClassDesc * container,
+        ReflHash        typeHash,
+        const chargr  * name, 
+        unsigned        size,
+        bool            deprecated
+    );
 
     const chargr * Name() const {
         return m_name;
@@ -71,6 +75,10 @@ public:
 
     ReflHash NameHash() const {
         return m_nameHash;
+    }
+
+    ReflHash TypeHash() const {
+        return m_typeHash;
     }
 
     const ReflMember * GetNext() const {
@@ -103,7 +111,14 @@ public:
     const EnumValue * GetEnumValue(int value) const;
     const EnumValue * GetEnumValue(const chargr * str, unsigned len) const;
 
-    void RegisterConversionFunc(ConversionFunc func);
+    void RegisterConversionFunc(ReflConversionFunc func);
+
+    void RegisterTempBinding(void * data) {
+        m_tempBinding = data;
+    }
+    void ClearTempBinding() {
+        m_tempBinding = NULL;
+    }
 
 private:
 
@@ -121,7 +136,11 @@ private:
         ReflIndex               oldType
     ) const;
 
-    ReflIndex DetermineType(ReflHash typeHash) const;
+    ReflIndex DetermineTypeIndex(ReflHash typeHash) const;
+
+    ReflIndex TypeIndex() const {
+        return m_index;
+    }
 
 private:
     ReflHash        m_nameHash;
@@ -136,7 +155,10 @@ private:
     EnumValue     * m_enumValues;
     ReflMember    * m_next;
 
-    ConversionFunc  m_convFunc;
+    ReflConversionFunc  m_convFunc;
+
+    bool            m_deprecated; // Need bit flags class
+    void          * m_tempBinding;
 };
 
 class ReflClassDesc {
@@ -144,20 +166,19 @@ public:
     ReflClassDesc(
         const chargr  * name, 
         unsigned        size,
-        CreateFunc      creationFunc
+        ReflCreateFunc  creationFunc
     );
 
     void Finalize();
 
     unsigned            NumMembers() const;
     const ReflMember  & GetMember(unsigned index) const;
-    const ReflMember  * FindMember(const chargr * name, unsigned * offset) const;
-    const ReflMember  * FindMember(ReflHash name, unsigned * offset) const;
+    const ReflMember  * FindMember(ReflHash name) const;
 
     void RegisterMember(ReflMember * member);
 
-    void RegisterFinalizationFunc(FinalizationFunc finalFunc);
-    void RegisterLoadFunc(LoadFunc loadFunc, unsigned currentVersion);
+    void RegisterFinalizationFunc(ReflFinalizationFunc finalFunc);
+    void RegisterManualVersioningFunc(ReflVersioningFunc loadFunc, unsigned currentVersion);
 
     bool NameMatches(const ReflHash rhs) const {
         return m_nameHash == rhs;
@@ -168,7 +189,10 @@ public:
     }
 
     bool Serialize(IStructuredTextStream * stream, const ReflClass * inst, unsigned offset = 0) const;
-    bool Deserialize(IStructuredTextStream * stream, ReflClass * inst, unsigned offset = 0) const;
+    bool Deserialize(IStructuredTextStream * stream, ReflClass * inst) const;
+    bool Deserialize(IStructuredTextStream * stream, ReflClass * inst, unsigned offset) const;
+    bool DeserializeMembers(IStructuredTextStream * stream, ReflClass * inst) const;
+    bool DeserializeMembers(IStructuredTextStream * stream, ReflClass * inst, unsigned offset) const;
 //  class ReflItr {
 //  public:
 //      ReflMember * operator * ();
@@ -177,6 +201,10 @@ public:
 //  private:
 //   //   const ReflClassDesc *
 //  };
+
+    bool RegisterTempBinding(ReflHash memberHash, ReflHash typeHash, void * data);
+    void ClearTempBinding(ReflHash memberHash, ReflHash typeHash);
+    void ClearAllTempBindings();
 
     struct Parent {
         Parent    * next;
@@ -202,29 +230,34 @@ public:
 
 private:
 
-    bool SerializeMembers(IStructuredTextStream * stream, const ReflClass * inst, unsigned offset) const;
     void FinalizeInst(ReflClass * inst) const;
+    const ReflMember  * FindMember(const chargr * name, unsigned * offset) const;
+    const ReflMember  * FindMember(ReflHash name, unsigned * offset) const;
+    ReflMember  * FindMember(ReflHash name);
+
     const ReflMember  * FindLocalMember(ReflHash name) const;
     Parent * FindParent(ReflHash parentHash) const;
 
+    bool SerializeMembers(IStructuredTextStream * stream, const ReflClass * inst, unsigned offset) const;
+
 private:
-    ReflHash            m_nameHash;
-    const chargr      * m_name;
+    ReflHash                m_nameHash;
+    const chargr          * m_name;
 
-    unsigned            m_version;
-    unsigned            m_size;
+    unsigned                m_version;
+    unsigned                m_size;
 
-    CreateFunc          m_creationFunc;
-    FinalizationFunc    m_finalizeFunc;
-    LoadFunc            m_loadFunc;
+    ReflCreateFunc          m_creationFunc;
+    ReflFinalizationFunc    m_finalizeFunc;
+    ReflVersioningFunc      m_versioningFunc;
 
-    ReflClassDesc     * m_next;
+    ReflClassDesc         * m_next;
 
-    Parent            * m_parents;
+    Parent                * m_parents;
 
-    ReflMember        * m_members;
+    ReflMember            * m_members;
 
-    ReflAlias         * m_memberAliases;
+    ReflAlias             * m_memberAliases;
 };
 
 class ReflClass {
@@ -315,6 +348,11 @@ public:
     };                                                                      \
     static ReflAutoRegister##name s_autoRegister##name
 
+#define REFL_DO_MANUAL_VERSIONING(func, version)                            \
+        s_reflInfo.RegisterManualVersioningFunc(                            \
+            func,                                                           \
+            version                                                         \
+        )
 #define REFL_ADD_CLASS_ALIAS(name, alias)                                   \
             static ReflAlias s_alias##alias = {                             \
                 NULL,                                                       \
@@ -365,6 +403,15 @@ public:
                 name,                                                       \
                 ReflGetTypeHash((((parent *)(0x0))->name))                  \
             )                           
+
+#define REFL_MEMBER_DEPRECATED(parent, name, type)                          \
+            static ReflMember s_member##name(                               \
+                &s_reflInfo,                                                \
+                ReflGetTypeHash(*((type *) (0x0))),                         \
+                TOWSTR(name),                                               \
+                sizeof(type),                                               \
+                true                                                        \
+            )
 
 #define REFL_MEMBER_ENUM(parent, name)                                      \
             REFL_MEMBER_INTERNAL(                                           \
