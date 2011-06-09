@@ -71,6 +71,7 @@ public:
         angleTest(0.0f),
         percentTest(0.0f)
     {
+        InitReflType();
     }
     
 //private: Make these public to simplify the test code        
@@ -143,7 +144,7 @@ TEST(ReflectionTest, TestBaseTypes) {
 
     IStructuredTextStream * testStream = StreamCreateXML(L"testBaseTypes.xml");
     ASSERT_TRUE(testStream != NULL);
-    bool result = testTypes.Serialize(testStream);
+    bool result = ReflLibrary::Serialize(testStream, &testTypes);
     EXPECT_EQ(true, result);
     testStream->Save();
     delete testStream;
@@ -154,7 +155,7 @@ TEST(ReflectionTest, TestBaseTypes) {
 
     ReflClass * inst = ReflLibrary::Deserialize(testStream, MemFlags(MEM_ARENA_DEFAULT, MEM_CAT_TEST));
     ASSERT_TRUE(inst != NULL);
-    TestBaseTypes * loadTypes = dynamic_cast<TestBaseTypes *>(inst);
+    TestBaseTypes * loadTypes = TestBaseTypes::Cast(inst);
     ASSERT_TRUE(loadTypes != NULL);
 
     EXPECT_EQ(s_boolValue,      loadTypes->boolTest);
@@ -187,6 +188,7 @@ public:
         memberUint32Test(0),
         memberFloat32Test(0.0f)
     {
+        InitReflType();
     }
 
 //private:
@@ -206,6 +208,7 @@ public:
         containerUint16Test(0),
         containerBoolTest(false)
     {
+        InitReflType();
     }
 
 // private:
@@ -230,7 +233,7 @@ TEST(ReflectionTest, TestMemberClass) {
 
     IStructuredTextStream * testStream = StreamCreateXML(L"testMemberClass.xml");
     ASSERT_TRUE(testStream != NULL);
-    bool result = testClassMember.Serialize(testStream);
+    bool result = ReflLibrary::Serialize(testStream, &testClassMember);
     EXPECT_EQ(true, result);
     testStream->Save();
     delete testStream;
@@ -241,7 +244,7 @@ TEST(ReflectionTest, TestMemberClass) {
 
     ReflClass * inst = ReflLibrary::Deserialize(testStream, MemFlags(MEM_ARENA_DEFAULT, MEM_CAT_TEST));
     ASSERT_TRUE(inst != NULL);
-    TestMemberClass * loadTypes = dynamic_cast<TestMemberClass *>(inst);
+    TestMemberClass * loadTypes = TestMemberClass::Cast(inst);
     ASSERT_TRUE(loadTypes != NULL);
 
     EXPECT_EQ(s_uint16Value,    loadTypes->containerUint16Test);

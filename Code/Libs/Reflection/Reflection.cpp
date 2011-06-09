@@ -851,6 +851,46 @@ unsigned ReflClassDesc::NumMembers() const {
 }
 
 //====================================================
+ReflClass * ReflClassDesc::OffsetToParent(ReflClass * inst, ReflHash typeHash) const {
+    ReflClass * ret = NULL;
+    const ReflClassDesc::Parent * parent = m_parents;
+    for (; parent != NULL && ret == NULL; parent = parent->next) {
+        if (parent->parentHash == typeHash) 
+            ret = reinterpret_cast<ReflClass *>(reinterpret_cast<byte *>(inst) + parent->offset);
+        else {
+            const ReflClassDesc * parentDesc = ReflLibrary::GetClassDesc(parent->parentHash);
+            if (parentDesc != NULL) {
+                ret = parentDesc->OffsetToParent(inst, typeHash);
+                if (ret != NULL) 
+                    ret = reinterpret_cast<ReflClass *>(reinterpret_cast<byte *>(ret) + parent->offset);\
+            }
+        }
+    }
+
+    return ret;
+}
+
+//====================================================
+const ReflClass * ReflClassDesc::OffsetToParent(const ReflClass * inst, ReflHash typeHash) const {
+    const ReflClass * ret = NULL;
+    const ReflClassDesc::Parent * parent = m_parents;
+    for (; parent != NULL && ret == NULL; parent = parent->next) {
+        if (parent->parentHash == typeHash) 
+            ret = reinterpret_cast<const ReflClass *>(reinterpret_cast<const byte *>(inst) + parent->offset);
+        else {
+            const ReflClassDesc * parentDesc = ReflLibrary::GetClassDesc(parent->parentHash);
+            if (parentDesc != NULL) {
+                ret = parentDesc->OffsetToParent(inst, typeHash);
+                if (ret != NULL) 
+                    ret = reinterpret_cast<const ReflClass *>(reinterpret_cast<const byte *>(ret) + parent->offset);\
+            }
+        }
+    }
+
+    return ret;
+}
+
+//====================================================
 void ReflClassDesc::RegisterFinalizationFunc(ReflFinalizationFunc func) {
     ASSERTGR(m_finalizeFunc == NULL);
     m_finalizeFunc = func;
@@ -945,48 +985,29 @@ void ReflClassDesc::SetNext(ReflClassDesc * next) {
     m_next = next;
 }
 
-//====================================================
-ReflClass::ReflClass() {
-}
-
 //////////////////////////////////////////////////////
 //
 // External Functions
 //
 
 //====================================================
-const ReflClassDesc * ReflLibrary::GetClassDesc(ReflHash nameHash) {
-    const ReflClassDesc * classDesc = s_descHead;
-    while(classDesc != NULL) {
-        if (classDesc->NameMatches(nameHash))
-            break;
-        classDesc = classDesc->GetNext();
-    }
+ReflClass * ReflCanCastTo(ReflClass * inst, ReflHash type) {
+    ReflClass * ret = NULL;
+    const ReflClassDesc * desc = ReflLibrary::GetClassDesc(inst->GetType());
+    if (desc != NULL) 
+        ret = desc->OffsetToParent(inst, type);
 
-    if (classDesc == NULL) {
-        const ReflAlias * alias = s_classAliasHead;
-        for (; alias != NULL; alias = alias->next) {
-            if (alias->oldHash == nameHash) {
-                classDesc = GetClassDesc(alias->newHash);
-                break;
-            }
-        }
-    }
-    return classDesc;
+    return ret;
 }
 
 //====================================================
-void ReflLibrary::RegisterClassDesc(ReflClassDesc * classDesc) {
-    classDesc->SetNext(s_descHead);
-    s_descHead = classDesc;
+const ReflClass * ReflCanCastTo(const ReflClass * inst, ReflHash type) {
+    const ReflClass * ret = NULL;
+    const ReflClassDesc * desc = ReflLibrary::GetClassDesc(inst->GetType());
+    if (desc != NULL) 
+        ret = desc->OffsetToParent(inst, type);
 
-    classDesc->Finalize();
-}
-
-//====================================================
-void ReflLibrary::RegisterClassDescAlias(ReflAlias * classDescAlias) {
-    classDescAlias->next = s_classAliasHead;
-    s_classAliasHead = classDescAlias;
+    return ret;
 }
 
 //====================================================
@@ -1015,5 +1036,59 @@ ReflClass * ReflLibrary::Deserialize(IStructuredTextStream * stream, MemFlags me
 
     stream->ReadParentNode();
     return ret;
+}
+
+//====================================================
+bool ReflLibrary::Deserialize(IStructuredTextStream * stream, ReflClass * inst) {
+    const ReflClassDesc * desc = GetClassDesc(inst);
+
+    return desc->Deserialize(stream, inst);
+}
+
+//====================================================
+const ReflClassDesc * ReflLibrary::GetClassDesc(ReflHash nameHash) {
+    const ReflClassDesc * classDesc = s_descHead;
+    while(classDesc != NULL) {
+        if (classDesc->NameMatches(nameHash))
+            break;
+        classDesc = classDesc->GetNext();
+    }
+
+    if (classDesc == NULL) {
+        const ReflAlias * alias = s_classAliasHead;
+        for (; alias != NULL; alias = alias->next) {
+            if (alias->oldHash == nameHash) {
+                classDesc = GetClassDesc(alias->newHash);
+                break;
+            }
+        }
+    }
+    return classDesc;
+}
+
+//====================================================
+const ReflClassDesc * ReflLibrary::GetClassDesc(const ReflClass * inst) {
+    return GetClassDesc(inst->GetType());
+}
+
+//====================================================
+void ReflLibrary::RegisterClassDesc(ReflClassDesc * classDesc) {
+    classDesc->SetNext(s_descHead);
+    s_descHead = classDesc;
+
+    classDesc->Finalize();
+}
+
+//====================================================
+void ReflLibrary::RegisterClassDescAlias(ReflAlias * classDescAlias) {
+    classDescAlias->next = s_classAliasHead;
+    s_classAliasHead = classDescAlias;
+}
+
+//====================================================
+bool ReflLibrary::Serialize(IStructuredTextStream * stream, const ReflClass * inst) {
+    const ReflClassDesc * desc = GetClassDesc(inst);
+
+    return desc->Serialize(stream, inst);
 }
 
