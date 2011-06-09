@@ -62,6 +62,7 @@ public:
         baseUint32Test(0),
         baseFloat32Test(0.0f)
     {
+        InitReflType();
     }
 
 //private:
@@ -84,7 +85,7 @@ TEST(ReflectionTest, TestSimpleNamespaces) {
 
     IStructuredTextStream * testStream = StreamCreateXML(L"testBasicNamespaces.xml");
     ASSERT_TRUE(testStream != NULL);
-    bool result = testNamespaces.Serialize(testStream);
+    bool result = ReflLibrary::Serialize(testStream, &testNamespaces);
     EXPECT_EQ(true, result);
     testStream->Save();
     delete testStream;
@@ -95,7 +96,7 @@ TEST(ReflectionTest, TestSimpleNamespaces) {
 
     ReflClass * inst = ReflLibrary::Deserialize(testStream, MemFlags(MEM_ARENA_DEFAULT, MEM_CAT_TEST));
     ASSERT_TRUE(inst != NULL);
-    TestSpace::SimpleNamespaceClass * loadTypes = dynamic_cast<TestSpace::SimpleNamespaceClass *>(inst);
+    TestSpace::SimpleNamespaceClass * loadTypes = TestSpace::SimpleNamespaceClass::Cast(inst);
     EXPECT_EQ(true, loadTypes != NULL);
 
     EXPECT_EQ(s_uint32Value,      loadTypes->baseUint32Test);
@@ -119,6 +120,7 @@ public:
         baseUint32Test(0),
         baseFloat32Test(0.0f)
     {
+        InitReflType();
     }
 
 //private:
@@ -140,6 +142,7 @@ public:
         int16Test(0),
         int8Test(0)
     {
+        InitReflType();
     }
 
 //private:
@@ -163,7 +166,7 @@ TEST(ReflectionTest, TestParentNamespaces) {
 
     IStructuredTextStream * testStream = StreamCreateXML(L"testParentNamespaces.xml");
     ASSERT_TRUE(testStream != NULL);
-    bool result = testNamespaces.Serialize(testStream);
+    bool result = ReflLibrary::Serialize(testStream, &testNamespaces);
     EXPECT_EQ(true, result);
     testStream->Save();
     delete testStream;
@@ -174,7 +177,7 @@ TEST(ReflectionTest, TestParentNamespaces) {
 
     ReflClass * inst = ReflLibrary::Deserialize(testStream, MemFlags(MEM_ARENA_DEFAULT, MEM_CAT_TEST));
     ASSERT_TRUE(inst != NULL);
-    SimpleParentNamespaceClass * loadTypes = dynamic_cast<SimpleParentNamespaceClass *>(inst);
+    SimpleParentNamespaceClass * loadTypes = SimpleParentNamespaceClass::Cast(inst);
     EXPECT_EQ(true, loadTypes != NULL);
 
     EXPECT_EQ(s_uint32Value,      loadTypes->baseUint32Test);
@@ -200,6 +203,7 @@ public:
         baseUint8Test2(0),
         baseUint16Test0(0)
     {
+        InitReflType();
     }
 
 //private:
@@ -225,7 +229,7 @@ TEST(ReflectionTest, TestAliasedNamespaces) {
 
     ReflClass * inst = ReflLibrary::Deserialize(testStream, MemFlags(MEM_ARENA_DEFAULT, MEM_CAT_TEST));
     ASSERT_TRUE(inst != NULL);
-    SimpleAliasedNamespaceClass * loadTypes = dynamic_cast<SimpleAliasedNamespaceClass *>(inst);
+    SimpleAliasedNamespaceClass * loadTypes = SimpleAliasedNamespaceClass::Cast(inst);
     EXPECT_EQ(true, loadTypes != NULL);
 
     EXPECT_EQ(s_uint8Value,      loadTypes->baseUint8Test0);

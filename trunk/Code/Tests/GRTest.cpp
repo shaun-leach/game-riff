@@ -99,6 +99,7 @@ public:
       basef32test(4.0f),
       basei16test(1600)
    {
+      InitReflType();
    }
 
 private:
@@ -122,6 +123,7 @@ public:
       basebase2f32test(-127.0f),
       basebase2u16test(17)
    {
+      InitReflType();
    }
 
 private:
@@ -144,6 +146,7 @@ public:
       base2f32test(596.0f),
       base2u16test(4000)
    {
+      InitReflType();
    }
 
 private:
@@ -168,6 +171,7 @@ public:
         basesubitest(445566),
         basesubftest(44.5566f)
     {
+       InitReflType();
     }
 
 private:
@@ -187,6 +191,7 @@ public:
         subitest(102),
         subftest(457.345f)
     {
+       InitReflType();
     }
 
 private:
@@ -214,6 +219,7 @@ public:
         pertest(1.0f),
         angtest(2.57f)
     {
+       InitReflType();
     }
 
     static void Convert(
@@ -222,7 +228,7 @@ public:
        ReflHash      oldType, 
        void        * data
     ) {
-       Dummy * dummy = dynamic_cast<Dummy *>(inst);
+       Dummy * dummy = Dummy::Cast(inst);
        if (dummy != NULL) {
           if (name == ReflHash(L"btest") && oldType == ReflHash(L"int32")) {
              int32 * idata = reinterpret_cast<int32 *>(data);
@@ -238,7 +244,7 @@ public:
        ReflHash      oldType, 
        void        * data
     ) {
-       Dummy * dummy = dynamic_cast<Dummy *>(inst);
+       Dummy * dummy = Dummy::Cast(inst);
        if (dummy != NULL) {
           if (name == ReflHash(L"itest") && oldType == ReflHash(L"float32")) {
              float32 * fdata = reinterpret_cast<float32 *>(data);
@@ -254,7 +260,7 @@ public:
        ReflHash      oldType, 
        void        * data
     ) {
-       Dummy * dummy = dynamic_cast<Dummy *>(inst);
+       Dummy * dummy = Dummy::Cast(inst);
        if (dummy != NULL) {
           if (name == ReflHash(L"basesubitest") && oldType == ReflHash(L"int32")) {
              int32 * idata = reinterpret_cast<int32 *>(data);
@@ -307,7 +313,8 @@ int main(int argc,  char * argv[]) {
     IStructuredTextStream * testStream = StreamCreateXML(L"test.xml");
 
     Dummy testClass;
-
+ 
+    ReflLibrary::Serialize(testStream, &testClass);
     testClass.Serialize(testStream);
 
     testStream->Save();
@@ -319,7 +326,10 @@ int main(int argc,  char * argv[]) {
     Dummy testClass;
     //testClass.Deserialize(testStream);
     ReflClass * inst = ReflLibrary::Deserialize(testStream, MemFlags(MEM_ARENA_DEFAULT, MEM_CAT_TEST));
-    Dummy * dummy = dynamic_cast<Dummy *>(inst);
+    Dummy * dummy             = Dummy::Cast(inst);
+    BaseBaseClass2 * basebase = BaseBaseClass2::Cast(inst);
+    BaseClass * base          = BaseClass::Cast(inst);
+    BaseClass2 * base2        = BaseClass2::Cast(inst);
 //*/
     DestroyObjects();
 }

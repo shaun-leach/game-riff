@@ -193,14 +193,6 @@ public:
     bool Deserialize(IStructuredTextStream * stream, ReflClass * inst, unsigned offset) const;
     bool DeserializeMembers(IStructuredTextStream * stream, ReflClass * inst) const;
     bool DeserializeMembers(IStructuredTextStream * stream, ReflClass * inst, unsigned offset) const;
-//  class ReflItr {
-//  public:
-//      ReflMember * operator * ();
-//      void operator++();
-//
-//  private:
-//   //   const ReflClassDesc *
-//  };
 
     bool RegisterTempBinding(ReflHash memberHash, ReflHash typeHash, void * data);
     void ClearTempBinding(ReflHash memberHash, ReflHash typeHash);
@@ -228,6 +220,8 @@ public:
 
     void RegisterMemberAlias(ReflAlias * alias);
 
+    ReflClass * OffsetToParent(ReflClass * inst, ReflHash typeHash) const;
+    const ReflClass * OffsetToParent(const ReflClass * inst, ReflHash typeHash) const;
 private:
 
     void FinalizeInst(ReflClass * inst) const;
@@ -262,12 +256,21 @@ private:
 
 class ReflClass {
 public:
-    ReflClass();
+    ReflClass() {
+    }
 
-    virtual bool Serialize(IStructuredTextStream * stream) = 0;
-    virtual bool Deserialize(IStructuredTextStream * stream) = 0;
+    ReflHash GetType() const {
+        return m_type;
+    }
+
+protected:
+
+    void SetTypeHash(ReflHash typeHash) {
+        m_type = typeHash;
+    }
 
 private:
+    ReflHash m_type;
 };
 
 template<typename t_Type>
@@ -276,12 +279,18 @@ template<typename t_Type>
 class ReflLibrary {
 public:
     static const ReflClassDesc * GetClassDesc(ReflHash nameHash);
+    static const ReflClassDesc * GetClassDesc(const ReflClass * inst);
 
     static void RegisterClassDesc(ReflClassDesc * classDesc);
     static void RegisterClassDescAlias(ReflAlias * classDescAlias);
 
     static ReflClass * Deserialize(IStructuredTextStream * stream, MemFlags memFlags);
+    static bool Serialize(IStructuredTextStream * stream, const ReflClass * inst);
+    static bool Deserialize(IStructuredTextStream * stream, ReflClass * inst);
 };
+
+ReflClass * ReflCanCastTo(ReflClass * inst, ReflHash type);
+const ReflClass * ReflCanCastTo(const ReflClass * inst, ReflHash type);
 
 #define REFL_DEFINE_USER_TYPE(type)                                         \
     template<typename t_Type>                                               \
@@ -296,22 +305,41 @@ public:
         static ReflHash s_className;                                        \
     public:                                                                 \
         static ReflClass * Create(unsigned count, MemFlags memFlags);       \
-        bool Serialize(IStructuredTextStream * stream);                     \
-        bool Deserialize(IStructuredTextStream * stream);                   \
-        static const ReflClassDesc & GetReflectionInfo();                   \
-        static ReflClassDesc * CreateReflClassDesc()
+        static const ReflClassDesc * GetReflectionInfo();                   \
+        static ReflClassDesc * CreateReflClassDesc();                       \
+        static name * Cast(ReflClass * inst);                               \
+        static const name * Cast(const ReflClass * inst);                   \
+        void InitReflType()
 
 #define REFL_IMPL_CLASS_INTERNAL(base, name, nameStr)                       \
     ReflClass * name::Create(unsigned count, MemFlags memFlags) {           \
         return static_cast<base *>(new(memFlags) name[count]);              \
     }                                                                       \
-    bool name::Serialize(IStructuredTextStream * stream) {                  \
-        const ReflClassDesc * desc = ReflLibrary::GetClassDesc(s_className);\
-        return desc->Serialize(stream, static_cast<base *>(this));          \
+    const ReflClassDesc * name::GetReflectionInfo() {                       \
+        return ReflLibrary::GetClassDesc(s_className);                      \
     }                                                                       \
-    bool name::Deserialize(IStructuredTextStream * stream) {                \
-        const ReflClassDesc * desc = ReflLibrary::GetClassDesc(s_className);\
-        return desc->Deserialize(stream, static_cast<base *>(this));        \
+    name * name::Cast(ReflClass * inst) {                                   \
+        name * derived = NULL;                                              \
+        if (inst->GetType() == s_className)                                 \
+            derived = reinterpret_cast<name *>(inst);                       \
+        else {                                                              \
+            ReflClass * parent = ReflCanCastTo(inst, s_className);          \
+            derived = reinterpret_cast<name *>(parent);                     \
+        }                                                                   \
+        return derived;                                                     \
+    }                                                                       \
+    const name * name::Cast(const ReflClass * inst) {                       \
+        const name * derived = NULL;                                        \
+        if (inst->GetType() == s_className)                                 \
+            derived = reinterpret_cast<const name *>(inst);                 \
+        else {                                                              \
+            const ReflClass * parent = ReflCanCastTo(inst, s_className);    \
+            derived = reinterpret_cast<const name *>(parent);               \
+        }                                                                   \
+        return derived;                                                     \
+    }                                                                       \
+    void name::InitReflType() {                                             \
+        base::SetTypeHash(s_className);                                     \
     }                                                                       \
     ReflHash name::s_className = ReflHash(nameStr)
 

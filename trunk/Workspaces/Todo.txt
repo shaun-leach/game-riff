@@ -16,20 +16,34 @@
 ---Too many stack strings with hardcoded values
 --------------
 -flesh out reflection more
---Prep everything for precompiled hashes
 --eliminate virtuals in ReflClass base
----Yes with template functions
----alternatively if each instance just had a 32 bit hash in the base class I could do everything as a c interface! :)
-----If I go this route I need to be sure this makes sense with virtuals
-----Especially for ref-counted assets
----Useful for classes I don't control, however can't access private members
+----test that classes with virtuals work correctly, ReflClass has to be at the root of the inheritance?
+****Need better initialization support
+****alternatively if each instance just had a 32 bit hash in the base class I could do everything as a c interface! :)
+****Need to handle casting to parents
+***Useful for classes I don't control, however can't access private members. Test this
+***Yes with template functions, though can't do a full implementation
+--Use table instead of linked list for members?
+--Need to support enums not tied to a class
+---Need designer friendly names for all enums
+--add code to finalize entire reflection library
+---Finalize when reflection library is initialized
+---Verify that every member of type "class" has a registered ReflClassDesc
+---Verify that every parent class has a registered ReflClassDesc
+---Verify that members are the correct size
+---Verify that member offsets are monotonic
+---make sure that there are no duplicate class names, include aliases
+---Verify that a class doesn't reflect members of a base class
+---If using 32 bit hashes, verify that there are no collisions
+--can I trap missing parents?
+--Prep everything for precompiled hashes
+--Designer friendly names???
+--Can I use typeid to get member name strings and compile time only? And do I need this?
+--Add support for classes that can't derive off of ReflClass
 --How do I return loaded data to outside world
 ---Think about use cases for how loaded data will be used
----All handled through the resource manager
----Need the ability to safely cast to the appropriate type
---Add safe cast functions
----Why not use RTTI???, inconsistent between platforms, not serializable, requires virtuals, very limited for what I need, effectively redundant
----Test RTTI
+***All handled through the resource manager
+***Need the ability to safely cast to the appropriate type
 --instead of doing all initialization in global contructors, just register functions and then call them all at the beginning of main
 --handle all types
 ---remove basic string type, should either be a hashed file name, or localized string
@@ -51,7 +65,6 @@
 ---Need a base class to derive streams off of so I only have one function for text and binary deserialization
 --implement template version and test performance when reading binary data
 --Test
----Manual versioning
 ---Need to test all types
 ----Test currently unimplemented types
 ****Currently implemented types
@@ -60,7 +73,8 @@
 ----Need to log these
 ---Missing aliases(this is really just a extra type)
 ----Need to log these
----Complex inheritance
+***Complex inheritance
+***Manual versioning
 ***Multiple aliases
 ***Simple class hierarchy
 ***multiple inheritance
@@ -69,14 +83,6 @@
 ***Conversion
 ***Namespaces
 --Need to remove strings in "gold" builds
---add code to finalize entire reflection library
----Finalize when reflection library is initialized
----Verify that every member of type "class" has a registered ReflClassDesc
----Verify that every parent class has a registered ReflClassDesc
----Verify that members are the correct size
----Verify that member offsets are monotonic
----make sure that there are no duplicate class names, include aliases
----If using 32 bit hashes, verify that there are no collisions
 --Improve upon embedded class reading(would be nice to have one function that reads single classes, subclasses and embedded classes out of a file)
 --Need to support deserializing reflected classes that are embedded in other xml
 ---Really just need to return multiple ReflClasses from Deserialize function.
@@ -129,6 +135,10 @@
 ****Type conversion
 ****Renamed enums
 ****Rename
+**Add safe cast functions
+***Need to handle casting to parent classes
+***Why not use RTTI???, inconsistent between platforms, not serializable, requires virtuals, very limited for what I need, effectively redundant
+***Test RTTI
 ----------
 -Create tools platform
 --Layer tools functionality on top of platform
@@ -145,6 +155,8 @@
 --test against STL
 ----------
 -Ref counted type
+-Smart pointers
+-Weak pointers
 ----------
 -Flesh out memory manager
 --memory leak checker

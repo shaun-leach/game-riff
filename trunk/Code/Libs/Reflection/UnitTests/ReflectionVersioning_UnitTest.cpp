@@ -61,6 +61,7 @@ public:
         baseFloat32Test(0.0f),
         newUint32Test(0)
     {
+        InitReflType();
     }
 
     static void VersioningFunc(
@@ -69,7 +70,7 @@ public:
         unsigned                version, 
         ReflClass             * inst
     ) {
-        SimpleVersioningClass * versioning = dynamic_cast<SimpleVersioningClass *>(inst);
+        SimpleVersioningClass * versioning = SimpleVersioningClass::Cast(inst);
         if (versioning != NULL) {
             uint32 oldUintValue;
             float32 oldFloatValue;
@@ -87,6 +88,8 @@ public:
                     versioning->baseUint32Test  = 0;
                 }
             }
+
+            desc->ClearAllTempBindings();
         }
     }
 //private:
@@ -110,7 +113,7 @@ TEST(ReflectionTest, TestSimpleVersioning) {
 
     ReflClass * inst = ReflLibrary::Deserialize(testStream, MemFlags(MEM_ARENA_DEFAULT, MEM_CAT_TEST));
     ASSERT_TRUE(inst != NULL);
-    SimpleVersioningClass * loadTypes = dynamic_cast<SimpleVersioningClass *>(inst);
+    SimpleVersioningClass * loadTypes = SimpleVersioningClass::Cast(inst);
     EXPECT_EQ(true, loadTypes != NULL);
 
     EXPECT_EQ(2 * s_uint32Value,  loadTypes->baseUint32Test);

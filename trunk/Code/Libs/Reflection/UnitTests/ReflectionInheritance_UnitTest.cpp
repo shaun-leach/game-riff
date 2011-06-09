@@ -60,6 +60,7 @@ public:
         baseUint32Test(0),
         baseFloat32Test(0.0f)
     {
+        InitReflType();
     }
 
 //private:
@@ -80,6 +81,7 @@ public:
         derivedInt16Test(0),
         derivedInt16Test2(0)
     {
+        InitReflType();
     }
 
 //private:
@@ -106,7 +108,7 @@ TEST(ReflectionTest, TestSimpleInheritance) {
 
     IStructuredTextStream * testStream = StreamCreateXML(L"testSimpleInheritance.xml");
     ASSERT_TRUE(testStream != NULL);
-    bool result = testInheritance.Serialize(testStream);
+    bool result = ReflLibrary::Serialize(testStream, &testInheritance);
     EXPECT_EQ(true, result);
     testStream->Save();
     delete testStream;
@@ -117,7 +119,7 @@ TEST(ReflectionTest, TestSimpleInheritance) {
 
     ReflClass * inst = ReflLibrary::Deserialize(testStream, MemFlags(MEM_ARENA_DEFAULT, MEM_CAT_TEST));
     ASSERT_TRUE(inst != NULL);
-    SimpleDerivedClass * loadTypes = dynamic_cast<SimpleDerivedClass *>(inst);
+    SimpleDerivedClass * loadTypes = SimpleDerivedClass::Cast(inst);
     ASSERT_TRUE(loadTypes != NULL);
 
     EXPECT_EQ(s_uint32Value,      loadTypes->baseUint32Test);
@@ -143,6 +145,7 @@ public:
         moreDerivedFloat32Test(0.0f),
         moreDerivedBoolTest2(false)
     {
+        InitReflType();
     }
 
 //private:
@@ -172,7 +175,7 @@ TEST(ReflectionTest, TestClassHierarchy) {
 
     IStructuredTextStream * testStream = StreamCreateXML(L"testClassHierarchy.xml");
     ASSERT_TRUE(testStream != NULL);
-    bool result = testInheritance.Serialize(testStream);
+    bool result = ReflLibrary::Serialize(testStream, &testInheritance);
     EXPECT_EQ(true, result);
     testStream->Save();
     delete testStream;
@@ -183,7 +186,7 @@ TEST(ReflectionTest, TestClassHierarchy) {
 
     ReflClass * inst = ReflLibrary::Deserialize(testStream, MemFlags(MEM_ARENA_DEFAULT, MEM_CAT_TEST));
     ASSERT_TRUE(inst != NULL);
-    MoreDerivedClass * loadTypes = dynamic_cast<MoreDerivedClass *>(inst);
+    MoreDerivedClass * loadTypes = MoreDerivedClass::Cast(inst);
     ASSERT_TRUE(loadTypes != NULL);
 
     EXPECT_EQ(s_uint32Value,      loadTypes->baseUint32Test);
@@ -211,6 +214,7 @@ public:
         base2Uint32Test(0),
         base2Float32Test(0.0f)
     {
+        InitReflType();
     }
 
 //private:
@@ -231,6 +235,7 @@ public:
         derivedInt16Test(0),
         derivedInt16Test2(0)
     {
+        InitReflType();
     }
 
 //private:
@@ -260,7 +265,7 @@ TEST(ReflectionTest, TestMultipleInheritance) {
 
     IStructuredTextStream * testStream = StreamCreateXML(L"testMultipleInheritance.xml");
     ASSERT_TRUE(testStream != NULL);
-    bool result = testInheritance.Serialize(testStream);
+    bool result = ReflLibrary::Serialize(testStream, static_cast<SimpleBaseClass *>(&testInheritance));
     EXPECT_EQ(true, result);
     testStream->Save();
     delete testStream;
@@ -271,7 +276,7 @@ TEST(ReflectionTest, TestMultipleInheritance) {
 
     ReflClass * inst = ReflLibrary::Deserialize(testStream, MemFlags(MEM_ARENA_DEFAULT, MEM_CAT_TEST));
     ASSERT_TRUE(inst != NULL);
-    MultipleInheritanceClass * loadTypes = dynamic_cast<MultipleInheritanceClass *>(inst);
+    MultipleInheritanceClass * loadTypes = MultipleInheritanceClass::Cast(inst);
     ASSERT_TRUE(loadTypes != NULL);
 
     EXPECT_EQ(s_uint32Value,      loadTypes->baseUint32Test);

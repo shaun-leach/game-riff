@@ -60,6 +60,7 @@ public:
         baseUint32Test(0),
         baseFloat32Test(0.0f)
     {
+        InitReflType();
     }
 
 //private:
@@ -80,7 +81,7 @@ TEST(ReflectionTest, TestSimpleClassAliasing) {
 
     ReflClass * inst = ReflLibrary::Deserialize(testStream, MemFlags(MEM_ARENA_DEFAULT, MEM_CAT_TEST));
     ASSERT_TRUE(inst != NULL);
-    SimpleAliasingClass * loadTypes = dynamic_cast<SimpleAliasingClass *>(inst);
+    SimpleAliasingClass * loadTypes = SimpleAliasingClass::Cast(inst);
     EXPECT_EQ(true, loadTypes != NULL);
 
     EXPECT_EQ(s_uint32Value,      loadTypes->baseUint32Test);
@@ -102,6 +103,7 @@ public:
         baseUint32Test(0),
         baseFloat32Test(0.0f)
     {
+        InitReflType();
     }
 
 //private:
@@ -122,7 +124,7 @@ TEST(ReflectionTest, TestSimpleMemberAliasing) {
 
     ReflClass * inst = ReflLibrary::Deserialize(testStream, MemFlags(MEM_ARENA_DEFAULT, MEM_CAT_TEST));
     ASSERT_TRUE(inst != NULL);
-    SimpleMemberAliasingClass * loadTypes = dynamic_cast<SimpleMemberAliasingClass *>(inst);
+    SimpleMemberAliasingClass * loadTypes = SimpleMemberAliasingClass::Cast(inst);
     EXPECT_EQ(true, loadTypes != NULL);
 
     EXPECT_EQ(s_uint32Value,      loadTypes->baseUint32Test);
@@ -144,6 +146,7 @@ public:
         baseEnumTest(ALIAS_VALUE_1),
         baseUint32Test(0)
     {
+        InitReflType();
     }
 
 //private:
@@ -172,7 +175,7 @@ TEST(ReflectionTest, TestSimpleEnumAliasing) {
 
     ReflClass * inst = ReflLibrary::Deserialize(testStream, MemFlags(MEM_ARENA_DEFAULT, MEM_CAT_TEST));
     ASSERT_TRUE(inst != NULL);
-    SimpleEnumAliasingClass * loadTypes = dynamic_cast<SimpleEnumAliasingClass *>(inst);
+    SimpleEnumAliasingClass * loadTypes = SimpleEnumAliasingClass::Cast(inst);
     EXPECT_EQ(true, loadTypes != NULL);
 
     EXPECT_EQ(s_uint32Value,                                loadTypes->baseUint32Test);

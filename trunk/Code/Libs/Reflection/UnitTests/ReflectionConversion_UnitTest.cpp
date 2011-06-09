@@ -60,6 +60,7 @@ public:
         baseUint32Test(0),
         baseFloat32Test(0.0f)
     {
+        InitReflType();
     }
 
     static void ConvertMember(
@@ -68,7 +69,7 @@ public:
         ReflHash      oldType, 
         void        * data
      ) {
-        SimpleConversionClass * conv = dynamic_cast<SimpleConversionClass *>(inst);
+        SimpleConversionClass * conv = SimpleConversionClass::Cast(inst);
         if (conv != NULL) {
            if (name == ReflHash(L"baseUint32Test") && oldType == ReflHash(L"float32")) {
                float32 * fdata = reinterpret_cast<float32 *>(data);
@@ -96,7 +97,7 @@ TEST(ReflectionTest, TestSimpleConversion) {
 
     ReflClass * inst = ReflLibrary::Deserialize(testStream, MemFlags(MEM_ARENA_DEFAULT, MEM_CAT_TEST));
     ASSERT_TRUE(inst != NULL);
-    SimpleConversionClass * loadTypes = dynamic_cast<SimpleConversionClass *>(inst);
+    SimpleConversionClass * loadTypes = SimpleConversionClass::Cast(inst);
     EXPECT_EQ(true, loadTypes != NULL);
 
     EXPECT_EQ(47,                 loadTypes->baseUint32Test);
@@ -118,6 +119,7 @@ public:
         baseInt32Test(0),
         baseFloat32Test(0.0f)
     {
+        InitReflType();
     }
 
     static void ConvertMember(
@@ -126,7 +128,7 @@ public:
         ReflHash      oldType, 
         void        * data
      ) {
-        SimpleAliasingConversionClass * conv = dynamic_cast<SimpleAliasingConversionClass *>(inst);
+        SimpleAliasingConversionClass * conv = SimpleAliasingConversionClass::Cast(inst);
         if (conv != NULL) {
            if (name == ReflHash(L"floatTest") && oldType == ReflHash(L"float32")) {
                float32 * fdata = reinterpret_cast<float32 *>(data);
@@ -154,7 +156,7 @@ TEST(ReflectionTest, TestSimpleConversionWithAliasing) {
 
     ReflClass * inst = ReflLibrary::Deserialize(testStream, MemFlags(MEM_ARENA_DEFAULT, MEM_CAT_TEST));
     ASSERT_TRUE(inst != NULL);
-    SimpleAliasingConversionClass * loadTypes = dynamic_cast<SimpleAliasingConversionClass *>(inst);
+    SimpleAliasingConversionClass * loadTypes = SimpleAliasingConversionClass::Cast(inst);
     EXPECT_EQ(true, loadTypes != NULL);
 
     EXPECT_EQ(-50,                loadTypes->baseInt32Test);
@@ -176,6 +178,7 @@ public:
         baseUint32Test(0),
         baseFloat32Test(0.0f)
     {
+        InitReflType();
     }
 
     static void ConvertMember(
@@ -184,7 +187,7 @@ public:
         ReflHash      oldType, 
         void        * data
      ) {
-        SimpleClassConversionClass * conv = dynamic_cast<SimpleClassConversionClass *>(inst);
+        SimpleClassConversionClass * conv = SimpleClassConversionClass::Cast(inst);
         if (conv != NULL) {
            if (name == ReflHash(L"memberUint32Test") && oldType == ReflHash(L"uint32")) {
                uint32 * udata = reinterpret_cast<uint32 *>(data);
@@ -212,7 +215,7 @@ TEST(ReflectionTest, TestClassConversion) {
 
     ReflClass * inst = ReflLibrary::Deserialize(testStream, MemFlags(MEM_ARENA_DEFAULT, MEM_CAT_TEST));
     ASSERT_TRUE(inst != NULL);
-    SimpleClassConversionClass * loadTypes = dynamic_cast<SimpleClassConversionClass *>(inst);
+    SimpleClassConversionClass * loadTypes = SimpleClassConversionClass::Cast(inst);
     EXPECT_EQ(true, loadTypes != NULL);
 
     EXPECT_EQ(s_uint32Value,      loadTypes->baseUint32Test);

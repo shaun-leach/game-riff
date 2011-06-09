@@ -61,10 +61,11 @@ public:
         baseFloat32Test(0.0f),
         classFinalized(false)
     {
+        InitReflType();
     }
 
     static void Finalize(ReflClass * inst) {
-        SimpleFinalizationClass * final = dynamic_cast<SimpleFinalizationClass *>(inst);
+        SimpleFinalizationClass * final = SimpleFinalizationClass::Cast(inst);
         if (final != NULL) {
             final->classFinalized = true;
         }
@@ -89,7 +90,7 @@ TEST(ReflectionTest, TestFinalization) {
 
     IStructuredTextStream * testStream = StreamCreateXML(L"testFinalization.xml");
     ASSERT_TRUE(testStream != NULL);
-    bool result = testFinalization.Serialize(testStream);
+    bool result = ReflLibrary::Serialize(testStream, &testFinalization);
     EXPECT_EQ(true, result);
     testStream->Save();
     delete testStream;
@@ -100,7 +101,7 @@ TEST(ReflectionTest, TestFinalization) {
 
     ReflClass * inst = ReflLibrary::Deserialize(testStream, MemFlags(MEM_ARENA_DEFAULT, MEM_CAT_TEST));
     ASSERT_TRUE(inst != NULL);
-    SimpleFinalizationClass * loadTypes = dynamic_cast<SimpleFinalizationClass *>(inst);
+    SimpleFinalizationClass * loadTypes = SimpleFinalizationClass::Cast(inst);
     EXPECT_EQ(true, loadTypes != NULL);
 
     EXPECT_EQ(s_uint32Value,      loadTypes->baseUint32Test);
