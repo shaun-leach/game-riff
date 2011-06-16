@@ -65,7 +65,7 @@ public:
     }
 
     static void Finalize(ReflClass * inst) {
-        SimpleFinalizationClass * final = SimpleFinalizationClass::Cast(inst);
+        SimpleFinalizationClass * final = ReflCast<SimpleFinalizationClass>(inst);
         if (final != NULL) {
             final->classFinalized = true;
         }
@@ -101,7 +101,7 @@ TEST(ReflectionTest, TestFinalization) {
 
     ReflClass * inst = ReflLibrary::Deserialize(testStream, MemFlags(MEM_ARENA_DEFAULT, MEM_CAT_TEST));
     ASSERT_TRUE(inst != NULL);
-    SimpleFinalizationClass * loadTypes = SimpleFinalizationClass::Cast(inst);
+    SimpleFinalizationClass * loadTypes = ReflCast<SimpleFinalizationClass>(inst);
     EXPECT_EQ(true, loadTypes != NULL);
 
     EXPECT_EQ(s_uint32Value,      loadTypes->baseUint32Test);

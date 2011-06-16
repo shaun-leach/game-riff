@@ -70,7 +70,7 @@ public:
         unsigned                version, 
         ReflClass             * inst
     ) {
-        SimpleVersioningClass * versioning = SimpleVersioningClass::Cast(inst);
+        SimpleVersioningClass * versioning = ReflCast<SimpleVersioningClass>(inst);
         if (versioning != NULL) {
             uint32 oldUintValue;
             float32 oldFloatValue;
@@ -113,7 +113,7 @@ TEST(ReflectionTest, TestSimpleVersioning) {
 
     ReflClass * inst = ReflLibrary::Deserialize(testStream, MemFlags(MEM_ARENA_DEFAULT, MEM_CAT_TEST));
     ASSERT_TRUE(inst != NULL);
-    SimpleVersioningClass * loadTypes = SimpleVersioningClass::Cast(inst);
+    SimpleVersioningClass * loadTypes = ReflCast<SimpleVersioningClass>(inst);
     EXPECT_EQ(true, loadTypes != NULL);
 
     EXPECT_EQ(2 * s_uint32Value,  loadTypes->baseUint32Test);

@@ -96,7 +96,7 @@ TEST(ReflectionTest, TestSimpleNamespaces) {
 
     ReflClass * inst = ReflLibrary::Deserialize(testStream, MemFlags(MEM_ARENA_DEFAULT, MEM_CAT_TEST));
     ASSERT_TRUE(inst != NULL);
-    TestSpace::SimpleNamespaceClass * loadTypes = TestSpace::SimpleNamespaceClass::Cast(inst);
+    TestSpace::SimpleNamespaceClass * loadTypes = ReflCast<TestSpace::SimpleNamespaceClass>(inst);
     EXPECT_EQ(true, loadTypes != NULL);
 
     EXPECT_EQ(s_uint32Value,      loadTypes->baseUint32Test);
@@ -177,7 +177,7 @@ TEST(ReflectionTest, TestParentNamespaces) {
 
     ReflClass * inst = ReflLibrary::Deserialize(testStream, MemFlags(MEM_ARENA_DEFAULT, MEM_CAT_TEST));
     ASSERT_TRUE(inst != NULL);
-    SimpleParentNamespaceClass * loadTypes = SimpleParentNamespaceClass::Cast(inst);
+    SimpleParentNamespaceClass * loadTypes = ReflCast<SimpleParentNamespaceClass>(inst);
     EXPECT_EQ(true, loadTypes != NULL);
 
     EXPECT_EQ(s_uint32Value,      loadTypes->baseUint32Test);
@@ -229,7 +229,7 @@ TEST(ReflectionTest, TestAliasedNamespaces) {
 
     ReflClass * inst = ReflLibrary::Deserialize(testStream, MemFlags(MEM_ARENA_DEFAULT, MEM_CAT_TEST));
     ASSERT_TRUE(inst != NULL);
-    SimpleAliasedNamespaceClass * loadTypes = SimpleAliasedNamespaceClass::Cast(inst);
+    SimpleAliasedNamespaceClass * loadTypes = ReflCast<SimpleAliasedNamespaceClass>(inst);
     EXPECT_EQ(true, loadTypes != NULL);
 
     EXPECT_EQ(s_uint8Value,      loadTypes->baseUint8Test0);
