@@ -17,12 +17,29 @@
 --------------
 -flesh out reflection more
 --eliminate virtuals in ReflClass base
-----test that classes with virtuals work correctly, ReflClass has to be at the root of the inheritance?
+---Add support for casting from ReflClass of 2nd parent
+---Add support for casting from multiple ReflClass parents
+---Unify OffsetToParent functions
+---Unit tests for casting from multiple base classes to derived class
+----Test downcasting from actual type to lesser types
+----Test with virtuals in second base class
+****Test casting to self
+****Test with virtuals
+****Make sure InitInst works correctly still
+*****Can be simplified
+***Can I set up casting to work with classes that don't derive from ReflClass?
+****I can cast to them but not from them
+***Unit test for casting to base when base has virtuals
+***test that classes with virtuals work correctly, ReflClass has to be at the root of the inheritance?
 ****Need better initialization support
 ****alternatively if each instance just had a 32 bit hash in the base class I could do everything as a c interface! :)
 ****Need to handle casting to parents
 ***Useful for classes I don't control, however can't access private members. Test this
 ***Yes with template functions, though can't do a full implementation
+***Fix casting to use m_reflOffset
+--Clean up header so class functions are organized better by functionality
+--How do I want to allocate reflected members? It would be preferred to allocate in contiguous arrays
+---However how do we handle ref counting and deletion?
 --Use table instead of linked list for members?
 --Need to support enums not tied to a class
 ---Need designer friendly names for all enums
@@ -38,7 +55,7 @@
 --can I trap missing parents?
 --Prep everything for precompiled hashes
 --Designer friendly names???
---Can I use typeid to get member name strings and compile time only? And do I need this?
+--Can I use typeid to get member name strings at compile time only? And do I need this?
 --Add support for classes that can't derive off of ReflClass
 --How do I return loaded data to outside world
 ---Think about use cases for how loaded data will be used
@@ -63,10 +80,11 @@
 ---Always embed a version #
 ---Need to write out type hash and size
 ---Need a base class to derive streams off of so I only have one function for text and binary deserialization
---implement template version and test performance when reading binary data
+--implement template version and test performance when reading binary data?
 --Test
 ---Need to test all types
 ----Test currently unimplemented types
+---Test const casting
 ****Currently implemented types
 ****Test that int8 deserialization works if the member is packed
 ---Need to test missing/extra types

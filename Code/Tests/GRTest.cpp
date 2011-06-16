@@ -222,13 +222,17 @@ public:
        InitReflType();
     }
 
+    virtual ~Dummy() {
+
+    }
+
     static void Convert(
        ReflClass   * inst, 
        ReflHash      name, 
        ReflHash      oldType, 
        void        * data
     ) {
-       Dummy * dummy = Dummy::Cast(inst);
+       Dummy * dummy = ReflCast<Dummy>(inst);
        if (dummy != NULL) {
           if (name == ReflHash(L"btest") && oldType == ReflHash(L"int32")) {
              int32 * idata = reinterpret_cast<int32 *>(data);
@@ -244,7 +248,7 @@ public:
        ReflHash      oldType, 
        void        * data
     ) {
-       Dummy * dummy = Dummy::Cast(inst);
+       Dummy * dummy = ReflCast<Dummy>(inst);
        if (dummy != NULL) {
           if (name == ReflHash(L"itest") && oldType == ReflHash(L"float32")) {
              float32 * fdata = reinterpret_cast<float32 *>(data);
@@ -260,7 +264,7 @@ public:
        ReflHash      oldType, 
        void        * data
     ) {
-       Dummy * dummy = Dummy::Cast(inst);
+       Dummy * dummy = ReflCast<Dummy>(inst);
        if (dummy != NULL) {
           if (name == ReflHash(L"basesubitest") && oldType == ReflHash(L"int32")) {
              int32 * idata = reinterpret_cast<int32 *>(data);
@@ -307,6 +311,217 @@ REFL_IMPL_CLASS_BEGIN(BaseClass, Dummy);
     REFL_MEMBER(Dummy, ctest);
 REFL_IMPL_CLASS_END(Dummy);
 
+class SimpleCastBaseClass : public ReflClass {
+public:
+    REFL_DEFINE_CLASS(SimpleCastBaseClass);
+    SimpleCastBaseClass() :
+        baseUint32Test(0),
+        baseFloat32Test(0.0f)
+    {
+        InitReflType();
+    }
+
+//private:
+    uint32      baseUint32Test;
+    float32     baseFloat32Test;
+};
+
+REFL_IMPL_CLASS_BEGIN(ReflClass, SimpleCastBaseClass);
+    REFL_MEMBER(SimpleCastBaseClass, baseUint32Test);
+    REFL_MEMBER(SimpleCastBaseClass, baseFloat32Test);
+REFL_IMPL_CLASS_END(SimpleCastBaseClass);
+
+class SimpleCastBaseClass2 : public ReflClass {
+public:
+    REFL_DEFINE_CLASS(SimpleCastBaseClass2);
+    SimpleCastBaseClass2() :
+        base2Uint32Test(0),
+        base2Float32Test(0.0f)
+    {
+        InitReflType();
+    }
+
+//private:
+    uint32      base2Uint32Test;
+    float32     base2Float32Test;
+};
+
+REFL_IMPL_CLASS_BEGIN(ReflClass, SimpleCastBaseClass2);
+    REFL_MEMBER(SimpleCastBaseClass2, base2Uint32Test);
+    REFL_MEMBER(SimpleCastBaseClass2, base2Float32Test);
+REFL_IMPL_CLASS_END(SimpleCastBaseClass2);
+
+class SimpleCastBaseClass3 : public SimpleCastBaseClass2 {
+public:
+    REFL_DEFINE_CLASS(SimpleCastBaseClass3);
+    SimpleCastBaseClass3() :
+        base3Uint32Test(0),
+        base3Float32Test(0.0f)
+    {
+        InitReflType();
+    }
+
+//private:
+    uint32      base3Uint32Test;
+    float32     base3Float32Test;
+};
+
+REFL_IMPL_CLASS_BEGIN(SimpleCastBaseClass2, SimpleCastBaseClass3);
+    REFL_ADD_PARENT(SimpleCastBaseClass3, SimpleCastBaseClass2);
+    REFL_MEMBER(SimpleCastBaseClass3, base3Uint32Test);
+    REFL_MEMBER(SimpleCastBaseClass3, base3Float32Test);
+REFL_IMPL_CLASS_END(SimpleCastBaseClass3);
+
+class ComplexInheritanceCastClass : public SimpleCastBaseClass, public SimpleCastBaseClass3 {
+public:
+    REFL_DEFINE_CLASS(ComplexInheritanceCastClass);
+    ComplexInheritanceCastClass() :
+        derivedBoolTest(false),
+        derivedInt16Test(0),
+        derivedInt16Test2(0)
+    {
+        InitReflType();
+    }
+
+//private:
+    bool        derivedBoolTest;
+    int16       derivedInt16Test;
+    int16       derivedInt16Test2;
+};
+
+REFL_IMPL_CLASS_BEGIN(SimpleCastBaseClass, ComplexInheritanceCastClass);
+    REFL_ADD_PARENT(ComplexInheritanceCastClass, SimpleCastBaseClass);
+    REFL_ADD_PARENT(ComplexInheritanceCastClass, SimpleCastBaseClass3);
+    REFL_MEMBER(ComplexInheritanceCastClass, derivedBoolTest);
+    REFL_MEMBER(ComplexInheritanceCastClass, derivedInt16Test);
+    REFL_MEMBER(ComplexInheritanceCastClass, derivedInt16Test2);
+REFL_IMPL_CLASS_END(ComplexInheritanceCastClass);
+
+//====================================================
+void TestCastingFromMultipleBases() {
+
+    ComplexInheritanceCastClass testCasting;
+    testCasting.baseUint32Test      = 320000;
+    testCasting.baseFloat32Test     = 32.32f;
+    testCasting.base2Uint32Test     = 310000;
+    testCasting.base2Float32Test    = 31.31f;
+    testCasting.base3Uint32Test     = 300000;
+    testCasting.base3Float32Test    = 30.30f;
+    testCasting.derivedBoolTest     = true;
+    testCasting.derivedInt16Test    = 1600;
+    testCasting.derivedInt16Test2   = 1601;
+
+    IStructuredTextStream * testStream = StreamCreateXML(L"testComplexMultipleInheritanceCasting.xml");
+    bool result = ReflLibrary::Serialize(testStream, static_cast<SimpleCastBaseClass *>(&testCasting));
+    testStream->Save();
+    delete testStream;
+    testStream = NULL;
+
+    testStream = StreamOpenXML(L"testComplexMultipleInheritanceCasting.xml");
+
+    ReflClass * inst = ReflLibrary::Deserialize(testStream, MemFlags(MEM_ARENA_DEFAULT, MEM_CAT_TEST));
+    ComplexInheritanceCastClass * loadTypes = ReflCast<ComplexInheritanceCastClass>(inst);
+
+    Dummy * castNull = ReflCast<Dummy>(inst);
+
+    SimpleCastBaseClass  * base1    = ReflCast<SimpleCastBaseClass>(inst);
+    SimpleCastBaseClass2 * base2    = ReflCast<SimpleCastBaseClass2>(inst);
+    SimpleCastBaseClass3 * base3    = ReflCast<SimpleCastBaseClass3>(inst);
+
+    //ReflClass            * instD    = ReflCast<ReflClass>(loadTypes);
+    ReflClass            * inst1    = ReflCast<ReflClass>(base1);
+    ReflClass            * inst2    = ReflCast<ReflClass>(base2);
+    ReflClass            * inst3    = ReflCast<ReflClass>(base3);
+
+    ComplexInheritanceCastClass * derived  = ReflCast<ComplexInheritanceCastClass>(base1);
+    ComplexInheritanceCastClass * derived2 = ReflCast<ComplexInheritanceCastClass>(base2);
+    ComplexInheritanceCastClass * derived4 = ReflCast<ComplexInheritanceCastClass>(base3);
+
+    SimpleCastBaseClass  * base12 = ReflCast<SimpleCastBaseClass>(base2);
+    SimpleCastBaseClass  * base13 = ReflCast<SimpleCastBaseClass>(base3);
+    SimpleCastBaseClass2 * base21 = ReflCast<SimpleCastBaseClass2>(base1);
+    SimpleCastBaseClass2 * base23 = ReflCast<SimpleCastBaseClass2>(base3);
+    SimpleCastBaseClass3 * base31 = ReflCast<SimpleCastBaseClass3>(base1);
+    SimpleCastBaseClass3 * base32 = ReflCast<SimpleCastBaseClass3>(base2);
+
+    delete loadTypes;
+    loadTypes = NULL;
+}
+
+class VirtualBaseClass : public ReflClass {
+public:
+    REFL_DEFINE_CLASS(VirtualBaseClass);
+    VirtualBaseClass() :
+        basevUint32Test(0),
+        basevFloat32Test(0.0f)
+    {
+        InitReflType();
+    }
+
+    virtual ~VirtualBaseClass() {
+    }
+//private:
+    uint32      basevUint32Test;
+    float32     basevFloat32Test;
+};
+
+REFL_IMPL_CLASS_BEGIN(ReflClass, VirtualBaseClass);
+    REFL_MEMBER(VirtualBaseClass, basevUint32Test);
+    REFL_MEMBER(VirtualBaseClass, basevFloat32Test);
+REFL_IMPL_CLASS_END(VirtualBaseClass);
+
+class CastWithVirtualsInBase : public VirtualBaseClass {
+public:
+    REFL_DEFINE_CLASS(CastWithVirtualsInBase);
+    CastWithVirtualsInBase() :
+        derivedBoolTest(false),
+        derivedInt16Test(0),
+        derivedInt16Test2(0)
+    {
+        InitReflType();
+    }
+
+//private:
+    bool        derivedBoolTest;
+    int16       derivedInt16Test;
+    int16       derivedInt16Test2;
+};
+
+REFL_IMPL_CLASS_BEGIN(VirtualBaseClass, CastWithVirtualsInBase);
+    REFL_ADD_PARENT(CastWithVirtualsInBase, VirtualBaseClass);
+    REFL_MEMBER(CastWithVirtualsInBase, derivedBoolTest);
+    REFL_MEMBER(CastWithVirtualsInBase, derivedInt16Test);
+    REFL_MEMBER(CastWithVirtualsInBase, derivedInt16Test2);
+REFL_IMPL_CLASS_END(CastWithVirtualsInBase);
+
+//====================================================
+void TestCastingWVirtualsInBase() {
+    CastWithVirtualsInBase testCasting;
+    testCasting.basevUint32Test     = 3200000;
+    testCasting.basevFloat32Test    = 32.32f;
+    testCasting.derivedBoolTest     = true;
+    testCasting.derivedInt16Test    = 17000;
+    testCasting.derivedInt16Test2   = 17001;
+
+    IStructuredTextStream * testStream = StreamCreateXML(L"testCastingWVirtualBase.xml");
+    bool result = ReflLibrary::Serialize(testStream, &testCasting);
+    testStream->Save();
+    delete testStream;
+    testStream = NULL;
+
+    testStream = StreamOpenXML(L"testCastingWVirtualBase.xml");
+
+    ReflClass * inst = ReflLibrary::Deserialize(testStream, MemFlags(MEM_ARENA_DEFAULT, MEM_CAT_TEST));
+    CastWithVirtualsInBase * loadTypes = ReflCast<CastWithVirtualsInBase>(inst);
+
+    CastWithVirtualsInBase * self = ReflCast<CastWithVirtualsInBase>(loadTypes);
+
+    VirtualBaseClass * base = ReflCast<VirtualBaseClass>(inst);
+
+    delete loadTypes;
+    loadTypes = NULL;
+}
+
 int main(int argc,  char * argv[]) {
    InitializeObjects();
 /*    
@@ -320,16 +535,19 @@ int main(int argc,  char * argv[]) {
     testStream->Save();
 //*/
     
+   TestCastingWVirtualsInBase();    
+   TestCastingFromMultipleBases();
 //*
+
     IStructuredTextStream * testStream = StreamOpenXML(L"test.xml");
 
     Dummy testClass;
     //testClass.Deserialize(testStream);
     ReflClass * inst = ReflLibrary::Deserialize(testStream, MemFlags(MEM_ARENA_DEFAULT, MEM_CAT_TEST));
-    Dummy * dummy             = Dummy::Cast(inst);
-    BaseBaseClass2 * basebase = BaseBaseClass2::Cast(inst);
-    BaseClass * base          = BaseClass::Cast(inst);
-    BaseClass2 * base2        = BaseClass2::Cast(inst);
+    Dummy * dummy             = ReflCast<Dummy>(inst);
+    BaseBaseClass2 * basebase = ReflCast<BaseBaseClass2>(inst);
+    BaseClass * base          = ReflCast<BaseClass>(inst);
+    BaseClass2 * base2        = ReflCast<BaseClass2>(inst);
 //*/
     DestroyObjects();
 }

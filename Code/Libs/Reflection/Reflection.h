@@ -89,6 +89,8 @@ public:
     }
     void SetNext(ReflMember * next);
 
+    void AdjustOffset(unsigned offset);
+
     void Finalize();
 
     bool ConvertToString(const byte * data, chargr * str, unsigned len) const;
@@ -166,6 +168,8 @@ public:
     ReflClassDesc(
         const chargr  * name, 
         unsigned        size,
+        unsigned        baseOffset,
+        unsigned        reflOffset,
         ReflCreateFunc  creationFunc
     );
 
@@ -181,12 +185,14 @@ public:
     void RegisterManualVersioningFunc(ReflVersioningFunc loadFunc, unsigned currentVersion);
 
     bool NameMatches(const ReflHash rhs) const {
-        return m_nameHash == rhs;
+        return m_typeHash == rhs;
     }
 
     ReflClass * Create(unsigned count, MemFlags memFlags) const {
         return m_creationFunc(count, memFlags);
     }
+
+    void InitInst(ReflClass * inst) const;
 
     bool Serialize(IStructuredTextStream * stream, const ReflClass * inst, unsigned offset = 0) const;
     bool Deserialize(IStructuredTextStream * stream, ReflClass * inst) const;
@@ -211,7 +217,7 @@ public:
     void SetNext(ReflClassDesc * next);
 
     ReflHash GetHash() const {
-        return m_nameHash;
+        return m_typeHash;
     }
 
     unsigned GetVersion() const {
@@ -220,8 +226,8 @@ public:
 
     void RegisterMemberAlias(ReflAlias * alias);
 
-    ReflClass * OffsetToParent(ReflClass * inst, ReflHash typeHash) const;
-    const ReflClass * OffsetToParent(const ReflClass * inst, ReflHash typeHash) const;
+    void * OffsetToParent(ReflClass * inst, ReflHash givenType, ReflHash targetType) const;
+    const void * OffsetToParent(const ReflClass * inst, ReflHash givenType, ReflHash targetType) const;
 private:
 
     void FinalizeInst(ReflClass * inst) const;
@@ -231,15 +237,18 @@ private:
 
     const ReflMember  * FindLocalMember(ReflHash name) const;
     Parent * FindParent(ReflHash parentHash) const;
+    bool FindParentOffset(ReflHash parentHash, unsigned * offset) const;
 
     bool SerializeMembers(IStructuredTextStream * stream, const ReflClass * inst, unsigned offset) const;
 
 private:
-    ReflHash                m_nameHash;
-    const chargr          * m_name;
+    ReflHash                m_typeHash;
+    const chargr          * m_typeName;
 
     unsigned                m_version;
     unsigned                m_size;
+    unsigned                m_baseOffset;
+    unsigned                m_reflOffset;
 
     ReflCreateFunc          m_creationFunc;
     ReflFinalizationFunc    m_finalizeFunc;
@@ -256,20 +265,24 @@ private:
 
 class ReflClass {
 public:
-    ReflClass() {
-    }
+    ReflClass();
 
     ReflHash GetType() const {
         return m_type;
     }
 
-protected:
-
     void SetTypeHash(ReflHash typeHash) {
         m_type = typeHash;
     }
 
+    static ReflHash GetReflType() {
+        return s_classType;
+    }
+protected:
+
 private:
+    static ReflHash s_classType;
+
     ReflHash m_type;
 };
 
@@ -289,8 +302,34 @@ public:
     static bool Deserialize(IStructuredTextStream * stream, ReflClass * inst);
 };
 
-ReflClass * ReflCanCastTo(ReflClass * inst, ReflHash type);
-const ReflClass * ReflCanCastTo(const ReflClass * inst, ReflHash type);
+void ReflInitType(ReflClass * inst, ReflHash type);
+
+void * ReflCanCastTo(ReflClass * inst, ReflHash givenType, ReflHash targetType);
+const void * ReflCanCastTo(const ReflClass * inst, ReflHash givenType, ReflHash targetType);
+
+template<typename t_cast, typename t_base>
+t_cast * ReflCast(t_base * inst) {
+    if (inst == NULL) 
+        return NULL;
+
+    ReflHash givenType  = t_base::GetReflType();
+    ReflHash targetType = t_cast::GetReflType();
+
+    t_cast * ret = reinterpret_cast<t_cast *>(ReflCanCastTo(inst, givenType, targetType));
+    return ret;
+}
+
+template<typename t_cast, typename t_base>
+const t_cast * ReflCast(const t_base * inst) {
+    if (inst == NULL) 
+        return NULL;
+
+    ReflHash givenType  = t_base::GetReflType();
+    ReflHash targetType = t_cast::GetReflType();
+
+    const t_cast * ret = reinterpret_cast<const t_cast *>(ReflCanCastTo(inst, givenType, targetType));
+    return ret;
+}
 
 #define REFL_DEFINE_USER_TYPE(type)                                         \
     template<typename t_Type>                                               \
@@ -307,39 +346,20 @@ const ReflClass * ReflCanCastTo(const ReflClass * inst, ReflHash type);
         static ReflClass * Create(unsigned count, MemFlags memFlags);       \
         static const ReflClassDesc * GetReflectionInfo();                   \
         static ReflClassDesc * CreateReflClassDesc();                       \
-        static name * Cast(ReflClass * inst);                               \
-        static const name * Cast(const ReflClass * inst);                   \
+        inline static ReflHash GetReflType() {                              \
+            return s_className;                                             \
+        }                                                                   \
         void InitReflType()
 
 #define REFL_IMPL_CLASS_INTERNAL(base, name, nameStr)                       \
     ReflClass * name::Create(unsigned count, MemFlags memFlags) {           \
-        return static_cast<base *>(new(memFlags) name[count]);              \
+        return static_cast<base *>(new(memFlags) name);                     \
     }                                                                       \
     const ReflClassDesc * name::GetReflectionInfo() {                       \
         return ReflLibrary::GetClassDesc(s_className);                      \
     }                                                                       \
-    name * name::Cast(ReflClass * inst) {                                   \
-        name * derived = NULL;                                              \
-        if (inst->GetType() == s_className)                                 \
-            derived = reinterpret_cast<name *>(inst);                       \
-        else {                                                              \
-            ReflClass * parent = ReflCanCastTo(inst, s_className);          \
-            derived = reinterpret_cast<name *>(parent);                     \
-        }                                                                   \
-        return derived;                                                     \
-    }                                                                       \
-    const name * name::Cast(const ReflClass * inst) {                       \
-        const name * derived = NULL;                                        \
-        if (inst->GetType() == s_className)                                 \
-            derived = reinterpret_cast<const name *>(inst);                 \
-        else {                                                              \
-            const ReflClass * parent = ReflCanCastTo(inst, s_className);    \
-            derived = reinterpret_cast<const name *>(parent);               \
-        }                                                                   \
-        return derived;                                                     \
-    }                                                                       \
     void name::InitReflType() {                                             \
-        base::SetTypeHash(s_className);                                     \
+        ReflInitType(static_cast<base *>(this), s_className);               \
     }                                                                       \
     ReflHash name::s_className = ReflHash(nameStr)
 
@@ -350,8 +370,10 @@ const ReflClass * ReflCanCastTo(const ReflClass * inst, ReflHash type);
         static ReflClassDesc s_reflInfo(                                    \
             TOWSTR(name),                                                   \
             sizeof(name),                                                   \
+            CLASSOFFSETOF(base, name),                                      \
+            CLASSOFFSETOF(ReflClass, base),                                 \
             name::Create                                                    \
-    )
+        )
                                 
 #define REFL_IMPL_CLASS_BEGIN_NAMESPACE(base, ns, name)                     \
     }                                                                       \
@@ -362,6 +384,8 @@ const ReflClass * ReflCanCastTo(const ReflClass * inst, ReflHash type);
         static ReflClassDesc s_reflInfo(                                    \
             TOWSTR(ns::name),                                               \
             sizeof(name),                                                   \
+            CLASSOFFSETOF(base, name),                                      \
+            CLASSOFFSETOF(ReflClass, base),                                 \
             name::Create                                                    \
         )
                                 

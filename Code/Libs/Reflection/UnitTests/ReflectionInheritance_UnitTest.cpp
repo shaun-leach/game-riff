@@ -119,7 +119,7 @@ TEST(ReflectionTest, TestSimpleInheritance) {
 
     ReflClass * inst = ReflLibrary::Deserialize(testStream, MemFlags(MEM_ARENA_DEFAULT, MEM_CAT_TEST));
     ASSERT_TRUE(inst != NULL);
-    SimpleDerivedClass * loadTypes = SimpleDerivedClass::Cast(inst);
+    SimpleDerivedClass * loadTypes = ReflCast<SimpleDerivedClass>(inst);
     ASSERT_TRUE(loadTypes != NULL);
 
     EXPECT_EQ(s_uint32Value,      loadTypes->baseUint32Test);
@@ -186,7 +186,7 @@ TEST(ReflectionTest, TestClassHierarchy) {
 
     ReflClass * inst = ReflLibrary::Deserialize(testStream, MemFlags(MEM_ARENA_DEFAULT, MEM_CAT_TEST));
     ASSERT_TRUE(inst != NULL);
-    MoreDerivedClass * loadTypes = MoreDerivedClass::Cast(inst);
+    MoreDerivedClass * loadTypes = ReflCast<MoreDerivedClass>(inst);
     ASSERT_TRUE(loadTypes != NULL);
 
     EXPECT_EQ(s_uint32Value,      loadTypes->baseUint32Test);
@@ -276,7 +276,7 @@ TEST(ReflectionTest, TestMultipleInheritance) {
 
     ReflClass * inst = ReflLibrary::Deserialize(testStream, MemFlags(MEM_ARENA_DEFAULT, MEM_CAT_TEST));
     ASSERT_TRUE(inst != NULL);
-    MultipleInheritanceClass * loadTypes = MultipleInheritanceClass::Cast(inst);
+    MultipleInheritanceClass * loadTypes = ReflCast<MultipleInheritanceClass>(inst);
     ASSERT_TRUE(loadTypes != NULL);
 
     EXPECT_EQ(s_uint32Value,      loadTypes->baseUint32Test);

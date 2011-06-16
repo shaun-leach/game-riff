@@ -67,6 +67,8 @@ enum EReflIndex {
 static ReflClassDesc  * s_descHead  = NULL;
 static ReflAlias      * s_classAliasHead = NULL;
 
+ReflHash ReflClass::s_classType(TOWSTR(ReflClass));
+
 //////////////////////////////////////////////////////
 //
 // Internal Types
@@ -331,6 +333,11 @@ ReflMember::ReflMember(
 }
 
 //====================================================
+void ReflMember::AdjustOffset(unsigned offset) {
+    m_offset -= offset;
+}
+
+//====================================================
 bool ReflMember::ConvertClassMember(
     IStructuredTextStream * stream, 
     ReflHash                nameHash,
@@ -582,12 +589,16 @@ bool ReflMember::Serialize(IStructuredTextStream * stream, const ReflClass * ins
 ReflClassDesc::ReflClassDesc(
     const chargr  * name, 
     unsigned        size,
-    ReflCreateFunc      creationFunc
+    unsigned        baseOffset,
+    unsigned        reflOffset,
+    ReflCreateFunc  creationFunc
 ) :
-    m_name(name),
-    m_nameHash(name),
+    m_typeName(name),
+    m_typeHash(name),
     m_version(1),
     m_size(size),
+    m_baseOffset(baseOffset),
+    m_reflOffset(reflOffset),
     m_creationFunc(creationFunc),
     m_finalizeFunc(NULL),
     m_versioningFunc(NULL),
@@ -599,6 +610,7 @@ ReflClassDesc::ReflClassDesc(
 
 //====================================================
 void ReflClassDesc::AddParent(Parent * parent) {
+    parent->offset -= m_baseOffset;
     parent->next = m_parents;
     m_parents = parent;
 }
@@ -717,11 +729,16 @@ bool ReflClassDesc::DeserializeMembers(
 
 //====================================================
 void ReflClassDesc::Finalize() {
+    unsigned parentOffset = 0;
     Parent * parent = NULL;
     while (m_parents != NULL) {
         Parent * next   = m_parents->next;
         m_parents->next = parent;
         parent          = m_parents;
+
+        const ReflClassDesc * parentDesc = ReflLibrary::GetClassDesc(parent->parentHash);
+        parentOffset   += parentDesc->m_baseOffset;
+
         m_parents       = next;
     }
     m_parents = parent;
@@ -730,6 +747,7 @@ void ReflClassDesc::Finalize() {
     while (m_members != NULL) {
         ReflMember * next = m_members->GetNext();
         m_members->SetNext(head);
+        m_members->AdjustOffset(parentOffset);
         m_members->Finalize();
         head        = m_members;
         m_members   = next;
@@ -824,9 +842,49 @@ ReflClassDesc::Parent * ReflClassDesc::FindParent(ReflHash parentHash) const {
 }
 
 //====================================================
+bool ReflClassDesc::FindParentOffset(ReflHash parentHash, unsigned * offset) const {
+
+    bool found = false;
+    Parent * retParent = FindParent(parentHash);
+
+    if (retParent != NULL) {
+        *offset = retParent->offset;
+        found = true;
+    }
+    else {
+        Parent * parent = m_parents;
+        for (; parent != NULL; parent = parent->next) {
+            const ReflClassDesc * desc = ReflLibrary::GetClassDesc(parent->parentHash);
+            unsigned recursiveOffset = 0;
+            if (desc->FindParentOffset(parentHash, &recursiveOffset)) {
+                *offset += recursiveOffset + parent->offset;
+                found = true;
+                break;
+            }
+        }
+    }
+
+    return found;
+}
+
+//====================================================
 const ReflMember & ReflClassDesc::GetMember(unsigned index) const {
     TESTME("Implement me");
     return m_members[0];
+}
+
+//====================================================
+void ReflClassDesc::InitInst(ReflClass * inst) const {
+    if (m_parents != NULL) {
+        Parent * parent = m_parents;
+        for (; parent != NULL; parent = parent->next) {
+            byte * ptr = reinterpret_cast<byte *>(inst);
+            ReflClass * base = reinterpret_cast<ReflClass *>(ptr + parent->offset);
+            base->SetTypeHash(m_typeHash);
+        }
+    }
+    else 
+        inst->SetTypeHash(m_typeHash);
 }
 
 //====================================================
@@ -851,40 +909,134 @@ unsigned ReflClassDesc::NumMembers() const {
 }
 
 //====================================================
-ReflClass * ReflClassDesc::OffsetToParent(ReflClass * inst, ReflHash typeHash) const {
-    ReflClass * ret = NULL;
-    const ReflClassDesc::Parent * parent = m_parents;
-    for (; parent != NULL && ret == NULL; parent = parent->next) {
-        if (parent->parentHash == typeHash) 
-            ret = reinterpret_cast<ReflClass *>(reinterpret_cast<byte *>(inst) + parent->offset);
+void * ReflClassDesc::OffsetToParent(ReflClass * inst, ReflHash givenType, ReflHash targetType) const {
+    int offset              = 0;
+    bool targetTypeFound    = false;
+    if (targetType == m_typeHash) {
+        if (givenType == m_typeHash) {
+            // Simple cast of from to the same type
+            offset = m_reflOffset + m_baseOffset;
+            targetTypeFound = true;
+        }
+        else if (givenType == ReflClass::GetReflType()) {
+            // Casting from ReflClass to our actual type
+            targetTypeFound = true;
+            offset = m_reflOffset + m_baseOffset;
+        }
         else {
-            const ReflClassDesc * parentDesc = ReflLibrary::GetClassDesc(parent->parentHash);
-            if (parentDesc != NULL) {
-                ret = parentDesc->OffsetToParent(inst, typeHash);
-                if (ret != NULL) 
-                    ret = reinterpret_cast<ReflClass *>(reinterpret_cast<byte *>(ret) + parent->offset);\
+            // Casting from a parent to our actual type
+            unsigned parentOffset = 0;
+            bool parentFound = FindParentOffset(givenType, &parentOffset);
+            if (parentFound) {
+                offset = m_reflOffset + parentOffset + m_baseOffset;
+                targetTypeFound = true;
             }
         }
+    }
+    else {
+        // Any to any
+        if (givenType == ReflClass::GetReflType()) {
+            unsigned targetOffset   = 0;
+            bool targetParentFound  = FindParentOffset(targetType, &targetOffset);
+            if (targetParentFound) {
+                offset = m_reflOffset - targetOffset + m_baseOffset;
+                targetTypeFound = true;
+            }
+        }
+        else if (targetType == ReflClass::GetReflType()) {
+            unsigned givenOffset    = 0;
+            bool givenParentFound   = FindParentOffset(givenType, &givenOffset);
+            if (givenParentFound) {
+                offset = m_reflOffset + givenOffset + m_baseOffset;
+                targetTypeFound = true;
+            }
+        }
+        else {
+            unsigned givenOffset    = 0;
+            bool givenParentFound   = FindParentOffset(givenType, &givenOffset);
+            unsigned targetOffset   = 0;
+            bool targetParentFound  = FindParentOffset(targetType, &targetOffset);
+           
+            if (givenParentFound && targetParentFound) {
+                offset = givenOffset - targetOffset + m_baseOffset;
+                targetTypeFound = true;
+            }
+        }
+    }
+
+    void * ret = NULL;
+    if (targetTypeFound) {
+        byte * ptr = reinterpret_cast<byte *>(inst);
+        if (ptr != NULL) 
+            ret = reinterpret_cast<void *>(ptr - offset);
     }
 
     return ret;
 }
 
 //====================================================
-const ReflClass * ReflClassDesc::OffsetToParent(const ReflClass * inst, ReflHash typeHash) const {
-    const ReflClass * ret = NULL;
-    const ReflClassDesc::Parent * parent = m_parents;
-    for (; parent != NULL && ret == NULL; parent = parent->next) {
-        if (parent->parentHash == typeHash) 
-            ret = reinterpret_cast<const ReflClass *>(reinterpret_cast<const byte *>(inst) + parent->offset);
+const void * ReflClassDesc::OffsetToParent(const ReflClass * inst, ReflHash givenType, ReflHash targetType) const {
+    TESTME("Make sure const version works");
+
+    int offset              = 0;
+    bool targetTypeFound    = false;
+    if (targetType == m_typeHash) {
+        if (givenType == m_typeHash) {
+            // Simple cast of from to the same type
+            offset = m_reflOffset;
+            targetTypeFound = true;
+        }
+        else if (givenType == ReflClass::GetReflType()) {
+            // Casting from ReflClass to our actual type
+            targetTypeFound = true;
+            offset = m_reflOffset;
+        }
         else {
-            const ReflClassDesc * parentDesc = ReflLibrary::GetClassDesc(parent->parentHash);
-            if (parentDesc != NULL) {
-                ret = parentDesc->OffsetToParent(inst, typeHash);
-                if (ret != NULL) 
-                    ret = reinterpret_cast<const ReflClass *>(reinterpret_cast<const byte *>(ret) + parent->offset);\
+            // Casting from a parent to our actual type
+            unsigned parentOffset = 0;
+            bool parentFound = FindParentOffset(givenType, &parentOffset);
+            if (parentFound) {
+                offset = m_reflOffset + parentOffset;
+                targetTypeFound = true;
             }
         }
+    }
+    else {
+        // Any to any
+        if (givenType == ReflClass::GetReflType()) {
+            unsigned targetOffset   = 0;
+            bool targetParentFound  = FindParentOffset(targetType, &targetOffset);
+            if (targetParentFound) {
+                offset = m_reflOffset - targetOffset;
+                targetTypeFound = true;
+            }
+        }
+        else if (targetType == ReflClass::GetReflType()) {
+            unsigned givenOffset    = 0;
+            bool givenParentFound   = FindParentOffset(givenType, &givenOffset);
+            if (givenParentFound) {
+                offset = m_reflOffset + givenOffset;
+                targetTypeFound = true;
+            }
+        }
+        else {
+            unsigned givenOffset    = 0;
+            bool givenParentFound   = FindParentOffset(givenType, &givenOffset);
+            unsigned targetOffset   = 0;
+            bool targetParentFound  = FindParentOffset(targetType, &targetOffset);
+
+            if (givenParentFound && targetParentFound) {
+                offset = givenOffset - targetOffset;
+                targetTypeFound = true;
+            }
+        }
+    }
+
+    const void * ret = NULL;
+    if (targetTypeFound) {
+        const byte * ptr = reinterpret_cast<const byte *>(inst);
+        if (ptr != NULL) 
+            ret = reinterpret_cast<const void *>(ptr - offset);
     }
 
     return ret;
@@ -912,6 +1064,7 @@ void ReflClassDesc::RegisterMemberAlias(ReflAlias * alias) {
 
 //====================================================
 void ReflClassDesc::RegisterMember(ReflMember * member) {
+    member->AdjustOffset(m_baseOffset);
     member->SetNext(m_members);
     m_members = member;
 }
@@ -934,13 +1087,12 @@ bool ReflClassDesc::SerializeMembers(
     const ReflClass       * inst, 
     unsigned                offset
 ) const {
-    const ReflClassDesc * parent = NULL;
     if (m_parents != NULL) {
         for (Parent * parent = m_parents; parent != NULL; parent = parent->next) {
             const ReflClassDesc * parentDesc = ReflLibrary::GetClassDesc(parent->parentHash);
             ASSERTMSGGR(parentDesc != NULL, "Missing parent descriptor");
             stream->WriteNode(L"BaseClass");
-            stream->WriteNodeAttribute(L"Type", parentDesc->m_name);
+            stream->WriteNodeAttribute(L"Type", parentDesc->m_typeName);
             chargr versionStr[32];
             StrPrintf(versionStr, 32, L"0x%x", parentDesc->GetVersion());
             stream->WriteNodeAttribute(L"Version", versionStr);
@@ -966,7 +1118,7 @@ bool ReflClassDesc::Serialize(
     unsigned                offset
 ) const {
     stream->WriteNode(L"Class");
-    stream->WriteNodeAttribute(L"Type", this->m_name);
+    stream->WriteNodeAttribute(L"Type", this->m_typeName);
     chargr versionStr[32];
     StrPrintf(versionStr, 32, L"0x%x", m_version);
     stream->WriteNodeAttribute(L"Version", versionStr);
@@ -985,29 +1137,42 @@ void ReflClassDesc::SetNext(ReflClassDesc * next) {
     m_next = next;
 }
 
+//====================================================
+ReflClass::ReflClass() :
+    m_type(TOWSTR(ReflClass))
+{
+}
+
 //////////////////////////////////////////////////////
 //
 // External Functions
 //
 
 //====================================================
-ReflClass * ReflCanCastTo(ReflClass * inst, ReflHash type) {
-    ReflClass * ret = NULL;
+void * ReflCanCastTo(ReflClass * inst, ReflHash givenType, ReflHash targetType) {
+    void * ret = NULL;
     const ReflClassDesc * desc = ReflLibrary::GetClassDesc(inst->GetType());
     if (desc != NULL) 
-        ret = desc->OffsetToParent(inst, type);
+        ret = desc->OffsetToParent(inst, givenType, targetType);
 
     return ret;
 }
 
 //====================================================
-const ReflClass * ReflCanCastTo(const ReflClass * inst, ReflHash type) {
-    const ReflClass * ret = NULL;
+const void * ReflCanCastTo(const ReflClass * inst, ReflHash givenType, ReflHash targetType) {
+    const void * ret = NULL;
     const ReflClassDesc * desc = ReflLibrary::GetClassDesc(inst->GetType());
     if (desc != NULL) 
-        ret = desc->OffsetToParent(inst, type);
+        ret = desc->OffsetToParent(inst, givenType, targetType);
 
     return ret;
+}
+
+//====================================================
+void ReflInitType(ReflClass * inst, ReflHash type) {
+    const ReflClassDesc * desc = ReflLibrary::GetClassDesc(type);
+    if (desc != NULL) 
+        desc->InitInst(inst);
 }
 
 //====================================================

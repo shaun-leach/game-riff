@@ -155,7 +155,7 @@ TEST(ReflectionTest, TestBaseTypes) {
 
     ReflClass * inst = ReflLibrary::Deserialize(testStream, MemFlags(MEM_ARENA_DEFAULT, MEM_CAT_TEST));
     ASSERT_TRUE(inst != NULL);
-    TestBaseTypes * loadTypes = TestBaseTypes::Cast(inst);
+    TestBaseTypes * loadTypes = ReflCast<TestBaseTypes>(inst);
     ASSERT_TRUE(loadTypes != NULL);
 
     EXPECT_EQ(s_boolValue,      loadTypes->boolTest);
@@ -244,7 +244,7 @@ TEST(ReflectionTest, TestMemberClass) {
 
     ReflClass * inst = ReflLibrary::Deserialize(testStream, MemFlags(MEM_ARENA_DEFAULT, MEM_CAT_TEST));
     ASSERT_TRUE(inst != NULL);
-    TestMemberClass * loadTypes = TestMemberClass::Cast(inst);
+    TestMemberClass * loadTypes = ReflCast<TestMemberClass>(inst);
     ASSERT_TRUE(loadTypes != NULL);
 
     EXPECT_EQ(s_uint16Value,    loadTypes->containerUint16Test);
