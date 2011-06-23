@@ -522,6 +522,145 @@ void TestCastingWVirtualsInBase() {
     loadTypes = NULL;
 }
 
+class NonreflectedClass {
+public:
+    NonreflectedClass() :
+        nfUint32Test(0),
+        nfFloat32Test(0.0f)
+    {
+    }
+
+    virtual ~NonreflectedClass() {
+    }
+//private:
+    uint32      nfUint32Test;
+    float32     nfFloat32Test;
+};
+
+class SimpleCastWithVirtualsNonreflectedBase : public NonreflectedClass, public SimpleCastBaseClass {
+public:
+    REFL_DEFINE_CLASS(SimpleCastWithVirtualsNonreflectedBase);
+    SimpleCastWithVirtualsNonreflectedBase() :
+        derivedBoolTest(false),
+        derivedInt16Test(0),
+        derivedInt16Test2(0)
+    {
+        InitReflType();
+    }
+
+//private:
+    bool        derivedBoolTest;
+    int16       derivedInt16Test;
+    int16       derivedInt16Test2;
+};
+
+REFL_IMPL_CLASS_BEGIN(SimpleCastBaseClass, SimpleCastWithVirtualsNonreflectedBase);
+    REFL_ADD_PARENT(SimpleCastWithVirtualsNonreflectedBase, SimpleCastBaseClass);
+    REFL_MEMBER(SimpleCastWithVirtualsNonreflectedBase, derivedBoolTest);
+    REFL_MEMBER(SimpleCastWithVirtualsNonreflectedBase, derivedInt16Test);
+    REFL_MEMBER(SimpleCastWithVirtualsNonreflectedBase, derivedInt16Test2);
+REFL_IMPL_CLASS_END(SimpleCastWithVirtualsNonreflectedBase);
+
+//====================================================
+void TestCastingWVirtualsNonreflectedBase() {
+    SimpleCastWithVirtualsNonreflectedBase testCasting;
+    testCasting.baseUint32Test      = 320000;
+    testCasting.baseFloat32Test     = 32.32f;
+    testCasting.derivedBoolTest     = true;
+    testCasting.derivedInt16Test    = 18000;
+    testCasting.derivedInt16Test2   = 18001;
+
+    IStructuredTextStream * testStream = StreamCreateXML(L"testCastingWVirtualsNonreflectedBase.xml");
+    bool result = ReflLibrary::Serialize(testStream, &testCasting);
+    testStream->Save();
+    delete testStream;
+    testStream = NULL;
+
+    testStream = StreamOpenXML(L"testCastingWVirtualsNonreflectedBase.xml");
+
+    ReflClass * inst = ReflLibrary::Deserialize(testStream, MemFlags(MEM_ARENA_DEFAULT, MEM_CAT_TEST));
+    SimpleCastWithVirtualsNonreflectedBase * loadTypes = ReflCast<SimpleCastWithVirtualsNonreflectedBase>(inst);
+
+    SimpleCastWithVirtualsNonreflectedBase * self = ReflCast<SimpleCastWithVirtualsNonreflectedBase>(loadTypes);
+
+    SimpleCastBaseClass * base = ReflCast<SimpleCastBaseClass>(inst);
+    SimpleCastWithVirtualsNonreflectedBase * derived1 = ReflCast<SimpleCastWithVirtualsNonreflectedBase>(base);
+
+    ReflClass * inst1 = ReflCast<ReflClass>(base);
+    ReflClass * inst2 = ReflCast<ReflClass>(loadTypes);
+    SimpleCastBaseClass * base2 = ReflCast<SimpleCastBaseClass>(loadTypes);
+
+    delete loadTypes;
+    loadTypes = NULL;
+}
+
+class CastWithVirtualsIn2ndBase : public SimpleCastBaseClass, public VirtualBaseClass {
+public:
+    REFL_DEFINE_CLASS(CastWithVirtualsIn2ndBase);
+    CastWithVirtualsIn2ndBase() :
+        derivedBoolTest(false),
+        derivedInt16Test(0),
+        derivedInt16Test2(0)
+    {
+        InitReflType();
+    }
+
+//private:
+    bool        derivedBoolTest;
+    int16       derivedInt16Test;
+    int16       derivedInt16Test2;
+};
+
+REFL_IMPL_CLASS_BEGIN(SimpleCastBaseClass, CastWithVirtualsIn2ndBase);
+    REFL_ADD_PARENT(CastWithVirtualsIn2ndBase, VirtualBaseClass);
+    REFL_ADD_PARENT(CastWithVirtualsIn2ndBase, SimpleCastBaseClass);
+    REFL_MEMBER(CastWithVirtualsIn2ndBase, derivedBoolTest);
+    REFL_MEMBER(CastWithVirtualsIn2ndBase, derivedInt16Test);
+    REFL_MEMBER(CastWithVirtualsIn2ndBase, derivedInt16Test2);
+REFL_IMPL_CLASS_END(CastWithVirtualsIn2ndBase);
+
+//====================================================
+void TestCastingWVirtualsIn2ndBase() {
+    CastWithVirtualsIn2ndBase testCasting;
+    testCasting.baseUint32Test      = 330000;
+    testCasting.baseFloat32Test     = 33.33f;
+    testCasting.basevUint32Test     = 320000;
+    testCasting.basevFloat32Test    = 32.32f;
+    testCasting.derivedBoolTest     = true;
+    testCasting.derivedInt16Test    = 19000;
+    testCasting.derivedInt16Test2   = 19001;
+
+    IStructuredTextStream * testStream = StreamCreateXML(L"testCastingWVirtual2ndBase.xml");
+    bool result = ReflLibrary::Serialize(testStream, static_cast<VirtualBaseClass *>(&testCasting));
+    testStream->Save();
+    delete testStream;
+    testStream = NULL;
+
+    testStream = StreamOpenXML(L"testCastingWVirtual2ndBase.xml");
+
+    ReflClass * inst = ReflLibrary::Deserialize(testStream, MemFlags(MEM_ARENA_DEFAULT, MEM_CAT_TEST));
+    CastWithVirtualsIn2ndBase * actual = ReflCast<CastWithVirtualsIn2ndBase>(inst);
+
+    //CastWithVirtualsIn2ndBase * self = ReflCast<CastWithVirtualsIn2ndBase>(actual);
+    //EXPECT_EQ(actual, self);
+
+    SimpleCastBaseClass * base1 = ReflCast<SimpleCastBaseClass>(inst);
+
+    //VirtualBaseClass * base1FromActual = ReflCast<VirtualBaseClass>(actual);
+    //EXPECT_EQ(base1, base1FromActual);
+
+    VirtualBaseClass * base2 = ReflCast<VirtualBaseClass>(inst);
+
+    //VirtualBaseClass * base2FromActual = ReflCast<VirtualBaseClass>(actual);
+    //EXPECT_EQ(base2, base2FromActual);
+
+    SimpleCastBaseClass * base12 = ReflCast<SimpleCastBaseClass>(base2);
+    VirtualBaseClass    * base21 = ReflCast<VirtualBaseClass>(base1);
+
+    delete actual;
+    actual = NULL;
+}
+
 int main(int argc,  char * argv[]) {
    InitializeObjects();
 /*    
@@ -535,6 +674,8 @@ int main(int argc,  char * argv[]) {
     testStream->Save();
 //*/
     
+   TestCastingWVirtualsIn2ndBase();    
+   TestCastingWVirtualsNonreflectedBase();    
    TestCastingWVirtualsInBase();    
    TestCastingFromMultipleBases();
 //*

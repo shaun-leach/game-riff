@@ -35,7 +35,7 @@ class IStructuredTextStream;
 typedef unsigned    ReflIndex;
 typedef Hash32      ReflHash;
 
-typedef ReflClass * (*ReflCreateFunc)(unsigned count, MemFlags memFlags);
+typedef void * (*ReflCreateFunc)(unsigned count, MemFlags memFlags);
 typedef void (*ReflFinalizationFunc)(ReflClass * inst);
 typedef void (*ReflConversionFunc)(ReflClass * inst, ReflHash name, ReflHash oldType, void * data);
 typedef void (*ReflVersioningFunc)(IStructuredTextStream * stream, ReflClassDesc * desc, unsigned version, ReflClass * inst);
@@ -96,11 +96,11 @@ public:
     bool ConvertToString(const byte * data, chargr * str, unsigned len) const;
     bool ConvertFromString(const byte * data, chargr * str, unsigned len) const;
 
-    bool Serialize(IStructuredTextStream * stream, const ReflClass * inst, unsigned offset) const;
-    bool Deserialize(IStructuredTextStream * stream, ReflHash nameHash, ReflClass * inst, unsigned offset) const;
+    bool Serialize(IStructuredTextStream * stream, const ReflClass * inst, const void * base, unsigned offset) const;
+    bool Deserialize(IStructuredTextStream * stream, ReflHash nameHash, ReflClass * inst, void * base, unsigned offset) const;
 
     bool Serialize(DataStream * stream, const ReflClass * inst, unsigned offset) const;
-    bool Deserialize(DataStream * stream, ReflHash nameHash, ReflClass * inst, unsigned offset) const;
+    bool Deserialize(DataStream * stream, ReflHash nameHash, ReflClass * inst, void * base, unsigned offset) const;
 
     struct EnumValue {
         EnumValue     * next;
@@ -124,7 +124,7 @@ public:
 
 private:
 
-    bool DeserializeClassMember(IStructuredTextStream * stream, ReflClass * inst, unsigned offset) const;
+    bool DeserializeClassMember(IStructuredTextStream * stream, void * inst, unsigned offset) const;
     bool ConvertDataMember(
         IStructuredTextStream * stream, 
         ReflHash                nameHash,
@@ -188,17 +188,17 @@ public:
         return m_typeHash == rhs;
     }
 
-    ReflClass * Create(unsigned count, MemFlags memFlags) const {
+    void * Create(unsigned count, MemFlags memFlags) const {
         return m_creationFunc(count, memFlags);
     }
 
-    void InitInst(ReflClass * inst) const;
+    void InitInst(void * inst) const;
 
     bool Serialize(IStructuredTextStream * stream, const ReflClass * inst, unsigned offset = 0) const;
     bool Deserialize(IStructuredTextStream * stream, ReflClass * inst) const;
-    bool Deserialize(IStructuredTextStream * stream, ReflClass * inst, unsigned offset) const;
-    bool DeserializeMembers(IStructuredTextStream * stream, ReflClass * inst) const;
-    bool DeserializeMembers(IStructuredTextStream * stream, ReflClass * inst, unsigned offset) const;
+    bool Deserialize(IStructuredTextStream * stream, void * inst, unsigned offset) const;
+    bool DeserializeMembers(IStructuredTextStream * stream, void * inst) const;
+    bool DeserializeMembers(IStructuredTextStream * stream, void * inst, unsigned offset) const;
 
     bool RegisterTempBinding(ReflHash memberHash, ReflHash typeHash, void * data);
     void ClearTempBinding(ReflHash memberHash, ReflHash typeHash);
@@ -206,7 +206,8 @@ public:
 
     struct Parent {
         Parent    * next;
-        unsigned    offset;
+        unsigned    baseOffset;
+        unsigned    reflOffset;
         ReflHash    parentHash;
     };
     void AddParent(Parent * parent);
@@ -226,20 +227,34 @@ public:
 
     void RegisterMemberAlias(ReflAlias * alias);
 
-    void * OffsetToParent(ReflClass * inst, ReflHash givenType, ReflHash targetType) const;
-    const void * OffsetToParent(const ReflClass * inst, ReflHash givenType, ReflHash targetType) const;
+    void * CastTo(ReflClass * inst, ReflHash givenType, ReflHash targetType) const;
+    const void * CastTo(const ReflClass * inst, ReflHash givenType, ReflHash targetType) const;
+    void * CastTo(void * inst, ReflHash givenType, ReflHash targetType) const;
+    const void * CastTo(const void * inst, ReflHash givenType, ReflHash targetType) const;
 private:
 
-    void FinalizeInst(ReflClass * inst) const;
+    bool CalculateCastOffset(ReflHash givenType, ReflHash targetType, int * offset) const;
+
+    void * CastToBase(ReflClass * inst) const;
+    const void * CastToBase(const ReflClass * inst) const;
+    ReflClass * CastToReflClass(void * inst) const;
+
+    void FinalizeInst(void * inst) const;
     const ReflMember  * FindMember(const chargr * name, unsigned * offset) const;
     const ReflMember  * FindMember(ReflHash name, unsigned * offset) const;
     ReflMember  * FindMember(ReflHash name);
 
     const ReflMember  * FindLocalMember(ReflHash name) const;
     Parent * FindParent(ReflHash parentHash) const;
-    bool FindParentOffset(ReflHash parentHash, unsigned * offset) const;
+    Parent * FindParentRecursive(ReflHash parentHash) const;
+    bool FindParentOffset(ReflHash parentHash, unsigned * offset, unsigned * reflOffset) const;
 
-    bool SerializeMembers(IStructuredTextStream * stream, const ReflClass * inst, unsigned offset) const;
+    bool SerializeMembers(
+        IStructuredTextStream * stream, 
+        const ReflClass       * inst,
+        const void            * base, 
+        unsigned                offset
+    ) const;
 
 private:
     ReflHash                m_typeHash;
@@ -302,32 +317,32 @@ public:
     static bool Deserialize(IStructuredTextStream * stream, ReflClass * inst);
 };
 
-void ReflInitType(ReflClass * inst, ReflHash type);
+void ReflInitType(void * inst, ReflHash type);
 
-void * ReflCanCastTo(ReflClass * inst, ReflHash givenType, ReflHash targetType);
-const void * ReflCanCastTo(const ReflClass * inst, ReflHash givenType, ReflHash targetType);
+void * ReflCanCastTo(ReflClass * inst, ReflHash actualType, ReflHash givenType, ReflHash targetType);
+const void * ReflCanCastTo(const ReflClass * inst, ReflHash actualType, ReflHash givenType, ReflHash targetType);
 
-template<typename t_cast, typename t_base>
-t_cast * ReflCast(t_base * inst) {
+template<typename t_cast, typename t_given>
+t_cast * ReflCast(t_given * inst) {
     if (inst == NULL) 
         return NULL;
 
-    ReflHash givenType  = t_base::GetReflType();
+    ReflHash givenType  = t_given::GetReflType();
     ReflHash targetType = t_cast::GetReflType();
 
-    t_cast * ret = reinterpret_cast<t_cast *>(ReflCanCastTo(inst, givenType, targetType));
+    t_cast * ret = reinterpret_cast<t_cast *>(ReflCanCastTo(inst, inst->GetType(), givenType, targetType));
     return ret;
 }
 
-template<typename t_cast, typename t_base>
-const t_cast * ReflCast(const t_base * inst) {
+template<typename t_cast, typename t_given>
+const t_cast * ReflCast(const t_given * inst) {
     if (inst == NULL) 
         return NULL;
 
-    ReflHash givenType  = t_base::GetReflType();
+    ReflHash givenType  = t_given::GetReflType();
     ReflHash targetType = t_cast::GetReflType();
 
-    const t_cast * ret = reinterpret_cast<const t_cast *>(ReflCanCastTo(inst, givenType, targetType));
+    const t_cast * ret = reinterpret_cast<const t_cast *>(ReflCanCastTo(inst, inst->GetType(), givenType, targetType));
     return ret;
 }
 
@@ -343,7 +358,7 @@ const t_cast * ReflCast(const t_base * inst) {
     private:                                                                \
         static ReflHash s_className;                                        \
     public:                                                                 \
-        static ReflClass * Create(unsigned count, MemFlags memFlags);       \
+        static void * Create(unsigned count, MemFlags memFlags);            \
         static const ReflClassDesc * GetReflectionInfo();                   \
         static ReflClassDesc * CreateReflClassDesc();                       \
         inline static ReflHash GetReflType() {                              \
@@ -352,14 +367,15 @@ const t_cast * ReflCast(const t_base * inst) {
         void InitReflType()
 
 #define REFL_IMPL_CLASS_INTERNAL(base, name, nameStr)                       \
-    ReflClass * name::Create(unsigned count, MemFlags memFlags) {           \
-        return static_cast<base *>(new(memFlags) name);                     \
+    void * name::Create(unsigned count, MemFlags memFlags) {                \
+        name * inst = new(memFlags) name;                                   \
+        return inst;                                                        \
     }                                                                       \
     const ReflClassDesc * name::GetReflectionInfo() {                       \
         return ReflLibrary::GetClassDesc(s_className);                      \
     }                                                                       \
     void name::InitReflType() {                                             \
-        ReflInitType(static_cast<base *>(this), s_className);               \
+        ReflInitType(this, s_className);                                    \
     }                                                                       \
     ReflHash name::s_className = ReflHash(nameStr)
 
@@ -425,6 +441,7 @@ const t_cast * ReflCast(const t_base * inst) {
             static ReflClassDesc::Parent s_parent##parent = {               \
                 NULL,                                                       \
                 CLASSOFFSETOF(parent, derived),                             \
+                CLASSOFFSETOF(ReflClass, parent),                           \
                 ReflHash(TOWSTR(parent))                                    \
             };                                                              \
             s_reflInfo.AddParent(&s_parent##parent)
@@ -433,6 +450,7 @@ const t_cast * ReflCast(const t_base * inst) {
             static ReflClassDesc::Parent s_parent##parent = {               \
                 NULL,                                                       \
                 CLASSOFFSETOF(parent, derived),                             \
+                CLASSOFFSETOF(ReflClass, parent),                           \
                 ReflHash(TOWSTR(ns::parent))                                \
             };                                                              \
             s_reflInfo.AddParent(&s_parent##parent)

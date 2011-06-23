@@ -139,16 +139,16 @@ TEST(ReflectionTest, TestSimpleCasting) {
 
     ReflClass * inst = ReflLibrary::Deserialize(testStream, MemFlags(MEM_ARENA_DEFAULT, MEM_CAT_TEST));
     ASSERT_TRUE(inst != NULL);
-    SimpleCastDerivedClass * loadTypes = ReflCast<SimpleCastDerivedClass>(inst);
-    ASSERT_TRUE(loadTypes != NULL);
-    SimpleCastDerivedClass * self = ReflCast<SimpleCastDerivedClass>(loadTypes);
-    EXPECT_EQ(loadTypes, self);
+    SimpleCastDerivedClass * actual = ReflCast<SimpleCastDerivedClass>(inst);
+    ASSERT_TRUE(actual != NULL);
+    SimpleCastDerivedClass * self = ReflCast<SimpleCastDerivedClass>(actual);
+    EXPECT_EQ(actual, self);
 
-    EXPECT_EQ(s_uint32Value,    loadTypes->baseUint32Test);
-    EXPECT_EQ(s_float32Value,   loadTypes->baseFloat32Test);
-    EXPECT_EQ(s_boolValue,      loadTypes->derivedBoolTest);
-    EXPECT_EQ(s_int16Value,     loadTypes->derivedInt16Test);
-    EXPECT_EQ(s_int16Value,     loadTypes->derivedInt16Test2);
+    EXPECT_EQ(s_uint32Value,    actual->baseUint32Test);
+    EXPECT_EQ(s_float32Value,   actual->baseFloat32Test);
+    EXPECT_EQ(s_boolValue,      actual->derivedBoolTest);
+    EXPECT_EQ(s_int16Value,     actual->derivedInt16Test);
+    EXPECT_EQ(s_int16Value,     actual->derivedInt16Test2);
 
     SimpleOtherBaseClass * castNull = ReflCast<SimpleOtherBaseClass>(inst);
     EXPECT_EQ(true, castNull == NULL);
@@ -158,8 +158,11 @@ TEST(ReflectionTest, TestSimpleCasting) {
     EXPECT_EQ(s_uint32Value,    base->baseUint32Test);
     EXPECT_EQ(s_float32Value,   base->baseFloat32Test);
 
-    delete loadTypes;
-    loadTypes = NULL;
+    SimpleCastBaseClass * base2 = ReflCast<SimpleCastBaseClass>(actual);
+    EXPECT_EQ(base, base2);
+
+    delete actual;
+    actual = NULL;
 }
 
 //////////////////////////////////////////////////////
@@ -216,19 +219,19 @@ TEST(ReflectionTest, TestClassHierarchyCasting) {
 
     ReflClass * inst = ReflLibrary::Deserialize(testStream, MemFlags(MEM_ARENA_DEFAULT, MEM_CAT_TEST));
     ASSERT_TRUE(inst != NULL);
-    MoreDerivedCastClass * loadTypes = ReflCast<MoreDerivedCastClass>(inst);
-    ASSERT_TRUE(loadTypes != NULL);
-    MoreDerivedCastClass * self = ReflCast<MoreDerivedCastClass>(loadTypes);
-    EXPECT_EQ(loadTypes, self);
+    MoreDerivedCastClass * actual = ReflCast<MoreDerivedCastClass>(inst);
+    ASSERT_TRUE(actual != NULL);
+    MoreDerivedCastClass * self = ReflCast<MoreDerivedCastClass>(actual);
+    EXPECT_EQ(actual, self);
 
-    EXPECT_EQ(s_uint32Value,      loadTypes->baseUint32Test);
-    EXPECT_EQ(s_float32Value,     loadTypes->baseFloat32Test);
-    EXPECT_EQ(s_boolValue,        loadTypes->derivedBoolTest);
-    EXPECT_EQ(s_int16Value,       loadTypes->derivedInt16Test);
-    EXPECT_EQ(s_int16Value,       loadTypes->derivedInt16Test2);
-    EXPECT_EQ(s_boolValue,        loadTypes->moreDerivedBoolTest);
-    EXPECT_EQ(s_float32Value,     loadTypes->moreDerivedFloat32Test);
-    EXPECT_EQ(s_boolValue,        loadTypes->moreDerivedBoolTest2);
+    EXPECT_EQ(s_uint32Value,      actual->baseUint32Test);
+    EXPECT_EQ(s_float32Value,     actual->baseFloat32Test);
+    EXPECT_EQ(s_boolValue,        actual->derivedBoolTest);
+    EXPECT_EQ(s_int16Value,       actual->derivedInt16Test);
+    EXPECT_EQ(s_int16Value,       actual->derivedInt16Test2);
+    EXPECT_EQ(s_boolValue,        actual->moreDerivedBoolTest);
+    EXPECT_EQ(s_float32Value,     actual->moreDerivedFloat32Test);
+    EXPECT_EQ(s_boolValue,        actual->moreDerivedBoolTest2);
 
     SimpleOtherBaseClass * castNull = ReflCast<SimpleOtherBaseClass>(inst);
     EXPECT_EQ(true, castNull == NULL);
@@ -254,8 +257,13 @@ TEST(ReflectionTest, TestClassHierarchyCasting) {
     EXPECT_EQ(derived->derivedInt16Test2,   otherDerived->derivedInt16Test2);
     EXPECT_EQ(derived->derivedBoolTest,     otherDerived->derivedBoolTest);
 
-    delete loadTypes;
-    loadTypes = NULL;
+    SimpleCastBaseClass * base1 = ReflCast<SimpleCastBaseClass>(actual);
+    EXPECT_EQ(base, base1);
+    SimpleCastDerivedClass * base2 = ReflCast<SimpleCastDerivedClass>(actual);
+    EXPECT_EQ(derived, base2);
+
+    delete actual;
+    actual = NULL;
 }
 
 //////////////////////////////////////////////////////
@@ -332,18 +340,18 @@ TEST(ReflectionTest, TestMultipleInheritanceCasting) {
 
     ReflClass * inst = ReflLibrary::Deserialize(testStream, MemFlags(MEM_ARENA_DEFAULT, MEM_CAT_TEST));
     ASSERT_TRUE(inst != NULL);
-    MultipleInheritanceCastClass * loadTypes = ReflCast<MultipleInheritanceCastClass>(inst);
-    ASSERT_TRUE(loadTypes != NULL);
-    //MultipleInheritanceCastClass * self = ReflCast<MultipleInheritanceCastClass>(loadTypes);
-    //EXPECT_EQ(loadTypes, self);
+    MultipleInheritanceCastClass * actual = ReflCast<MultipleInheritanceCastClass>(inst);
+    ASSERT_TRUE(actual != NULL);
+    //MultipleInheritanceCastClass * self = ReflCast<MultipleInheritanceCastClass>(actual);
+    //EXPECT_EQ(actual, self);
 
-    EXPECT_EQ(s_uint32Value,      loadTypes->baseUint32Test);
-    EXPECT_EQ(s_float32Value,     loadTypes->baseFloat32Test);
-    EXPECT_EQ(310000,             loadTypes->base2Uint32Test);
-    EXPECT_EQ(31.31f,             loadTypes->base2Float32Test);
-    EXPECT_EQ(s_boolValue,        loadTypes->derivedBoolTest);
-    EXPECT_EQ(s_int16Value,       loadTypes->derivedInt16Test);
-    EXPECT_EQ(s_uint16Value,      loadTypes->derivedInt16Test2);
+    EXPECT_EQ(s_uint32Value,      actual->baseUint32Test);
+    EXPECT_EQ(s_float32Value,     actual->baseFloat32Test);
+    EXPECT_EQ(310000,             actual->base2Uint32Test);
+    EXPECT_EQ(31.31f,             actual->base2Float32Test);
+    EXPECT_EQ(s_boolValue,        actual->derivedBoolTest);
+    EXPECT_EQ(s_int16Value,       actual->derivedInt16Test);
+    EXPECT_EQ(s_uint16Value,      actual->derivedInt16Test2);
 
     SimpleOtherBaseClass * castNull = ReflCast<SimpleOtherBaseClass>(inst);
     EXPECT_EQ(true, castNull == NULL);
@@ -365,8 +373,13 @@ TEST(ReflectionTest, TestMultipleInheritanceCasting) {
     EXPECT_EQ(base2->base2Uint32Test,   otherBase2->base2Uint32Test);
     EXPECT_EQ(base2->base2Float32Test,  otherBase2->base2Float32Test);
 
-    delete loadTypes;
-    loadTypes = NULL;
+    //SimpleCastBaseClass * base1 = ReflCast<SimpleCastBaseClass>(actual);
+    //EXPECT_EQ(base, base1);
+    //SimpleCastBaseClass2 * base2FromActual = ReflCast<SimpleCastBaseClass2>(actual);
+    //EXPECT_EQ(base2, base2FromActual);
+
+    delete actual;
+    actual = NULL;
 }
 
 //////////////////////////////////////////////////////
@@ -446,20 +459,20 @@ TEST(ReflectionTest, TestComplexInheritanceCasting) {
 
     ReflClass * inst = ReflLibrary::Deserialize(testStream, MemFlags(MEM_ARENA_DEFAULT, MEM_CAT_TEST));
     ASSERT_TRUE(inst != NULL);
-    ComplexInheritanceCastClass * loadTypes = ReflCast<ComplexInheritanceCastClass>(inst);
-    ASSERT_TRUE(loadTypes != NULL);
-    //ComplexInheritanceCastClass * self = ReflCast<ComplexInheritanceCastClass>(loadTypes);
-    //EXPECT_EQ(loadTypes, self);
+    ComplexInheritanceCastClass * actual = ReflCast<ComplexInheritanceCastClass>(inst);
+    ASSERT_TRUE(actual != NULL);
+    //ComplexInheritanceCastClass * self = ReflCast<ComplexInheritanceCastClass>(actual);
+    //EXPECT_EQ(actual, self);
 
-    EXPECT_EQ(s_uint32Value,      loadTypes->baseUint32Test);
-    EXPECT_EQ(s_float32Value,     loadTypes->baseFloat32Test);
-    EXPECT_EQ(310000,             loadTypes->base2Uint32Test);
-    EXPECT_EQ(31.31f,             loadTypes->base2Float32Test);
-    EXPECT_EQ(300000,             loadTypes->base3Uint32Test);
-    EXPECT_EQ(30.30f,             loadTypes->base3Float32Test);
-    EXPECT_EQ(s_boolValue,        loadTypes->derivedBoolTest);
-    EXPECT_EQ(s_int16Value,       loadTypes->derivedInt16Test);
-    EXPECT_EQ(s_uint16Value,      loadTypes->derivedInt16Test2);
+    EXPECT_EQ(s_uint32Value,      actual->baseUint32Test);
+    EXPECT_EQ(s_float32Value,     actual->baseFloat32Test);
+    EXPECT_EQ(310000,             actual->base2Uint32Test);
+    EXPECT_EQ(31.31f,             actual->base2Float32Test);
+    EXPECT_EQ(300000,             actual->base3Uint32Test);
+    EXPECT_EQ(30.30f,             actual->base3Float32Test);
+    EXPECT_EQ(s_boolValue,        actual->derivedBoolTest);
+    EXPECT_EQ(s_int16Value,       actual->derivedInt16Test);
+    EXPECT_EQ(s_uint16Value,      actual->derivedInt16Test2);
 
     SimpleOtherBaseClass * castNull = ReflCast<SimpleOtherBaseClass>(inst);
     EXPECT_EQ(true, castNull == NULL);
@@ -501,8 +514,8 @@ TEST(ReflectionTest, TestComplexInheritanceCasting) {
     EXPECT_EQ(base2->base2Uint32Test,   otherBase22->base2Uint32Test);
     EXPECT_EQ(base2->base2Float32Test,  otherBase22->base2Float32Test);
 
-    delete loadTypes;
-    loadTypes = NULL;
+    delete actual;
+    actual = NULL;
 }
 
 //====================================================
@@ -546,13 +559,13 @@ TEST(ReflectionTest, TestCastingFromMultipleBases) {
     EXPECT_EQ(300000,             base3->base3Uint32Test);
     EXPECT_EQ(30.30f,             base3->base3Float32Test);
 
-    //ReflClass            * instD    = ReflCast<ReflClass>(loadTypes);
+    //ReflClass            * instD    = ReflCast<ReflClass>(actual);
     ReflClass            * inst1    = ReflCast<ReflClass>(base1);
     ReflClass            * inst2    = ReflCast<ReflClass>(base2);
     ReflClass            * inst3    = ReflCast<ReflClass>(base3);
     EXPECT_EQ(inst, inst1);
     EXPECT_EQ(inst, inst2);
-    EXPECT_EQ(inst, inst2);
+    EXPECT_EQ(inst, inst3);
 
     ComplexInheritanceCastClass * derived1 = ReflCast<ComplexInheritanceCastClass>(base1);
     ComplexInheritanceCastClass * derived2 = ReflCast<ComplexInheritanceCastClass>(base2);
@@ -573,6 +586,13 @@ TEST(ReflectionTest, TestCastingFromMultipleBases) {
     EXPECT_EQ(base2, base23);
     EXPECT_EQ(base3, base31);
     EXPECT_EQ(base3, base32);
+
+//  SimpleCastBaseClass  * base1FromActual = ReflCast<SimpleCastBaseClass>(actual);
+//  SimpleCastBaseClass2 * base2FromActual = ReflCast<SimpleCastBaseClass2>(actual);
+//  SimpleCastBaseClass3 * base3FromActual = ReflCast<SimpleCastBaseClass3>(actual);
+//  EXPECT_EQ(base1, base1FromActual);
+//  EXPECT_EQ(base2, base2FromActual);
+//  EXPECT_EQ(base3, base3FromActual);
 
     delete actual;
     actual = NULL;
@@ -644,17 +664,17 @@ TEST(ReflectionTest, TestCastingWVirtualsNonreflectedBase) {
 
     ReflClass * inst = ReflLibrary::Deserialize(testStream, MemFlags(MEM_ARENA_DEFAULT, MEM_CAT_TEST));
     ASSERT_TRUE(inst != NULL);
-    SimpleCastWithVirtualsNonreflectedBase * loadTypes = ReflCast<SimpleCastWithVirtualsNonreflectedBase>(inst);
-    ASSERT_TRUE(loadTypes != NULL);
+    SimpleCastWithVirtualsNonreflectedBase * actual = ReflCast<SimpleCastWithVirtualsNonreflectedBase>(inst);
+    ASSERT_TRUE(actual != NULL);
 
-    SimpleCastWithVirtualsNonreflectedBase * self = ReflCast<SimpleCastWithVirtualsNonreflectedBase>(loadTypes);
-    EXPECT_EQ(loadTypes, self);
+    SimpleCastWithVirtualsNonreflectedBase * self = ReflCast<SimpleCastWithVirtualsNonreflectedBase>(actual);
+    EXPECT_EQ(actual, self);
 
-    EXPECT_EQ(s_uint32Value,    loadTypes->baseUint32Test);
-    EXPECT_EQ(s_float32Value,   loadTypes->baseFloat32Test);
-    EXPECT_EQ(s_boolValue,      loadTypes->derivedBoolTest);
-    EXPECT_EQ(s_int16Value,     loadTypes->derivedInt16Test);
-    EXPECT_EQ(s_int16Value,     loadTypes->derivedInt16Test2);
+    EXPECT_EQ(s_uint32Value,    actual->baseUint32Test);
+    EXPECT_EQ(s_float32Value,   actual->baseFloat32Test);
+    EXPECT_EQ(s_boolValue,      actual->derivedBoolTest);
+    EXPECT_EQ(s_int16Value,     actual->derivedInt16Test);
+    EXPECT_EQ(s_int16Value,     actual->derivedInt16Test2);
 
     SimpleOtherBaseClass * castNull = ReflCast<SimpleOtherBaseClass>(inst);
     EXPECT_EQ(true, castNull == NULL);
@@ -664,8 +684,21 @@ TEST(ReflectionTest, TestCastingWVirtualsNonreflectedBase) {
     EXPECT_EQ(s_uint32Value,    base->baseUint32Test);
     EXPECT_EQ(s_float32Value,   base->baseFloat32Test);
 
-    delete loadTypes;
-    loadTypes = NULL;
+    SimpleCastWithVirtualsNonreflectedBase * derived1 = ReflCast<SimpleCastWithVirtualsNonreflectedBase>(base);
+    EXPECT_EQ(actual, derived1);
+
+    ReflClass * inst1 = ReflCast<ReflClass>(base);
+    EXPECT_EQ(inst, inst1);
+
+    ReflClass * inst2 = ReflCast<ReflClass>(actual);
+    EXPECT_EQ(inst, inst2);
+
+    SimpleCastBaseClass * base2 = ReflCast<SimpleCastBaseClass>(actual);
+    EXPECT_EQ(true, base2 != NULL);
+    EXPECT_EQ(base, base2);
+
+    delete actual;
+    actual = NULL;
 }
 
 //////////////////////////////////////////////////////
@@ -741,17 +774,17 @@ TEST(ReflectionTest, TestCastingWVirtualsInBase) {
 
     ReflClass * inst = ReflLibrary::Deserialize(testStream, MemFlags(MEM_ARENA_DEFAULT, MEM_CAT_TEST));
     ASSERT_TRUE(inst != NULL);
-    CastWithVirtualsInBase * loadTypes = ReflCast<CastWithVirtualsInBase>(inst);
-    ASSERT_TRUE(loadTypes != NULL);
+    CastWithVirtualsInBase * actual = ReflCast<CastWithVirtualsInBase>(inst);
+    ASSERT_TRUE(actual != NULL);
 
-    CastWithVirtualsInBase * self = ReflCast<CastWithVirtualsInBase>(loadTypes);
-    EXPECT_EQ(loadTypes, self);
+    CastWithVirtualsInBase * self = ReflCast<CastWithVirtualsInBase>(actual);
+    EXPECT_EQ(actual, self);
 
-    EXPECT_EQ(s_uint32Value,    loadTypes->basevUint32Test);
-    EXPECT_EQ(s_float32Value,   loadTypes->basevFloat32Test);
-    EXPECT_EQ(s_boolValue,      loadTypes->derivedBoolTest);
-    EXPECT_EQ(s_int16Value,     loadTypes->derivedInt16Test);
-    EXPECT_EQ(s_int16Value,     loadTypes->derivedInt16Test2);
+    EXPECT_EQ(s_uint32Value,    actual->basevUint32Test);
+    EXPECT_EQ(s_float32Value,   actual->basevFloat32Test);
+    EXPECT_EQ(s_boolValue,      actual->derivedBoolTest);
+    EXPECT_EQ(s_int16Value,     actual->derivedInt16Test);
+    EXPECT_EQ(s_int16Value,     actual->derivedInt16Test2);
 
     SimpleOtherBaseClass * castNull = ReflCast<SimpleOtherBaseClass>(inst);
     EXPECT_EQ(true, castNull == NULL);
@@ -761,7 +794,219 @@ TEST(ReflectionTest, TestCastingWVirtualsInBase) {
     EXPECT_EQ(s_uint32Value,    base->basevUint32Test);
     EXPECT_EQ(s_float32Value,   base->basevFloat32Test);
 
-    delete loadTypes;
-    loadTypes = NULL;
+    VirtualBaseClass * baseFromActual = ReflCast<VirtualBaseClass>(actual);
+    EXPECT_EQ(base, baseFromActual);
+
+    delete actual;
+    actual = NULL;
+}
+
+class CastWithVirtualsIn2ndBase : public SimpleCastBaseClass, public VirtualBaseClass {
+public:
+    REFL_DEFINE_CLASS(CastWithVirtualsIn2ndBase);
+    CastWithVirtualsIn2ndBase() :
+        derivedBoolTest(false),
+        derivedInt16Test(0),
+        derivedInt16Test2(0)
+    {
+        InitReflType();
+    }
+
+//private:
+    bool        derivedBoolTest;
+    int16       derivedInt16Test;
+    int16       derivedInt16Test2;
+};
+
+REFL_IMPL_CLASS_BEGIN(VirtualBaseClass, CastWithVirtualsIn2ndBase);
+    REFL_ADD_PARENT(CastWithVirtualsIn2ndBase, VirtualBaseClass);
+    REFL_ADD_PARENT(CastWithVirtualsIn2ndBase, SimpleCastBaseClass);
+    REFL_MEMBER(CastWithVirtualsIn2ndBase, derivedBoolTest);
+    REFL_MEMBER(CastWithVirtualsIn2ndBase, derivedInt16Test);
+    REFL_MEMBER(CastWithVirtualsIn2ndBase, derivedInt16Test2);
+REFL_IMPL_CLASS_END(CastWithVirtualsIn2ndBase);
+
+//====================================================
+TEST(ReflectionTest, TestCastingWVirtualsIn2ndBase) {
+    CastWithVirtualsIn2ndBase testCasting;
+    testCasting.baseUint32Test      = 330000;
+    testCasting.baseFloat32Test     = 33.33f;
+    testCasting.basevUint32Test     = s_uint32Value;
+    testCasting.basevFloat32Test    = s_float32Value;
+    testCasting.derivedBoolTest     = s_boolValue;
+    testCasting.derivedInt16Test    = s_int16Value;
+    testCasting.derivedInt16Test2   = s_int16Value;
+
+    IStructuredTextStream * testStream = StreamCreateXML(L"testCastingWVirtual2ndBase.xml");
+    ASSERT_TRUE(testStream != NULL);
+    bool result = ReflLibrary::Serialize(testStream, static_cast<VirtualBaseClass *>(&testCasting));
+    EXPECT_EQ(true, result);
+    testStream->Save();
+    delete testStream;
+    testStream = NULL;
+
+    testStream = StreamOpenXML(L"testCastingWVirtual2ndBase.xml");
+    ASSERT_TRUE(testStream != NULL);
+
+    ReflClass * inst = ReflLibrary::Deserialize(testStream, MemFlags(MEM_ARENA_DEFAULT, MEM_CAT_TEST));
+    ASSERT_TRUE(inst != NULL);
+    CastWithVirtualsIn2ndBase * actual = ReflCast<CastWithVirtualsIn2ndBase>(inst);
+    ASSERT_TRUE(actual != NULL);
+
+    //CastWithVirtualsIn2ndBase * self = ReflCast<CastWithVirtualsIn2ndBase>(actual);
+    //EXPECT_EQ(actual, self);
+
+    EXPECT_EQ(330000,           actual->baseUint32Test);
+    EXPECT_EQ(33.33f,           actual->baseFloat32Test);
+    EXPECT_EQ(s_uint32Value,    actual->basevUint32Test);
+    EXPECT_EQ(s_float32Value,   actual->basevFloat32Test);
+    EXPECT_EQ(s_boolValue,      actual->derivedBoolTest);
+    EXPECT_EQ(s_int16Value,     actual->derivedInt16Test);
+    EXPECT_EQ(s_int16Value,     actual->derivedInt16Test2);
+
+    SimpleOtherBaseClass * castNull = ReflCast<SimpleOtherBaseClass>(inst);
+    EXPECT_EQ(true, castNull == NULL);
+
+    SimpleCastBaseClass * base1 = ReflCast<SimpleCastBaseClass>(inst);
+    EXPECT_EQ(true, base1 != NULL);
+    EXPECT_EQ(330000,           base1->baseUint32Test);
+    EXPECT_EQ(33.33f,           base1->baseFloat32Test);
+
+    //VirtualBaseClass * base1FromActual = ReflCast<VirtualBaseClass>(actual);
+    //EXPECT_EQ(base1, base1FromActual);
+
+    VirtualBaseClass * base2 = ReflCast<VirtualBaseClass>(inst);
+    EXPECT_EQ(true, base2 != NULL);
+    EXPECT_EQ(s_uint32Value,    base2->basevUint32Test);
+    EXPECT_EQ(s_float32Value,   base2->basevFloat32Test);
+
+    //VirtualBaseClass * base2FromActual = ReflCast<VirtualBaseClass>(actual);
+    //EXPECT_EQ(base2, base2FromActual);
+
+    SimpleCastBaseClass * base12 = ReflCast<SimpleCastBaseClass>(base2);
+    VirtualBaseClass    * base21 = ReflCast<VirtualBaseClass>(base1);
+    EXPECT_EQ(base1, base12);
+    EXPECT_EQ(base2, base21);
+
+    delete actual;
+    actual = NULL;
+}
+
+//////////////////////////////////////////////////////
+//
+// Test casting w/ virtuals in the base class
+//
+
+class Virtual2ndBaseClass : public ReflClass {
+public:
+    REFL_DEFINE_CLASS(Virtual2ndBaseClass);
+    Virtual2ndBaseClass() :
+        basev2Uint32Test(0),
+        basev2Float32Test(0.0f)
+    {
+        InitReflType();
+    }
+
+    virtual ~Virtual2ndBaseClass() {
+    }
+//private:
+    uint32      basev2Uint32Test;
+    float32     basev2Float32Test;
+};
+
+REFL_IMPL_CLASS_BEGIN(ReflClass, Virtual2ndBaseClass);
+    REFL_MEMBER(Virtual2ndBaseClass, basev2Uint32Test);
+    REFL_MEMBER(Virtual2ndBaseClass, basev2Float32Test);
+REFL_IMPL_CLASS_END(Virtual2ndBaseClass);
+
+class CastWithVirtualsIn2Bases : public VirtualBaseClass, public Virtual2ndBaseClass {
+public:
+    REFL_DEFINE_CLASS(CastWithVirtualsIn2Bases);
+    CastWithVirtualsIn2Bases() :
+        derivedBoolTest(false),
+        derivedInt16Test(0),
+        derivedInt16Test2(0)
+    {
+        InitReflType();
+    }
+
+//private:
+    bool        derivedBoolTest;
+    int16       derivedInt16Test;
+    int16       derivedInt16Test2;
+};
+
+REFL_IMPL_CLASS_BEGIN(VirtualBaseClass, CastWithVirtualsIn2Bases);
+    REFL_ADD_PARENT(CastWithVirtualsIn2Bases, VirtualBaseClass);
+    REFL_ADD_PARENT(CastWithVirtualsIn2Bases, Virtual2ndBaseClass);
+    REFL_MEMBER(CastWithVirtualsIn2Bases, derivedBoolTest);
+    REFL_MEMBER(CastWithVirtualsIn2Bases, derivedInt16Test);
+    REFL_MEMBER(CastWithVirtualsIn2Bases, derivedInt16Test2);
+REFL_IMPL_CLASS_END(CastWithVirtualsIn2Bases);
+
+//====================================================
+TEST(ReflectionTest, TestCastingWVirtualsIn2Bases) {
+    CastWithVirtualsIn2Bases testCasting;
+    testCasting.basevUint32Test     = s_uint32Value;
+    testCasting.basevFloat32Test    = s_float32Value;
+    testCasting.basev2Uint32Test      = 330000;
+    testCasting.basev2Float32Test     = 33.33f;
+    testCasting.derivedBoolTest     = s_boolValue;
+    testCasting.derivedInt16Test    = s_int16Value;
+    testCasting.derivedInt16Test2   = s_int16Value;
+
+    IStructuredTextStream * testStream = StreamCreateXML(L"testCastingWVirtual2Bases.xml");
+    ASSERT_TRUE(testStream != NULL);
+    bool result = ReflLibrary::Serialize(testStream, static_cast<VirtualBaseClass *>(&testCasting));
+    EXPECT_EQ(true, result);
+    testStream->Save();
+    delete testStream;
+    testStream = NULL;
+
+    testStream = StreamOpenXML(L"testCastingWVirtual2Bases.xml");
+    ASSERT_TRUE(testStream != NULL);
+
+    ReflClass * inst = ReflLibrary::Deserialize(testStream, MemFlags(MEM_ARENA_DEFAULT, MEM_CAT_TEST));
+    ASSERT_TRUE(inst != NULL);
+    CastWithVirtualsIn2Bases * actual = ReflCast<CastWithVirtualsIn2Bases>(inst);
+    ASSERT_TRUE(actual != NULL);
+
+    //CastWithVirtualsIn2ndBase * self = ReflCast<CastWithVirtualsIn2ndBase>(actual);
+    //EXPECT_EQ(actual, self);
+
+    EXPECT_EQ(s_uint32Value,    actual->basevUint32Test);
+    EXPECT_EQ(s_float32Value,   actual->basevFloat32Test);
+    EXPECT_EQ(330000,           actual->basev2Uint32Test);
+    EXPECT_EQ(33.33f,           actual->basev2Float32Test);
+    EXPECT_EQ(s_boolValue,      actual->derivedBoolTest);
+    EXPECT_EQ(s_int16Value,     actual->derivedInt16Test);
+    EXPECT_EQ(s_int16Value,     actual->derivedInt16Test2);
+
+    SimpleOtherBaseClass * castNull = ReflCast<SimpleOtherBaseClass>(inst);
+    EXPECT_EQ(true, castNull == NULL);
+
+    VirtualBaseClass * base1 = ReflCast<VirtualBaseClass>(inst);
+    EXPECT_EQ(true, base1 != NULL);
+    EXPECT_EQ(s_uint32Value,    base1->basevUint32Test);
+    EXPECT_EQ(s_float32Value,   base1->basevFloat32Test);
+
+    //VirtualBaseClass * base1FromActual = ReflCast<VirtualBaseClass>(actual);
+    //EXPECT_EQ(base1, base1FromActual);
+
+    Virtual2ndBaseClass * base2 = ReflCast<Virtual2ndBaseClass>(inst);
+    EXPECT_EQ(true, base2 != NULL);
+    EXPECT_EQ(330000,           base2->basev2Uint32Test);
+    EXPECT_EQ(33.33f,           base2->basev2Float32Test);
+
+    //VirtualBaseClass * base2FromActual = ReflCast<VirtualBaseClass>(actual);
+    //EXPECT_EQ(base2, base2FromActual);
+
+    VirtualBaseClass    * base12 = ReflCast<VirtualBaseClass>(base2);
+    Virtual2ndBaseClass * base21 = ReflCast<Virtual2ndBaseClass>(base1);
+    EXPECT_EQ(base1, base12);
+    EXPECT_EQ(base2, base21);
+
+    delete actual;
+    actual = NULL;
 }
 

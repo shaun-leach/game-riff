@@ -16,27 +16,14 @@
 ---Too many stack strings with hardcoded values
 --------------
 -flesh out reflection more
+--Use specialized template functions to get class type for members
+--Have serialization use a template function to eliminate the cast
 --eliminate virtuals in ReflClass base
+---Need better method for calculating reflOffset
 ---Add support for casting from ReflClass of 2nd parent
----Add support for casting from multiple ReflClass parents
----Unify OffsetToParent functions
----Unit tests for casting from multiple base classes to derived class
-----Test downcasting from actual type to lesser types
-----Test with virtuals in second base class
-****Test casting to self
-****Test with virtuals
-****Make sure InitInst works correctly still
-*****Can be simplified
-***Can I set up casting to work with classes that don't derive from ReflClass?
-****I can cast to them but not from them
-***Unit test for casting to base when base has virtuals
-***test that classes with virtuals work correctly, ReflClass has to be at the root of the inheritance?
-****Need better initialization support
-****alternatively if each instance just had a 32 bit hash in the base class I could do everything as a c interface! :)
-****Need to handle casting to parents
-***Useful for classes I don't control, however can't access private members. Test this
-***Yes with template functions, though can't do a full implementation
-***Fix casting to use m_reflOffset
+---Add support for casting from multiple ReflClass parents(ambiguous if there's multiple inheritance)
+----Don't pass inst through cast functions, use void * instead
+----Re-enable tests
 --Clean up header so class functions are organized better by functionality
 --How do I want to allocate reflected members? It would be preferred to allocate in contiguous arrays
 ---However how do we handle ref counting and deletion?
@@ -157,6 +144,26 @@
 ***Need to handle casting to parent classes
 ***Why not use RTTI???, inconsistent between platforms, not serializable, requires virtuals, very limited for what I need, effectively redundant
 ***Test RTTI
+**eliminate virtuals in ReflClass base
+***Test with virtuals in second base class
+***Unify OffsetToParent functions
+***Test downcasting from actual type to lesser types
+***Unit tests for casting from multiple base classes to derived class
+****Need to test where m_reflOffset != 0
+****Test casting to self
+****Test with virtuals
+****Make sure InitInst works correctly still
+*****Can be simplified
+***Can I set up casting to work with classes that don't derive from ReflClass?
+****I can cast to them but not from them
+***Unit test for casting to base when base has virtuals
+***test that classes with virtuals work correctly, ReflClass has to be at the root of the inheritance?
+****Need better initialization support
+****alternatively if each instance just had a 32 bit hash in the base class I could do everything as a c interface! :)
+****Need to handle casting to parents
+***Useful for classes I don't control, however can't access private members. Test this
+***Yes with template functions, though can't do a full implementation
+***Fix casting to use m_reflOffset
 ----------
 -Create tools platform
 --Layer tools functionality on top of platform
