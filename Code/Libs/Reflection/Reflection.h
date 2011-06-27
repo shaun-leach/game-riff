@@ -111,8 +111,6 @@ public:
         m_tempBinding = NULL;
     }
 
-    void SetIsEnum();
-
 private:
 
     bool DeserializeClassMember(IStructuredTextStream * stream, void * inst, unsigned offset) const;
@@ -231,6 +229,7 @@ public:
     void RegisterEnumValue(EnumValue * value);
     const EnumValue * GetEnumValue(int value) const;
     const EnumValue * GetEnumValue(const chargr * str, unsigned len) const;
+    bool IsEnumType() const;
 
     void * CastTo(ReflClass * inst, ReflHash givenType, ReflHash targetType) const;
     const void * CastTo(const ReflClass * inst, ReflHash givenType, ReflHash targetType) const;
@@ -494,13 +493,6 @@ const t_cast * ReflCast(const t_given * inst) {
                 true                                                        \
             )
 
-#define REFL_MEMBER_ENUM(name)                                              \
-            REFL_MEMBER_INTERNAL(                                           \
-                name,                                                       \
-                ReflGetTypeHash((((t_reflType *)(0x0))->name))              \
-            );                                                              \
-            s_member##name.SetIsEnum()
-
 #define REFL_ADD_MEMBER_CONVERSION(name, conv)                              \
             s_member##name.RegisterConversionFunc(conv)
 
@@ -525,17 +517,6 @@ const t_cast * ReflCast(const t_given * inst) {
     REFL_DEFINE_USER_TYPE(name);                                            \
     template<typename t_reflType>                                           \
     ReflTypeDesc * ReflCreateEnumDesc##name() {                             \
-        static ReflTypeDesc s_typeDesc(                                     \
-            TOWSTR(name),                                                   \
-            sizeof(t_reflType),                                             \
-            0,                                                              \
-            0,                                                              \
-            NULL                                                            \
-        )
-
-#define REFL_CLASS_ENUM_IMPL_BEGIN(className, name)                         \
-    template<typename t_reflType>                                           \
-    ReflTypeDesc * className::ReflCreateEnumDesc##name() {                  \
         static ReflTypeDesc s_typeDesc(                                     \
             TOWSTR(name),                                                   \
             sizeof(t_reflType),                                             \
@@ -569,18 +550,6 @@ const t_cast * ReflCast(const t_given * inst) {
     public:                                                                 \
         ReflAutoRegister##name() {                                          \
             ReflTypeDesc * desc = ReflCreateEnumDesc##name<name>();         \
-            ReflLibrary::RegisterClassDesc(desc);                           \
-        }                                                                   \
-    };                                                                      \
-    static ReflAutoRegister##name s_autoRegister##name
-
-#define REFL_CLASS_ENUM_IMPL_END(className, name)                           \
-        return &s_typeDesc;                                                 \
-    }                                                                       \
-    class ReflAutoRegister##name {                                          \
-    public:                                                                 \
-        ReflAutoRegister##name() {                                          \
-            ReflTypeDesc * desc = className::ReflCreateEnumDesc##name<name>();    \
             ReflLibrary::RegisterClassDesc(desc);                           \
         }                                                                   \
     };                                                                      \

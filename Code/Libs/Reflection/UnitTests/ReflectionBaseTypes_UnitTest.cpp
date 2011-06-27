@@ -121,7 +121,7 @@ REFL_IMPL_CLASS_BEGIN(ReflClass, TestBaseTypes);
     REFL_MEMBER(int64Test);
     REFL_MEMBER(uint64Test);
     REFL_MEMBER(float32Test);
-    REFL_MEMBER_ENUM(enumTest);
+    REFL_MEMBER(enumTest);
     //REFL_MEMBER(TestBaseTypes, angleTest);
     //REFL_MEMBER(TestBaseTypes, percentTest);
 REFL_IMPL_CLASS_END(TestBaseTypes);

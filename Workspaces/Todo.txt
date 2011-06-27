@@ -16,23 +16,24 @@
 ---Too many stack strings with hardcoded values
 --------------
 -flesh out reflection more
---Need to support enums tied to a class
+--Enums
+---Need to handle different sized enums in serialization code
+----test
 ---Add test for class with multiple enum members
----Include support for private enums
----Need to handle different sizes enums
-***Need to use actual enum type instead of just enum
-***Need designer friendly names for all enums
+---Need to support enums tied to a class
+----Include support for private enums
 --add code to finalize entire reflection library
 ---Finalize when reflection library is initialized
 ---Verify that every member of type "class" has a registered ReflClassDesc
 ---Verify that every parent class has a registered ReflClassDesc
 ---Verify that members are the correct size
----Verify that member offsets are monotonic
+---Verify that member offsets are monotonic?
 ---make sure that there are no duplicate class names, include aliases
 ---Verify that a class doesn't reflect members of a base class
 ---If using 32 bit hashes, verify that there are no collisions
 ---can I trap missing parents?
---Designer friendly names???
+***Get rid of SetIsEnum and determine at finalization time
+--Designer friendly names
 --Add support for classes that can't derive off of ReflClass
 --Have serialization use a template function to eliminate the cast?
 --eliminate virtuals in ReflClass base
@@ -41,7 +42,7 @@
 ---Add support for casting from multiple ReflClass parents(ambiguous if there's multiple inheritance)
 ----Don't pass inst through cast functions, use void * instead?
 ----Re-enable tests
---How do I want to allocate reflected members? It would be preferred to allocate in contiguous arrays
+--How do I want to allocate reflected objects? It would be preferred to allocate in contiguous arrays
 ---However how do we handle ref counting and deletion?
 --Prep everything for precompiled hashes
 --Can I use typeid to get member name strings at compile time only? And do I need this?
@@ -77,7 +78,7 @@
 ****Test that int8 deserialization works if the member is packed
 ---Need to test missing/extra types
 ----Need to log these
----Missing aliases(this is really just a extra type)
+---Missing aliases(this is really just an extra type)
 ----Need to log these
 ***Complex inheritance
 ***Manual versioning
@@ -169,6 +170,8 @@
 **Use specialized template functions to get class type for members
 ***Can I do something similar for dealing with namespaces? No.
 **Clean up header so class functions are organized better by functionality
+**Need to use actual enum type instead of just enum
+**Need designer friendly names for all enums
 ----------
 -Create tools platform
 --Layer tools functionality on top of platform
@@ -183,6 +186,7 @@
 --Array(fixed, dynamic)
 --hash
 --test against STL
+--Can all of these have a fixed memory allocator?
 ----------
 -Ref counted type
 -Smart pointers

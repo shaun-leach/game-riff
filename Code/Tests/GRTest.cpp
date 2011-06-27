@@ -308,7 +308,7 @@ REFL_IMPL_CLASS_BEGIN(BaseClass, Dummy);
     REFL_ADD_MEMBER_ALIAS_W_CONVERSION(class_alias_test, mcTest, ConvertClassTest);
     REFL_MEMBER(btest);
     REFL_ADD_MEMBER_CONVERSION(btest, Convert);
-    REFL_MEMBER_ENUM(etest);
+    REFL_MEMBER(etest);
     REFL_MEMBER(pertest);
     REFL_MEMBER(angtest);
     REFL_ADD_MEMBER_ALIAS(angtest, atest);
