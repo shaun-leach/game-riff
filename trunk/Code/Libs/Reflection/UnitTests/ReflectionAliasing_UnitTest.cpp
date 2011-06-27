@@ -70,8 +70,8 @@ public:
 
 REFL_IMPL_CLASS_BEGIN(ReflClass, SimpleAliasingClass);
     REFL_ADD_CLASS_ALIAS(SimpleAliasingClass, OldAliasingClass);
-    REFL_MEMBER(SimpleAliasingClass, baseUint32Test);
-    REFL_MEMBER(SimpleAliasingClass, baseFloat32Test);
+    REFL_MEMBER(baseUint32Test);
+    REFL_MEMBER(baseFloat32Test);
 REFL_IMPL_CLASS_END(SimpleAliasingClass);
 
 //====================================================
@@ -112,9 +112,9 @@ public:
 };
 
 REFL_IMPL_CLASS_BEGIN(ReflClass, SimpleMemberAliasingClass);
-    REFL_MEMBER(SimpleMemberAliasingClass, baseUint32Test);
+    REFL_MEMBER(baseUint32Test);
     REFL_ADD_MEMBER_ALIAS(baseUint32Test, uint32Test);
-    REFL_MEMBER(SimpleMemberAliasingClass, baseFloat32Test);
+    REFL_MEMBER(baseFloat32Test);
 REFL_IMPL_CLASS_END(SimpleMemberAliasingClass);
 
 //====================================================
@@ -139,6 +139,12 @@ TEST(ReflectionTest, TestSimpleMemberAliasing) {
 // Test simple enum aliasing
 //
 
+enum EAliasValue {
+    ALIAS_VALUE_1,
+    ALIAS_VALUE_2,
+    ALIAS_VALUE_3
+};
+
 class SimpleEnumAliasingClass : public ReflClass {
 public:
     REFL_DEFINE_CLASS(SimpleEnumAliasingClass);
@@ -150,22 +156,20 @@ public:
     }
 
 //private:
-    enum EAliasValue {
-        ALIAS_VALUE_1,
-        ALIAS_VALUE_2,
-        ALIAS_VALUE_3
-    };
     EAliasValue baseEnumTest;
     uint32      baseUint32Test;
 };
 
+REFL_ENUM_IMPL_BEGIN(EAliasValue);
+    REFL_ENUM_VALUE(ALIAS_VALUE_1, Left);
+    REFL_ENUM_VALUE(ALIAS_VALUE_2, Right);
+    REFL_ENUM_VALUE(ALIAS_VALUE_3, Up);
+        REFL_ENUM_ALIAS(ALIAS_VALUE_3, ALIAS_VALUE_4, Down);
+REFL_ENUM_IMPL_END(EAliasValue);
+
 REFL_IMPL_CLASS_BEGIN(ReflClass, SimpleEnumAliasingClass);
-    REFL_MEMBER_ENUM(SimpleEnumAliasingClass, baseEnumTest);
-        REFL_ENUM_VALUE(baseEnumTest, ALIAS_VALUE_1);
-        REFL_ENUM_VALUE(baseEnumTest, ALIAS_VALUE_2);
-        REFL_ENUM_VALUE(baseEnumTest, ALIAS_VALUE_3);
-            REFL_ENUM_ALIAS(baseEnumTest, ALIAS_VALUE_3, ALIAS_VALUE_4);
-    REFL_MEMBER(SimpleEnumAliasingClass, baseUint32Test);
+    REFL_MEMBER_ENUM(baseEnumTest);
+    REFL_MEMBER(baseUint32Test);
 REFL_IMPL_CLASS_END(SimpleEnumAliasingClass);
 
 //====================================================
@@ -178,8 +182,8 @@ TEST(ReflectionTest, TestSimpleEnumAliasing) {
     SimpleEnumAliasingClass * loadTypes = ReflCast<SimpleEnumAliasingClass>(inst);
     EXPECT_EQ(true, loadTypes != NULL);
 
-    EXPECT_EQ(s_uint32Value,                                loadTypes->baseUint32Test);
-    EXPECT_EQ(SimpleEnumAliasingClass::ALIAS_VALUE_3,       loadTypes->baseEnumTest);
+    EXPECT_EQ(s_uint32Value,                    loadTypes->baseUint32Test);
+    EXPECT_EQ(ALIAS_VALUE_3,                    loadTypes->baseEnumTest);
 
     delete loadTypes;
     loadTypes = NULL;

@@ -64,7 +64,7 @@ enum EReflIndex {
     REFL_INDEX_ENDTYPE,
 };
 
-static ReflClassDesc  * s_descHead  = NULL;
+static ReflTypeDesc  * s_descHead  = NULL;
 static ReflAlias      * s_classAliasHead = NULL;
 
 ReflHash ReflClass::s_classType(TOWSTR(ReflClass));
@@ -78,22 +78,23 @@ typedef void (*ToStringFunc)(const ReflMember * desc, const byte * data, const c
 typedef void (*FromStringFunc)(const ReflMember * desc, byte * data, const chargr * format, const chargr * str, unsigned len);
 
 struct TypeDesc {
-    TypeDesc()
-    {
+    TypeDesc() {
         // Empty constructor seen as the table will have already 
         //   been initialized in the function below by the time
         //   the global constructor is called.
-        typeHash = ReflHash(typeName);
+        typeHash = ReflHash(m_typeName);
     }
 
     TypeDesc(
+        EReflIndex        index,
         const chargr    * name,
         unsigned          size,
         const chargr    * inFormat,
         ToStringFunc      toStr,
         FromStringFunc    fromStr
     ) :
-        typeName(name),
+        m_index(index),
+        m_typeName(name),
         typeSize(size),
         typeHash(name),
         format(inFormat),
@@ -101,12 +102,34 @@ struct TypeDesc {
         fromString(fromStr)
     {
     }
-    const chargr  * typeName;
+
+    const chargr  * GetTypeName(const ReflTypeDesc * desc) const {
+        const chargr * name = m_typeName;
+        if (m_index == REFL_INDEX_ENUM) {
+            ASSERTMSGGR(desc != NULL, "Unregistered enum type");
+            name = desc->GetTypeName();
+        }
+        return name;
+    }
+
+    bool TypeMatches(ReflHash givenType, ReflHash memberType) const {
+        bool result = false;
+        if (m_index == REFL_INDEX_ENUM) 
+            result = givenType == memberType;
+        else
+            result = givenType == typeHash;
+        return result;
+    }
+
     ReflHash        typeHash;
     unsigned        typeSize;
     const chargr  * format;
     ToStringFunc    toString;
     FromStringFunc  fromString;
+
+private:
+    EReflIndex      m_index;
+    const chargr  * m_typeName;
 };
 
 static TypeDesc s_typeDesc[REFL_INDEX_ENDTYPE];
@@ -147,7 +170,9 @@ void ConvertToString<REFL_INDEX_UINT8, uint8>(const ReflMember * , const byte * 
 template<>
 void ConvertToString<REFL_INDEX_ENUM, char>(const ReflMember * memberDesc, const byte * data, const chargr * format, chargr * string, unsigned len) {
     int * idata = (int *) data;
-    const ReflMember::EnumValue * enumValue = memberDesc->GetEnumValue(*data);
+    const ReflTypeDesc * enumDesc = ReflLibrary::GetClassDesc(memberDesc->TypeHash());
+    ASSERTMSGGR(enumDesc != NULL, "Unregistered enum type");
+    const ReflTypeDesc::EnumValue * enumValue = enumDesc->GetEnumValue(*data);
     if (enumValue != NULL) 
         StrPrintf(string, len, L"%s", enumValue->name);
     else {
@@ -204,12 +229,14 @@ void ConvertFromString<REFL_INDEX_UINT8, uint8>(const ReflMember * , byte * data
 //====================================================
 template<>
 void ConvertFromString<REFL_INDEX_ENUM, char>(const ReflMember * memberDesc, byte * data, const chargr * , const chargr * string, unsigned len) {
-    const ReflMember::EnumValue * value = memberDesc->GetEnumValue(string, len);
-    if (value != NULL) {
-        *((int *) data) = value->value;
+    const ReflTypeDesc * enumDesc = ReflLibrary::GetClassDesc(memberDesc->TypeHash());
+    ASSERTMSGGR(enumDesc != NULL, "Unregistered enum type");
+    const ReflTypeDesc::EnumValue * enumValue = enumDesc->GetEnumValue(string, len);
+    if (enumValue != NULL) {
+        *((int *) data) = enumValue->value;
     }
     else {
-        ASSERTMSGGR(false, "Unhandled enum value");
+        ASSERTMSGGR(false, "Unregistered enum value");
         //Need to log a message here?
     }
 }
@@ -238,32 +265,32 @@ void ConvertFromString<REFL_INDEX_CHAR>(byte * data, const chargr * string, unsi
 
 //====================================================
 void InitializeTypeTable() {
-    s_typeDesc[REFL_INDEX_BOOL        ] = TypeDesc(L"bool",            sizeof(bool),         NULL,      &ConvertToString<REFL_INDEX_BOOL,           bool>, &ConvertFromString<REFL_INDEX_BOOL,           bool>);
-    s_typeDesc[REFL_INDEX_INT8        ] = TypeDesc(L"int8",            sizeof(int8),         NULL,      &ConvertToString<REFL_INDEX_INT8,           int8>, &ConvertFromString<REFL_INDEX_INT8,           int8>);
-    s_typeDesc[REFL_INDEX_UINT8       ] = TypeDesc(L"uint8",           sizeof(uint8),        NULL,      &ConvertToString<REFL_INDEX_UINT8,         uint8>, &ConvertFromString<REFL_INDEX_UINT8,         uint8>);
-    s_typeDesc[REFL_INDEX_INT16       ] = TypeDesc(L"int16",           sizeof(int16),        L"%hd",    &ConvertToString<REFL_INDEX_INT16,         int16>, &ConvertFromString<REFL_INDEX_INT16,         int16>);
-    s_typeDesc[REFL_INDEX_UINT16      ] = TypeDesc(L"uint16",          sizeof(uint16),       L"%hu",    &ConvertToString<REFL_INDEX_UINT16,       uint16>, &ConvertFromString<REFL_INDEX_UINT16,       uint16>);
-    s_typeDesc[REFL_INDEX_INT32       ] = TypeDesc(L"int32",           sizeof(int32),        L"%d",     &ConvertToString<REFL_INDEX_INT32,         int32>, &ConvertFromString<REFL_INDEX_INT32,         int32>);
-    s_typeDesc[REFL_INDEX_UINT32      ] = TypeDesc(L"uint32",          sizeof(uint32),       L"%u",     &ConvertToString<REFL_INDEX_UINT32,       uint32>, &ConvertFromString<REFL_INDEX_UINT32,       uint32>);
-    s_typeDesc[REFL_INDEX_INT64       ] = TypeDesc(L"int64",           sizeof(int64),        L"%lld",   &ConvertToString<REFL_INDEX_INT64,         int64>, &ConvertFromString<REFL_INDEX_INT64,         int64>);
-    s_typeDesc[REFL_INDEX_UINT64      ] = TypeDesc(L"uint64",          sizeof(uint64),       L"%llu",   &ConvertToString<REFL_INDEX_UINT64,       uint64>, &ConvertFromString<REFL_INDEX_UINT64,       uint64>);
-    s_typeDesc[REFL_INDEX_INT128      ] = TypeDesc(L"int128",          sizeof(int128),       NULL,      &ConvertToString<REFL_INDEX_INT128,       int128>, &ConvertFromString<REFL_INDEX_INT128,       int128>);
-    s_typeDesc[REFL_INDEX_UINT128     ] = TypeDesc(L"uint128",         sizeof(uint128),      NULL,      &ConvertToString<REFL_INDEX_UINT128,     uint128>, &ConvertFromString<REFL_INDEX_UINT128,     uint128>);
-    s_typeDesc[REFL_INDEX_FLOAT16     ] = TypeDesc(L"float16",         sizeof(float16),      L"%f",     &ConvertToString<REFL_INDEX_FLOAT16,       float>, &ConvertFromString<REFL_INDEX_FLOAT16,       float>);
-    s_typeDesc[REFL_INDEX_FLOAT32     ] = TypeDesc(L"float32",         sizeof(float32),      L"%f",     &ConvertToString<REFL_INDEX_FLOAT32,       float>, &ConvertFromString<REFL_INDEX_FLOAT32,       float>);
-    s_typeDesc[REFL_INDEX_STRING      ] = TypeDesc(L"chargr *",        sizeof(chargr *),     L"%s",     &ConvertToString<REFL_INDEX_STRING, const chargr>, &ConvertFromString<REFL_INDEX_STRING, const chargr>);
-    s_typeDesc[REFL_INDEX_CLASS       ] = TypeDesc(L"class",           0,                    NULL,      &ConvertToString<REFL_INDEX_CLASS,          char>, &ConvertFromString<REFL_INDEX_CLASS,          char>);
-    s_typeDesc[REFL_INDEX_ENUM        ] = TypeDesc(L"enum",            sizeof(unsigned),     NULL,      &ConvertToString<REFL_INDEX_ENUM,           char>, &ConvertFromString<REFL_INDEX_ENUM,           char>);
-    s_typeDesc[REFL_INDEX_FIXED_ARRAY ] = TypeDesc(L"fixedarray",      0,                    NULL,      &ConvertToString<REFL_INDEX_FIXED_ARRAY,    char>, &ConvertFromString<REFL_INDEX_FIXED_ARRAY,    char>);
-    s_typeDesc[REFL_INDEX_VAR_ARRAY   ] = TypeDesc(L"vararray",        0,                    NULL,      &ConvertToString<REFL_INDEX_VAR_ARRAY,      char>, &ConvertFromString<REFL_INDEX_VAR_ARRAY,      char>);
-    s_typeDesc[REFL_INDEX_POINTER     ] = TypeDesc(L"pointer",         sizeof(void *),       NULL,      &ConvertToString<REFL_INDEX_POINTER,        char>, &ConvertFromString<REFL_INDEX_POINTER,        char>);
-    s_typeDesc[REFL_INDEX_COLOR       ] = TypeDesc(L"color",           sizeof(color),        NULL,      &ConvertToString<REFL_INDEX_COLOR,          char>, &ConvertFromString<REFL_INDEX_COLOR,          char>);
-    s_typeDesc[REFL_INDEX_ANGLE       ] = TypeDesc(L"angle",           sizeof(angle),        NULL,      &ConvertToString<REFL_INDEX_ANGLE,         float>, &ConvertFromString<REFL_INDEX_ANGLE,         float>);
-    s_typeDesc[REFL_INDEX_PERCENTAGE  ] = TypeDesc(L"percentage",      sizeof(percentage),   NULL,      &ConvertToString<REFL_INDEX_PERCENTAGE,    float>, &ConvertFromString<REFL_INDEX_PERCENTAGE,    float>);
-    s_typeDesc[REFL_INDEX_EULER_ANGLES] = TypeDesc(L"eulers",          sizeof(eulers),       NULL,      &ConvertToString<REFL_INDEX_EULER_ANGLES,  float>, &ConvertFromString<REFL_INDEX_EULER_ANGLES,  float>);
-    s_typeDesc[REFL_INDEX_VEC3        ] = TypeDesc(L"vec3",            sizeof(vec3),         NULL,      &ConvertToString<REFL_INDEX_VEC3,          float>, &ConvertFromString<REFL_INDEX_VEC3,          float>);
-    s_typeDesc[REFL_INDEX_VEC4        ] = TypeDesc(L"vec4",            sizeof(vec4),         NULL,      &ConvertToString<REFL_INDEX_VEC4,          float>, &ConvertFromString<REFL_INDEX_VEC4,          float>);
-    s_typeDesc[REFL_INDEX_QUATERNION  ] = TypeDesc(L"quaternion",      sizeof(quaternion),   NULL,      &ConvertToString<REFL_INDEX_QUATERNION,    float>, &ConvertFromString<REFL_INDEX_QUATERNION,    float>);
+    s_typeDesc[REFL_INDEX_BOOL        ] = TypeDesc(REFL_INDEX_BOOL,          L"bool",            sizeof(bool),         NULL,      &ConvertToString<REFL_INDEX_BOOL,           bool>, &ConvertFromString<REFL_INDEX_BOOL,           bool>);
+    s_typeDesc[REFL_INDEX_INT8        ] = TypeDesc(REFL_INDEX_INT8,          L"int8",            sizeof(int8),         NULL,      &ConvertToString<REFL_INDEX_INT8,           int8>, &ConvertFromString<REFL_INDEX_INT8,           int8>);
+    s_typeDesc[REFL_INDEX_UINT8       ] = TypeDesc(REFL_INDEX_UINT8,         L"uint8",           sizeof(uint8),        NULL,      &ConvertToString<REFL_INDEX_UINT8,         uint8>, &ConvertFromString<REFL_INDEX_UINT8,         uint8>);
+    s_typeDesc[REFL_INDEX_INT16       ] = TypeDesc(REFL_INDEX_INT16,         L"int16",           sizeof(int16),        L"%hd",    &ConvertToString<REFL_INDEX_INT16,         int16>, &ConvertFromString<REFL_INDEX_INT16,         int16>);
+    s_typeDesc[REFL_INDEX_UINT16      ] = TypeDesc(REFL_INDEX_UINT16,        L"uint16",          sizeof(uint16),       L"%hu",    &ConvertToString<REFL_INDEX_UINT16,       uint16>, &ConvertFromString<REFL_INDEX_UINT16,       uint16>);
+    s_typeDesc[REFL_INDEX_INT32       ] = TypeDesc(REFL_INDEX_INT32,         L"int32",           sizeof(int32),        L"%d",     &ConvertToString<REFL_INDEX_INT32,         int32>, &ConvertFromString<REFL_INDEX_INT32,         int32>);
+    s_typeDesc[REFL_INDEX_UINT32      ] = TypeDesc(REFL_INDEX_UINT32,        L"uint32",          sizeof(uint32),       L"%u",     &ConvertToString<REFL_INDEX_UINT32,       uint32>, &ConvertFromString<REFL_INDEX_UINT32,       uint32>);
+    s_typeDesc[REFL_INDEX_INT64       ] = TypeDesc(REFL_INDEX_INT64,         L"int64",           sizeof(int64),        L"%lld",   &ConvertToString<REFL_INDEX_INT64,         int64>, &ConvertFromString<REFL_INDEX_INT64,         int64>);
+    s_typeDesc[REFL_INDEX_UINT64      ] = TypeDesc(REFL_INDEX_UINT64,        L"uint64",          sizeof(uint64),       L"%llu",   &ConvertToString<REFL_INDEX_UINT64,       uint64>, &ConvertFromString<REFL_INDEX_UINT64,       uint64>);
+    s_typeDesc[REFL_INDEX_INT128      ] = TypeDesc(REFL_INDEX_INT128,        L"int128",          sizeof(int128),       NULL,      &ConvertToString<REFL_INDEX_INT128,       int128>, &ConvertFromString<REFL_INDEX_INT128,       int128>);
+    s_typeDesc[REFL_INDEX_UINT128     ] = TypeDesc(REFL_INDEX_UINT128,       L"uint128",         sizeof(uint128),      NULL,      &ConvertToString<REFL_INDEX_UINT128,     uint128>, &ConvertFromString<REFL_INDEX_UINT128,     uint128>);
+    s_typeDesc[REFL_INDEX_FLOAT16     ] = TypeDesc(REFL_INDEX_FLOAT16,       L"float16",         sizeof(float16),      L"%f",     &ConvertToString<REFL_INDEX_FLOAT16,       float>, &ConvertFromString<REFL_INDEX_FLOAT16,       float>);
+    s_typeDesc[REFL_INDEX_FLOAT32     ] = TypeDesc(REFL_INDEX_FLOAT32,       L"float32",         sizeof(float32),      L"%f",     &ConvertToString<REFL_INDEX_FLOAT32,       float>, &ConvertFromString<REFL_INDEX_FLOAT32,       float>);
+    s_typeDesc[REFL_INDEX_STRING      ] = TypeDesc(REFL_INDEX_STRING,        L"chargr *",        sizeof(chargr *),     L"%s",     &ConvertToString<REFL_INDEX_STRING, const chargr>, &ConvertFromString<REFL_INDEX_STRING, const chargr>);
+    s_typeDesc[REFL_INDEX_CLASS       ] = TypeDesc(REFL_INDEX_CLASS,         L"class",           0,                    NULL,      &ConvertToString<REFL_INDEX_CLASS,          char>, &ConvertFromString<REFL_INDEX_CLASS,          char>);
+    s_typeDesc[REFL_INDEX_ENUM        ] = TypeDesc(REFL_INDEX_ENUM,          L"enum",            sizeof(unsigned),     NULL,      &ConvertToString<REFL_INDEX_ENUM,           char>, &ConvertFromString<REFL_INDEX_ENUM,           char>);
+    s_typeDesc[REFL_INDEX_FIXED_ARRAY ] = TypeDesc(REFL_INDEX_FIXED_ARRAY,   L"fixedarray",      0,                    NULL,      &ConvertToString<REFL_INDEX_FIXED_ARRAY,    char>, &ConvertFromString<REFL_INDEX_FIXED_ARRAY,    char>);
+    s_typeDesc[REFL_INDEX_VAR_ARRAY   ] = TypeDesc(REFL_INDEX_VAR_ARRAY,     L"vararray",        0,                    NULL,      &ConvertToString<REFL_INDEX_VAR_ARRAY,      char>, &ConvertFromString<REFL_INDEX_VAR_ARRAY,      char>);
+    s_typeDesc[REFL_INDEX_POINTER     ] = TypeDesc(REFL_INDEX_POINTER,       L"pointer",         sizeof(void *),       NULL,      &ConvertToString<REFL_INDEX_POINTER,        char>, &ConvertFromString<REFL_INDEX_POINTER,        char>);
+    s_typeDesc[REFL_INDEX_COLOR       ] = TypeDesc(REFL_INDEX_COLOR,         L"color",           sizeof(color),        NULL,      &ConvertToString<REFL_INDEX_COLOR,          char>, &ConvertFromString<REFL_INDEX_COLOR,          char>);
+    s_typeDesc[REFL_INDEX_ANGLE       ] = TypeDesc(REFL_INDEX_ANGLE,         L"angle",           sizeof(angle),        NULL,      &ConvertToString<REFL_INDEX_ANGLE,         float>, &ConvertFromString<REFL_INDEX_ANGLE,         float>);
+    s_typeDesc[REFL_INDEX_PERCENTAGE  ] = TypeDesc(REFL_INDEX_PERCENTAGE,    L"percentage",      sizeof(percentage),   NULL,      &ConvertToString<REFL_INDEX_PERCENTAGE,    float>, &ConvertFromString<REFL_INDEX_PERCENTAGE,    float>);
+    s_typeDesc[REFL_INDEX_EULER_ANGLES] = TypeDesc(REFL_INDEX_EULER_ANGLES,  L"eulers",          sizeof(eulers),       NULL,      &ConvertToString<REFL_INDEX_EULER_ANGLES,  float>, &ConvertFromString<REFL_INDEX_EULER_ANGLES,  float>);
+    s_typeDesc[REFL_INDEX_VEC3        ] = TypeDesc(REFL_INDEX_VEC3,          L"vec3",            sizeof(vec3),         NULL,      &ConvertToString<REFL_INDEX_VEC3,          float>, &ConvertFromString<REFL_INDEX_VEC3,          float>);
+    s_typeDesc[REFL_INDEX_VEC4        ] = TypeDesc(REFL_INDEX_VEC4,          L"vec4",            sizeof(vec4),         NULL,      &ConvertToString<REFL_INDEX_VEC4,          float>, &ConvertFromString<REFL_INDEX_VEC4,          float>);
+    s_typeDesc[REFL_INDEX_QUATERNION  ] = TypeDesc(REFL_INDEX_QUATERNION,    L"quaternion",      sizeof(quaternion),   NULL,      &ConvertToString<REFL_INDEX_QUATERNION,    float>, &ConvertFromString<REFL_INDEX_QUATERNION,    float>);
 
 };
 
@@ -274,7 +301,7 @@ void InitializeTypeTable() {
 
 //====================================================
 ReflMember::ReflMember(
-    ReflClassDesc * container,
+    ReflTypeDesc * container,
     ReflHash        typeHash, 
     const chargr  * name, 
     unsigned        size,
@@ -286,7 +313,6 @@ ReflMember::ReflMember(
     m_typeHash(typeHash),
     m_size(size),
     m_offset(offset),
-    m_enumValues(NULL),
     m_next(NULL),
     m_convFunc(NULL),
     m_deprecated(false),
@@ -304,7 +330,7 @@ ReflMember::ReflMember(
 
 //====================================================
 ReflMember::ReflMember(
-    ReflClassDesc * container,
+    ReflTypeDesc * container,
     ReflHash        typeHash, 
     const chargr  * name, 
     unsigned        size,
@@ -316,7 +342,6 @@ ReflMember::ReflMember(
     m_typeHash(typeHash),
     m_size(size),
     m_offset(0),
-    m_enumValues(NULL),
     m_next(NULL),
     m_convFunc(NULL),
     m_deprecated(deprecated),
@@ -408,8 +433,11 @@ bool ReflMember::Deserialize(
     ReflHash typeHash(type);
 
     bool retResult = true;
-    if (typeHash == s_typeDesc[TypeIndex()].typeHash) {
-        if (m_index != REFL_INDEX_CLASS) {
+    if (s_typeDesc[TypeIndex()].TypeMatches(typeHash, m_typeHash)) {
+        if (m_index == REFL_INDEX_CLASS) {
+            retResult = DeserializeClassMember(stream, base, offset);
+        }
+        else {
             chargr value[256];
             stream->ReadNodeValue(value, 256);
             byte * member = reinterpret_cast<byte *>(base);
@@ -420,9 +448,6 @@ bool ReflMember::Deserialize(
                 member = reinterpret_cast<byte *>(m_tempBinding);
             }
             s_typeDesc[TypeIndex()].fromString(this, member, s_typeDesc[TypeIndex()].format, value, 256);
-        }
-        else {
-            retResult = DeserializeClassMember(stream, base, offset);
         }
     }
     else if (m_convFunc != NULL) {
@@ -445,7 +470,7 @@ bool ReflMember::Deserialize(
 
 //====================================================
 bool ReflMember::DeserializeClassMember(IStructuredTextStream * stream, void * base, unsigned offset) const {
-    const ReflClassDesc * subClass = ReflLibrary::GetClassDesc(m_typeHash);
+    const ReflTypeDesc * subClass = ReflLibrary::GetClassDesc(m_typeHash);
     if (subClass != NULL) {
         if (stream->ReadChildNode() == STREAM_ERROR_NODEDOESNTEXIST) {
             ASSERTMSGGR(false, "Need to log an error here");
@@ -497,41 +522,6 @@ ReflIndex ReflMember::DetermineTypeIndex(ReflHash typeHash) const {
 
 //====================================================
 void ReflMember::Finalize() {
-    EnumValue * head = NULL;
-    while (m_enumValues != NULL) {
-        EnumValue * next = m_enumValues->next;
-        m_enumValues->next  = head;
-        head                = m_enumValues;
-        m_enumValues = next;
-    }
-
-    m_enumValues = head;
-}
-
-//====================================================
-const ReflMember::EnumValue * ReflMember::GetEnumValue(int value) const {
-    const EnumValue * val = m_enumValues;
-    while (val != NULL) {
-        if (val->value == value) 
-            break;
-
-        val = val->next;
-    }
-
-    return val;
-}
-
-//====================================================
-const ReflMember::EnumValue * ReflMember::GetEnumValue(const chargr * str, unsigned len) const {
-    const EnumValue * val = m_enumValues;
-    while (val != NULL) {
-        if (StrICmp(str, val->name, len) == 0) 
-            break;
-
-        val = val->next;
-    }
-
-    return val;
 }
 
 //====================================================
@@ -546,9 +536,8 @@ void ReflMember::RegisterConversionFunc(ReflConversionFunc func) {
 }
 
 //====================================================
-void ReflMember::RegisterEnumValue(ReflMember::EnumValue * value) {
-    value->next     = m_enumValues;
-    m_enumValues    = value;
+void ReflMember::SetIsEnum() {
+    m_index = REFL_INDEX_ENUM;
 }
 
 //====================================================
@@ -568,11 +557,11 @@ bool ReflMember::Serialize(
 
     stream->WriteNode(L"DataMember");
     stream->WriteNodeAttribute(L"Name", Name());
-    stream->WriteNodeAttribute(L"Type", s_typeDesc[TypeIndex()].typeName);
+    const ReflTypeDesc * typeDesc = ReflLibrary::GetClassDesc(m_typeHash);
+    stream->WriteNodeAttribute(L"Type", s_typeDesc[TypeIndex()].GetTypeName(typeDesc));
     if (m_index == REFL_INDEX_CLASS) {
-        const ReflClassDesc * subClass = ReflLibrary::GetClassDesc(m_typeHash);
-        if (subClass != NULL) 
-            subClass->Serialize(stream, inst, offset + m_offset);
+        if (typeDesc != NULL) 
+            typeDesc->Serialize(stream, inst, offset + m_offset);
         else {
             // Need to log error
             ASSERTMSGGR(false, "Unregistered type, log error");
@@ -592,7 +581,7 @@ bool ReflMember::Serialize(
 }
 
 //====================================================
-ReflClassDesc::ReflClassDesc(
+ReflTypeDesc::ReflTypeDesc(
     const chargr  * name, 
     unsigned        size,
     unsigned        baseOffset,
@@ -610,339 +599,38 @@ ReflClassDesc::ReflClassDesc(
     m_versioningFunc(NULL),
     m_members(NULL),
     m_next(NULL),
-    m_parents(NULL)
+    m_parents(NULL),
+    m_enumValues(NULL)
 {
 }
 
 //====================================================
-void ReflClassDesc::AddParent(Parent * parent) {
+void ReflTypeDesc::AddParent(Parent * parent) {
     //parent->offset -= m_baseOffset;
     parent->next = m_parents;
     m_parents = parent;
 }
 
 //====================================================
-void * ReflClassDesc::CastToBase(ReflClass * inst) const {
+void * ReflTypeDesc::CastToBase(ReflClass * inst) const {
     byte * base = reinterpret_cast<byte *>(inst);
     return reinterpret_cast<void *>(base - m_reflOffset - m_baseOffset);
 }
 
 //====================================================
-const void * ReflClassDesc::CastToBase(const ReflClass * inst) const {
+const void * ReflTypeDesc::CastToBase(const ReflClass * inst) const {
     const byte * base = reinterpret_cast<const byte *>(inst);
     return reinterpret_cast<const void *>(base - m_reflOffset - m_baseOffset);
 }
 
 //====================================================
-ReflClass * ReflClassDesc::CastToReflClass(void * inst) const {
+ReflClass * ReflTypeDesc::CastToReflClass(void * inst) const {
     byte * base = static_cast<byte *>(inst);
     return reinterpret_cast<ReflClass *>(base + m_reflOffset + m_baseOffset);
 }
 
 //====================================================
-void ReflClassDesc::ClearAllTempBindings() {
-    ReflMember * member = m_members;
-    while(member != NULL) {
-        member->ClearTempBinding();
-
-        member = member->GetNext();
-    }
-}
-
-//====================================================
-void ReflClassDesc::ClearTempBinding(ReflHash memberHash, ReflHash typeHash) {
-    ReflMember * member = FindMember(memberHash);
-    if (member != NULL && member->TypeHash() == typeHash) {
-        member->ClearTempBinding();
-    }
-}
-
-//====================================================
-bool ReflClassDesc::Deserialize(
-    IStructuredTextStream * stream, 
-    ReflClass             * inst
-) const {
-    return Deserialize(stream, CastToBase(inst), 0);
-}
-
-//====================================================
-bool ReflClassDesc::Deserialize(
-    IStructuredTextStream * stream, 
-    void                  * inst, 
-    unsigned                offset
-) const {
-    chargr versionStr[32];
-    unsigned version = 0;
-    if (stream->ReadNodeAttribute(L"Version", versionStr, 32) == STREAM_ERROR_OK) {
-        StrReadValue(versionStr, 32, L"%x", &version);
-    }
-    else 
-        ASSERTMSGGR(false, "Need to log this error");
-
-    if (m_versioningFunc != NULL) {
-        m_versioningFunc(stream, const_cast<ReflClassDesc *>(this), version, CastToReflClass(inst));
-    }
-    else {
-        DeserializeMembers(stream, inst, offset);
-    }
-
-    FinalizeInst(inst);
-
-    return true;
-}
-
-//====================================================
-bool ReflClassDesc::DeserializeMembers(
-    IStructuredTextStream * stream, 
-    void                  * inst
-) const {
-    return DeserializeMembers(stream, inst, 0);
-}
-
-//====================================================
-bool ReflClassDesc::DeserializeMembers(
-    IStructuredTextStream * stream, 
-    void                  * inst, 
-    unsigned                offset
-) const {
-    if (stream->ReadChildNode() == STREAM_ERROR_NODEDOESNTEXIST) 
-        return true;
-
-    do {
-        chargr nodeName[64];
-        stream->ReadNodeName(nodeName, 64);
-
-        if (StrICmp(nodeName, L"DataMember", 10) == 0) {
-
-            chargr name[256];
-            EStreamError result = stream->ReadNodeAttribute(L"Name", name, 256);
-            ASSERTMSGGR(result == STREAM_ERROR_OK, "Need to log this error message");
-            ReflHash nameHash(name);
-            unsigned memberOffset = 0;
-            const ReflMember * member = FindMember(nameHash, &memberOffset);
-            if (member != NULL) {
-                member->Deserialize(
-                    stream, 
-                    nameHash,
-                    CastToReflClass(inst),
-                    inst, 
-                    offset + memberOffset
-                );
-            }
-        }
-        else if (StrICmp(nodeName, L"BaseClass", 9) == 0) {
-            chargr baseClassName[256];
-            EStreamError result = stream->ReadNodeAttribute(L"Type", baseClassName, 256);
-            if (result == STREAM_ERROR_OK) {
-                const ReflClassDesc * parentDesc = ReflLibrary::GetClassDesc(ReflHash(baseClassName));
-                if (parentDesc != NULL) {
-                    Parent * parent = FindParent(parentDesc->GetHash());
-                    if (parent != NULL) 
-                        parentDesc->Deserialize(stream, inst, offset + parent->baseOffset);
-                }
-            }
-            else {
-                ASSERTMSGGR(result == STREAM_ERROR_OK, "Need to log this error message");
-            }
-        }
-    } while (stream->ReadNextNode() != STREAM_ERROR_NODEDOESNTEXIST);
-
-    stream->ReadParentNode();
-
-    return true;
-}
-
-//====================================================
-void ReflClassDesc::Finalize() {
-    Parent * parent = NULL;
-    while (m_parents != NULL) {
-        Parent * next   = m_parents->next;
-        m_parents->next = parent;
-        parent          = m_parents;
-
-        const ReflClassDesc * parentDesc = ReflLibrary::GetClassDesc(parent->parentHash);
-
-        m_parents       = next;
-    }
-    m_parents = parent;
-
-    if (m_parents != NULL) {
-        m_baseOffset = m_parents->baseOffset;
-        m_reflOffset = m_parents->reflOffset;
-    }
-
-    ReflMember * head = NULL;
-    while (m_members != NULL) {
-        ReflMember * next = m_members->GetNext();
-        m_members->SetNext(head);
-        m_members->Finalize();
-        head        = m_members;
-        m_members   = next;
-    }
-
-    m_members = head;
-}
-
-//====================================================
-void ReflClassDesc::FinalizeInst(void * inst) const {
-    if (m_finalizeFunc != NULL) {
-        ReflClass * refl = CastToReflClass(inst);
-        m_finalizeFunc(refl);
-    }
-}
-
-//====================================================
-ReflMember * ReflClassDesc::FindMember(ReflHash nameHash) {
-    unsigned offset = 0;
-    const ReflMember * member = FindMember(nameHash, &offset);
-
-    return const_cast<ReflMember *>(member);
-}
-
-//====================================================
-const ReflMember * ReflClassDesc::FindMember(ReflHash nameHash) const {
-    unsigned offset = 0;
-    const ReflMember * member = FindMember(nameHash, &offset);
-
-    return member;
-}
-
-//====================================================
-const ReflMember * ReflClassDesc::FindMember(const chargr * name, unsigned * offset) const {
-    ReflHash nameHash(name);
-
-    const ReflMember * member = FindMember(nameHash, offset);
-
-    return member;
-}
-
-//====================================================
-const ReflMember * ReflClassDesc::FindMember(ReflHash nameHash, unsigned * offset) const {
-    ASSERTGR(offset != NULL);
-    const ReflMember * member = NULL;
-    if (m_parents != NULL) {
-        for (Parent * parent = m_parents; parent != NULL && member == NULL; parent = parent->next) {
-            const ReflClassDesc * parentDesc = ReflLibrary::GetClassDesc(parent->parentHash);
-            ASSERTMSGGR(parentDesc != NULL, "Missing parent descriptor");
-            member = parentDesc->FindMember(nameHash, offset);
-            if (member != NULL) 
-                *offset += parent->baseOffset;
-        }
-    }
-
-    if (member == NULL) 
-        member = FindLocalMember(nameHash);
-
-    if (member == NULL) {
-        for (ReflAlias * alias = m_memberAliases; alias != NULL; alias = alias->next) {
-            if (nameHash == alias->oldHash) {
-                member = FindLocalMember(alias->newHash);
-                break;
-            }
-        }
-    }
-
-    return member;
-}
-
-//====================================================
-const ReflMember * ReflClassDesc::FindLocalMember(ReflHash nameHash) const {
-    const ReflMember * member = m_members;
-    while (member != NULL) {
-        if (member->Matches(nameHash)) {
-            break;
-        }
-        member = member->GetNext();
-    }
-    return member;
-}
-
-//====================================================
-ReflClassDesc::Parent * ReflClassDesc::FindParent(ReflHash parentHash) const {
-    Parent * parent = m_parents;
-    for (; parent != NULL; parent = parent->next) {
-        if (parent->parentHash == parentHash) {
-            break;
-        }
-    }
-
-    return parent;
-}
-
-//====================================================
-bool ReflClassDesc::FindParentOffset(ReflHash parentHash, unsigned * offset, unsigned * reflOffset) const {
-
-    bool found = false;
-    Parent * retParent = FindParent(parentHash);
-
-    if (retParent != NULL) {
-        *offset     = retParent->baseOffset;
-        *reflOffset = retParent->reflOffset;
-        found = true;
-    }
-    else {
-        Parent * parent = m_parents;
-        for (; parent != NULL; parent = parent->next) {
-            const ReflClassDesc * desc = ReflLibrary::GetClassDesc(parent->parentHash);
-            unsigned recursiveOffset        = 0;
-            unsigned recursiveReflOffset    = 0;
-            if (desc->FindParentOffset(parentHash, &recursiveOffset, &recursiveReflOffset)) {
-                *offset     += recursiveOffset + parent->baseOffset;
-                *reflOffset += recursiveReflOffset + parent->reflOffset;
-                found = true;
-                break;
-            }
-        }
-    }
-
-    return found;
-}
-
-//====================================================
-const ReflMember & ReflClassDesc::GetMember(unsigned index) const {
-    TESTME("Implement me");
-    return m_members[0];
-}
-
-//====================================================
-void ReflClassDesc::InitInst(void * inst) const {
-    if (m_parents != NULL) {
-        Parent * parent = m_parents;
-        for (; parent != NULL; parent = parent->next) {
-            byte * ptr = reinterpret_cast<byte *>(inst);
-            ReflClass * base = reinterpret_cast<ReflClass *>(ptr + parent->baseOffset + parent->reflOffset);
-            base->SetTypeHash(m_typeHash);
-        }
-    }
-    else {
-        ReflClass * base = reinterpret_cast<ReflClass *>(inst);
-        base->SetTypeHash(m_typeHash);
-    }
-}
-
-//====================================================
-unsigned ReflClassDesc::NumMembers() const {
-    TESTME("Implement me");
-    unsigned memberCount = 0;
-
-    const ReflClassDesc::Parent * parent = m_parents;
-    while(parent != NULL) {
-        const ReflClassDesc * parentDesc = ReflLibrary::GetClassDesc(parent->parentHash);
-        memberCount += parentDesc->NumMembers();
-        parent = parent->next;
-    }
-
-    const ReflMember * member = m_members;
-    while(member != NULL) {
-        memberCount++;
-        member = member->GetNext();
-    }
-
-    return memberCount;
-}
-
-//====================================================
-bool ReflClassDesc::CalculateCastOffset(ReflHash givenType, ReflHash targetType, int * offset) const {
+bool ReflTypeDesc::CalculateCastOffset(ReflHash givenType, ReflHash targetType, int * offset) const {
     bool targetTypeFound    = false;
     if (targetType == m_typeHash) {
         // Casting to the actual type from any type
@@ -997,7 +685,7 @@ bool ReflClassDesc::CalculateCastOffset(ReflHash givenType, ReflHash targetType,
 }
 
 //====================================================
-void * ReflClassDesc::CastTo(ReflClass * inst, ReflHash givenType, ReflHash targetType) const {
+void * ReflTypeDesc::CastTo(ReflClass * inst, ReflHash givenType, ReflHash targetType) const {
     void * base = NULL;
     if (givenType != m_typeHash && givenType != ReflClass::GetReflType()) {
         unsigned offset     = 0;
@@ -1015,7 +703,7 @@ void * ReflClassDesc::CastTo(ReflClass * inst, ReflHash givenType, ReflHash targ
 }
 
 //====================================================
-const void * ReflClassDesc::CastTo(const ReflClass * inst, ReflHash givenType, ReflHash targetType) const {
+const void * ReflTypeDesc::CastTo(const ReflClass * inst, ReflHash givenType, ReflHash targetType) const {
     const void * base = NULL;
     if (givenType != m_typeHash && givenType != ReflClass::GetReflType()) {
         unsigned offset     = 0;
@@ -1036,7 +724,7 @@ const void * ReflClassDesc::CastTo(const ReflClass * inst, ReflHash givenType, R
 }
 
 //====================================================
-void * ReflClassDesc::CastTo(void * inst, ReflHash givenType, ReflHash targetType) const {
+void * ReflTypeDesc::CastTo(void * inst, ReflHash givenType, ReflHash targetType) const {
 
     int offset = 0;
     bool targetTypeFound = CalculateCastOffset(givenType, targetType, &offset);
@@ -1052,7 +740,7 @@ void * ReflClassDesc::CastTo(void * inst, ReflHash givenType, ReflHash targetTyp
 }
 
 //====================================================
-const void * ReflClassDesc::CastTo(const void * inst, ReflHash givenType, ReflHash targetType) const {
+const void * ReflTypeDesc::CastTo(const void * inst, ReflHash givenType, ReflHash targetType) const {
     TESTME("Make sure const version works");
 
     int offset = 0;
@@ -1069,13 +757,358 @@ const void * ReflClassDesc::CastTo(const void * inst, ReflHash givenType, ReflHa
 }
 
 //====================================================
-void ReflClassDesc::RegisterFinalizationFunc(ReflFinalizationFunc func) {
+void ReflTypeDesc::ClearAllTempBindings() {
+    ReflMember * member = m_members;
+    while(member != NULL) {
+        member->ClearTempBinding();
+
+        member = member->GetNext();
+    }
+}
+
+//====================================================
+void ReflTypeDesc::ClearTempBinding(ReflHash memberHash, ReflHash typeHash) {
+    ReflMember * member = FindMember(memberHash);
+    if (member != NULL && member->TypeHash() == typeHash) {
+        member->ClearTempBinding();
+    }
+}
+
+//====================================================
+bool ReflTypeDesc::Deserialize(
+    IStructuredTextStream * stream, 
+    ReflClass             * inst
+) const {
+    return Deserialize(stream, CastToBase(inst), 0);
+}
+
+//====================================================
+bool ReflTypeDesc::Deserialize(
+    IStructuredTextStream * stream, 
+    void                  * inst, 
+    unsigned                offset
+) const {
+    chargr versionStr[32];
+    unsigned version = 0;
+    if (stream->ReadNodeAttribute(L"Version", versionStr, 32) == STREAM_ERROR_OK) {
+        StrReadValue(versionStr, 32, L"%x", &version);
+    }
+    else 
+        ASSERTMSGGR(false, "Need to log this error");
+
+    if (m_versioningFunc != NULL) {
+        m_versioningFunc(stream, const_cast<ReflTypeDesc *>(this), version, CastToReflClass(inst));
+    }
+    else {
+        DeserializeMembers(stream, inst, offset);
+    }
+
+    FinalizeInst(inst);
+
+    return true;
+}
+
+//====================================================
+bool ReflTypeDesc::DeserializeMembers(
+    IStructuredTextStream * stream, 
+    void                  * inst
+) const {
+    return DeserializeMembers(stream, inst, 0);
+}
+
+//====================================================
+bool ReflTypeDesc::DeserializeMembers(
+    IStructuredTextStream * stream, 
+    void                  * inst, 
+    unsigned                offset
+) const {
+    if (stream->ReadChildNode() == STREAM_ERROR_NODEDOESNTEXIST) 
+        return true;
+
+    do {
+        chargr nodeName[64];
+        stream->ReadNodeName(nodeName, 64);
+
+        if (StrICmp(nodeName, L"DataMember", 10) == 0) {
+
+            chargr name[256];
+            EStreamError result = stream->ReadNodeAttribute(L"Name", name, 256);
+            ASSERTMSGGR(result == STREAM_ERROR_OK, "Need to log this error message");
+            ReflHash nameHash(name);
+            unsigned memberOffset = 0;
+            const ReflMember * member = FindMember(nameHash, &memberOffset);
+            if (member != NULL) {
+                member->Deserialize(
+                    stream, 
+                    nameHash,
+                    CastToReflClass(inst),
+                    inst, 
+                    offset + memberOffset
+                );
+            }
+        }
+        else if (StrICmp(nodeName, L"BaseClass", 9) == 0) {
+            chargr baseClassName[256];
+            EStreamError result = stream->ReadNodeAttribute(L"Type", baseClassName, 256);
+            if (result == STREAM_ERROR_OK) {
+                const ReflTypeDesc * parentDesc = ReflLibrary::GetClassDesc(ReflHash(baseClassName));
+                if (parentDesc != NULL) {
+                    Parent * parent = FindParent(parentDesc->GetHash());
+                    if (parent != NULL) 
+                        parentDesc->Deserialize(stream, inst, offset + parent->baseOffset);
+                }
+            }
+            else {
+                ASSERTMSGGR(result == STREAM_ERROR_OK, "Need to log this error message");
+            }
+        }
+    } while (stream->ReadNextNode() != STREAM_ERROR_NODEDOESNTEXIST);
+
+    stream->ReadParentNode();
+
+    return true;
+}
+
+//====================================================
+void ReflTypeDesc::Finalize() {
+    Parent * parent = NULL;
+    while (m_parents != NULL) {
+        Parent * next   = m_parents->next;
+        m_parents->next = parent;
+        parent          = m_parents;
+
+        const ReflTypeDesc * parentDesc = ReflLibrary::GetClassDesc(parent->parentHash);
+
+        m_parents       = next;
+    }
+    m_parents = parent;
+
+    if (m_parents != NULL) {
+        m_baseOffset = m_parents->baseOffset;
+        m_reflOffset = m_parents->reflOffset;
+    }
+
+    ReflMember * head = NULL;
+    while (m_members != NULL) {
+        ReflMember * next = m_members->GetNext();
+        m_members->SetNext(head);
+        m_members->Finalize();
+        head        = m_members;
+        m_members   = next;
+    }
+
+    m_members = head;
+
+    EnumValue * enumHead = NULL;
+    while (m_enumValues != NULL) {
+        EnumValue * next    = m_enumValues->next;
+        m_enumValues->next  = enumHead;
+        enumHead            = m_enumValues;
+        m_enumValues        = next;
+    }
+
+    m_enumValues = enumHead;
+}
+
+//====================================================
+void ReflTypeDesc::FinalizeInst(void * inst) const {
+    if (m_finalizeFunc != NULL) {
+        ReflClass * refl = CastToReflClass(inst);
+        m_finalizeFunc(refl);
+    }
+}
+
+//====================================================
+ReflMember * ReflTypeDesc::FindMember(ReflHash nameHash) {
+    unsigned offset = 0;
+    const ReflMember * member = FindMember(nameHash, &offset);
+
+    return const_cast<ReflMember *>(member);
+}
+
+//====================================================
+const ReflMember * ReflTypeDesc::FindMember(ReflHash nameHash) const {
+    unsigned offset = 0;
+    const ReflMember * member = FindMember(nameHash, &offset);
+
+    return member;
+}
+
+//====================================================
+const ReflMember * ReflTypeDesc::FindMember(const chargr * name, unsigned * offset) const {
+    ReflHash nameHash(name);
+
+    const ReflMember * member = FindMember(nameHash, offset);
+
+    return member;
+}
+
+//====================================================
+const ReflMember * ReflTypeDesc::FindMember(ReflHash nameHash, unsigned * offset) const {
+    ASSERTGR(offset != NULL);
+    const ReflMember * member = NULL;
+    if (m_parents != NULL) {
+        for (Parent * parent = m_parents; parent != NULL && member == NULL; parent = parent->next) {
+            const ReflTypeDesc * parentDesc = ReflLibrary::GetClassDesc(parent->parentHash);
+            ASSERTMSGGR(parentDesc != NULL, "Missing parent descriptor");
+            member = parentDesc->FindMember(nameHash, offset);
+            if (member != NULL) 
+                *offset += parent->baseOffset;
+        }
+    }
+
+    if (member == NULL) 
+        member = FindLocalMember(nameHash);
+
+    if (member == NULL) {
+        for (ReflAlias * alias = m_memberAliases; alias != NULL; alias = alias->next) {
+            if (nameHash == alias->oldHash) {
+                member = FindLocalMember(alias->newHash);
+                break;
+            }
+        }
+    }
+
+    return member;
+}
+
+//====================================================
+const ReflMember * ReflTypeDesc::FindLocalMember(ReflHash nameHash) const {
+    const ReflMember * member = m_members;
+    while (member != NULL) {
+        if (member->Matches(nameHash)) {
+            break;
+        }
+        member = member->GetNext();
+    }
+    return member;
+}
+
+//====================================================
+ReflTypeDesc::Parent * ReflTypeDesc::FindParent(ReflHash parentHash) const {
+    Parent * parent = m_parents;
+    for (; parent != NULL; parent = parent->next) {
+        if (parent->parentHash == parentHash) {
+            break;
+        }
+    }
+
+    return parent;
+}
+
+//====================================================
+bool ReflTypeDesc::FindParentOffset(ReflHash parentHash, unsigned * offset, unsigned * reflOffset) const {
+
+    bool found = false;
+    Parent * retParent = FindParent(parentHash);
+
+    if (retParent != NULL) {
+        *offset     = retParent->baseOffset;
+        *reflOffset = retParent->reflOffset;
+        found = true;
+    }
+    else {
+        Parent * parent = m_parents;
+        for (; parent != NULL; parent = parent->next) {
+            const ReflTypeDesc * desc = ReflLibrary::GetClassDesc(parent->parentHash);
+            unsigned recursiveOffset        = 0;
+            unsigned recursiveReflOffset    = 0;
+            if (desc->FindParentOffset(parentHash, &recursiveOffset, &recursiveReflOffset)) {
+                *offset     += recursiveOffset + parent->baseOffset;
+                *reflOffset += recursiveReflOffset + parent->reflOffset;
+                found = true;
+                break;
+            }
+        }
+    }
+
+    return found;
+}
+
+//====================================================
+const ReflTypeDesc::EnumValue * ReflTypeDesc::GetEnumValue(int value) const {
+    const EnumValue * val = m_enumValues;
+    while (val != NULL) {
+        if (val->value == value) 
+            break;
+
+        val = val->next;
+    }
+
+    return val;
+}
+
+//====================================================
+const ReflTypeDesc::EnumValue * ReflTypeDesc::GetEnumValue(const chargr * str, unsigned len) const {
+    const EnumValue * val = m_enumValues;
+    while (val != NULL) {
+        if (StrICmp(str, val->name, len) == 0) 
+            break;
+
+        val = val->next;
+    }
+
+    return val;
+}
+
+//====================================================
+const ReflMember & ReflTypeDesc::GetMember(unsigned index) const {
+    TESTME("Implement me");
+    return m_members[0];
+}
+
+//====================================================
+void ReflTypeDesc::InitInst(void * inst) const {
+    if (m_parents != NULL) {
+        Parent * parent = m_parents;
+        for (; parent != NULL; parent = parent->next) {
+            byte * ptr = reinterpret_cast<byte *>(inst);
+            ReflClass * base = reinterpret_cast<ReflClass *>(ptr + parent->baseOffset + parent->reflOffset);
+            base->SetTypeHash(m_typeHash);
+        }
+    }
+    else {
+        ReflClass * base = reinterpret_cast<ReflClass *>(inst);
+        base->SetTypeHash(m_typeHash);
+    }
+}
+
+//====================================================
+unsigned ReflTypeDesc::NumMembers() const {
+    TESTME("Implement me");
+    unsigned memberCount = 0;
+
+    const ReflTypeDesc::Parent * parent = m_parents;
+    while(parent != NULL) {
+        const ReflTypeDesc * parentDesc = ReflLibrary::GetClassDesc(parent->parentHash);
+        memberCount += parentDesc->NumMembers();
+        parent = parent->next;
+    }
+
+    const ReflMember * member = m_members;
+    while(member != NULL) {
+        memberCount++;
+        member = member->GetNext();
+    }
+
+    return memberCount;
+}
+
+//====================================================
+void ReflTypeDesc::RegisterEnumValue(ReflTypeDesc::EnumValue * value) {
+    ASSERTGR(value->next == NULL);
+    value->next     = m_enumValues;
+    m_enumValues    = value;
+}
+
+//====================================================
+void ReflTypeDesc::RegisterFinalizationFunc(ReflFinalizationFunc func) {
     ASSERTGR(m_finalizeFunc == NULL);
     m_finalizeFunc = func;
 }
 
 //====================================================
-void ReflClassDesc::RegisterManualVersioningFunc(ReflVersioningFunc func, unsigned currentVersion) {
+void ReflTypeDesc::RegisterManualVersioningFunc(ReflVersioningFunc func, unsigned currentVersion) {
     ASSERTGR(m_versioningFunc == NULL);
     m_versioningFunc = func;
 
@@ -1083,19 +1116,19 @@ void ReflClassDesc::RegisterManualVersioningFunc(ReflVersioningFunc func, unsign
 }
 
 //====================================================
-void ReflClassDesc::RegisterMemberAlias(ReflAlias * alias) {
+void ReflTypeDesc::RegisterMemberAlias(ReflAlias * alias) {
     alias->next = m_memberAliases;
     m_memberAliases = alias;
 }
 
 //====================================================
-void ReflClassDesc::RegisterMember(ReflMember * member) {
+void ReflTypeDesc::RegisterMember(ReflMember * member) {
     member->SetNext(m_members);
     m_members = member;
 }
 
 //====================================================
-bool ReflClassDesc::RegisterTempBinding(ReflHash memberHash, ReflHash typeHash, void * data) {
+bool ReflTypeDesc::RegisterTempBinding(ReflHash memberHash, ReflHash typeHash, void * data) {
     bool bound = false;
     ReflMember * member = FindMember(memberHash);
     if (member != NULL && member->TypeHash() == typeHash) {
@@ -1107,7 +1140,7 @@ bool ReflClassDesc::RegisterTempBinding(ReflHash memberHash, ReflHash typeHash, 
 }
 
 //====================================================
-bool ReflClassDesc::SerializeMembers(
+bool ReflTypeDesc::SerializeMembers(
     IStructuredTextStream * stream, 
     const ReflClass       * inst,
     const void            * base, 
@@ -1115,7 +1148,7 @@ bool ReflClassDesc::SerializeMembers(
 ) const {
     if (m_parents != NULL) {
         for (Parent * parent = m_parents; parent != NULL; parent = parent->next) {
-            const ReflClassDesc * parentDesc = ReflLibrary::GetClassDesc(parent->parentHash);
+            const ReflTypeDesc * parentDesc = ReflLibrary::GetClassDesc(parent->parentHash);
             ASSERTMSGGR(parentDesc != NULL, "Missing parent descriptor");
             stream->WriteNode(L"BaseClass");
             stream->WriteNodeAttribute(L"Type", parentDesc->m_typeName);
@@ -1138,7 +1171,7 @@ bool ReflClassDesc::SerializeMembers(
 }
 
 //====================================================
-bool ReflClassDesc::Serialize(
+bool ReflTypeDesc::Serialize(
     IStructuredTextStream * stream, 
     const ReflClass       * inst, 
     unsigned                offset
@@ -1157,7 +1190,7 @@ bool ReflClassDesc::Serialize(
 }
 
 //====================================================
-void ReflClassDesc::SetNext(ReflClassDesc * next) {
+void ReflTypeDesc::SetNext(ReflTypeDesc * next) {
     // This should only be set once during global initialization
     ASSERTGR(m_next == NULL);
     m_next = next;
@@ -1177,7 +1210,7 @@ ReflClass::ReflClass() :
 //====================================================
 void * ReflCanCastTo(ReflClass * inst, ReflHash actualType, ReflHash givenType, ReflHash targetType) {
     void * ret = NULL;
-    const ReflClassDesc * desc = ReflLibrary::GetClassDesc(actualType);
+    const ReflTypeDesc * desc = ReflLibrary::GetClassDesc(actualType);
     if (desc != NULL) 
         ret = desc->CastTo(inst, givenType, targetType);
 
@@ -1187,7 +1220,7 @@ void * ReflCanCastTo(ReflClass * inst, ReflHash actualType, ReflHash givenType, 
 //====================================================
 const void * ReflCanCastTo(const ReflClass * inst, ReflHash actualType, ReflHash givenType, ReflHash targetType) {
     const void * ret = NULL;
-    const ReflClassDesc * desc = ReflLibrary::GetClassDesc(actualType);
+    const ReflTypeDesc * desc = ReflLibrary::GetClassDesc(actualType);
     if (desc != NULL) 
         ret = desc->CastTo(inst, givenType, targetType);
 
@@ -1196,7 +1229,7 @@ const void * ReflCanCastTo(const ReflClass * inst, ReflHash actualType, ReflHash
 
 //====================================================
 void ReflInitType(void * inst, ReflHash type) {
-    const ReflClassDesc * desc = ReflLibrary::GetClassDesc(type);
+    const ReflTypeDesc * desc = ReflLibrary::GetClassDesc(type);
     if (desc != NULL) 
         desc->InitInst(inst);
 }
@@ -1213,7 +1246,7 @@ ReflClass * ReflLibrary::Deserialize(IStructuredTextStream * stream, MemFlags me
 
         chargr typeName[256];
         if (stream->ReadNodeAttribute(L"Type", typeName, 256) == STREAM_ERROR_OK) {
-            const ReflClassDesc * desc = GetClassDesc(ReflHash(typeName));
+            const ReflTypeDesc * desc = GetClassDesc(ReflHash(typeName));
 
             if (desc != NULL) {
                 void * base = desc->Create(1, memFlags);
@@ -1234,14 +1267,14 @@ ReflClass * ReflLibrary::Deserialize(IStructuredTextStream * stream, MemFlags me
 
 //====================================================
 bool ReflLibrary::Deserialize(IStructuredTextStream * stream, ReflClass * inst) {
-    const ReflClassDesc * desc = GetClassDesc(inst);
+    const ReflTypeDesc * desc = GetClassDesc(inst);
 
     return desc->Deserialize(stream, inst);
 }
 
 //====================================================
-const ReflClassDesc * ReflLibrary::GetClassDesc(ReflHash nameHash) {
-    const ReflClassDesc * classDesc = s_descHead;
+const ReflTypeDesc * ReflLibrary::GetClassDesc(ReflHash nameHash) {
+    const ReflTypeDesc * classDesc = s_descHead;
     while(classDesc != NULL) {
         if (classDesc->NameMatches(nameHash))
             break;
@@ -1261,12 +1294,12 @@ const ReflClassDesc * ReflLibrary::GetClassDesc(ReflHash nameHash) {
 }
 
 //====================================================
-const ReflClassDesc * ReflLibrary::GetClassDesc(const ReflClass * inst) {
+const ReflTypeDesc * ReflLibrary::GetClassDesc(const ReflClass * inst) {
     return GetClassDesc(inst->GetType());
 }
 
 //====================================================
-void ReflLibrary::RegisterClassDesc(ReflClassDesc * classDesc) {
+void ReflLibrary::RegisterClassDesc(ReflTypeDesc * classDesc) {
     classDesc->SetNext(s_descHead);
     s_descHead = classDesc;
 
@@ -1281,7 +1314,7 @@ void ReflLibrary::RegisterClassDescAlias(ReflAlias * classDescAlias) {
 
 //====================================================
 bool ReflLibrary::Serialize(IStructuredTextStream * stream, const ReflClass * inst) {
-    const ReflClassDesc * desc = GetClassDesc(inst);
+    const ReflTypeDesc * desc = GetClassDesc(inst);
 
     return desc->Serialize(stream, inst);
 }

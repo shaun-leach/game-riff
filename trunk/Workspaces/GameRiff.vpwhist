@@ -41,142 +41,100 @@ scroll:0
 [State]
 SCREEN: 1920 1200 4 3 1022 726 0 0 M 0 0 0 0 1534 702 0
 CWD: \projects\game-riff\trunk\Code
-BUFFER: BN="GRTest\test.xml"
-BI: MA=1 74 1  TABS=1 5  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=XML	HM=0 MF=131680 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=70 ESBU2=2 CL="" SC="" SCE= SCU=
-VIEW: LN=.2527 CL=44 LE=0 CX=44 CY=37 WI=5 BI=26 HT=0 HN=0 HF=0 HC=4
 BUFFER: BN="..\Code\Tests\GRTest.cpp"
-BI: MA=1 74 1  TABS=1 5  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=C/C++	HM=0 MF=3212136 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=1 CL="" SC="" SCE= SCU=
-VIEW: LN=.16374 CL=11 LE=0 CX=11 CY=3 WI=5 BI=31 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="..\Code\Libs\Reflection\Reflection.cpp"
-BI: MA=1 74 1  TABS=1 5  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=C/C++	HM=0 MF=1180264 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1 CL="" SC="" SCE= SCU=
-VIEW: LN=.37575 CL=24 LE=0 CX=24 CY=13 WI=5 BI=24 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="..\Code\Libs\Reflection\Reflection.h"
-BI: MA=1 74 1  TABS=1 5  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=C/C++	HM=0 MF=1179688 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1 CL="" SC="" SCE= SCU=
-VIEW: LN=.7666 CL=1 LE=0 CX=1 CY=24 WI=5 BI=23 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="..\Code\Libs\Reflection\UnitTests\ReflectionCasting_UnitTest.cpp"
-BI: MA=1 74 1  TABS=1 5  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=C/C++	HM=0 MF=1049192 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=1 CL="" SC="" SCE= SCU=
-VIEW: LN=.33402 CL=102 LE=0 CX=102 CY=25 WI=5 BI=51 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="GRTest\testCastingWVirtualBase.xml"
-BI: MA=1 74 1  TABS=1 5  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=XML	HM=0 MF=0 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=70 ESBU2=2 CL="" SC="" SCE= SCU=
-VIEW: LN=.0 CL=1 LE=0 CX=1 CY=0 WI=5 BI=27 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="GRTest\testCastingWVirtuals.xml"
-BI: MA=1 74 1  TABS=1 5  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=XML	HM=0 MF=0 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=70 ESBU2=2 CL="" SC="" SCE= SCU=
-VIEW: LN=.0 CL=1 LE=0 CX=1 CY=0 WI=5 BI=44 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="..\Code\Core\Windows\MacrosWin.h"
-BI: MA=1 74 1  TABS=1 5  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=C/C++	HM=0 MF=608 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=1 CL="" SC="" SCE= SCU=
-VIEW: LN=.0 CL=1 LE=0 CX=1 CY=0 WI=5 BI=55 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="..\Code\Libs\Reflection\UnitTests\ReflectionAliasing_UnitTest.cpp"
 BI: MA=1 74 1  TABS=1 5  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=C/C++	HM=0 MF=1180264 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=1 CL="" SC="" SCE= SCU=
-VIEW: LN=.6391 CL=52 LE=0 CX=52 CY=20 WI=5 BI=4 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="..\Code\Libs\Reflection\UnitTests\ReflectionBaseTypes_UnitTest.cpp"
-BI: MA=1 74 1  TABS=1 5  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=C/C++	HM=0 MF=1179752 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=1 CL="" SC="" SCE= SCU=
-VIEW: LN=.8660 CL=44 LE=0 CX=44 CY=20 WI=5 BI=22 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="..\Code\Libs\Reflection\UnitTests\ReflectionConversion_UnitTest.cpp"
-BI: MA=1 74 1  TABS=1 5  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=C/C++	HM=0 MF=1179688 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=1 CL="" SC="" SCE= SCU=
-VIEW: LN=.7879 CL=55 LE=0 CX=55 CY=20 WI=5 BI=45 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="..\Code\Libs\Reflection\UnitTests\ReflectionFinalization_UnitTest.cpp"
-BI: MA=1 74 1  TABS=1 5  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=C/C++	HM=0 MF=1179752 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=1 CL="" SC="" SCE= SCU=
-VIEW: LN=.4044 CL=52 LE=0 CX=52 CY=20 WI=5 BI=42 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="..\Code\Libs\Reflection\UnitTests\ReflectionInheritance_UnitTest.cpp"
-BI: MA=1 74 1  TABS=1 5  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=C/C++	HM=0 MF=1180264 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=1 CL="" SC="" SCE= SCU=
-VIEW: LN=.7058 CL=45 LE=0 CX=45 CY=20 WI=5 BI=36 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="..\Code\Libs\Reflection\UnitTests\ReflectionNamespaces_UnitTest.cpp"
-BI: MA=1 74 1  TABS=1 5  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=C/C++	HM=0 MF=1180264 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=1 CL="" SC="" SCE= SCU=
-VIEW: LN=.3771 CL=34 LE=0 CX=34 CY=20 WI=5 BI=47 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="..\Code\Libs\Reflection\UnitTests\ReflectionVersioning_UnitTest.cpp"
-BI: MA=1 74 1  TABS=1 5  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=C/C++	HM=0 MF=1180264 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=1 CL="" SC="" SCE= SCU=
-VIEW: LN=.4704 CL=50 LE=0 CX=50 CY=20 WI=5 BI=34 HT=0 HN=0 HF=0 HC=4
+VIEW: LN=.20983 CL=7 LE=0 CX=7 CY=12 WI=5 BI=31 HT=0 HN=0 HF=0 HC=4
 BUFFER: BN="Todo.txt"
 BI: MA=1 74 1  TABS=1 5  WWS=1 IWT=0 ST=0 IN=1 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Plain Text	HM=0 MF=131072 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1 CL="" SC="" SCE= SCU=
-VIEW: LN=.861 CL=5 LE=0 CX=5 CY=17 WI=5 BI=25 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="..\Code\testComplexMultipleInheritanceCasting.xml"
-BI: MA=1 74 1  TABS=1 5  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=XML	HM=0 MF=0 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=70 ESBU2=2 CL="" SC="" SCE= SCU=
-VIEW: LN=.0 CL=1 LE=0 CX=1 CY=0 WI=5 BI=53 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="..\Code\Libs\Stream\Stream.h"
-BI: MA=1 74 1  TABS=1 5  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=C/C++	HM=0 MF=0 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1 CL="" SC="" SCE= SCU=
-VIEW: LN=.0 CL=1 LE=0 CX=1 CY=0 WI=5 BI=39 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="..\Code\testSimpleVersioning.xml"
-BI: MA=1 74 1  TABS=1 5  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=XML	HM=0 MF=131680 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=70 ESBU2=2 CL="" SC="" SCE= SCU=
-VIEW: LN=.24 CL=49 LE=0 CX=49 CY=1 WI=5 BI=32 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="..\Code\Ext\gtest\include\gtest\internal\gtest-internal.h"
-BI: MA=1 74 1  TABS=1 5  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=1 SE=1 SN=0 BIN=0 MN=C/C++	HM=0 MF=0 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=1 CL="" SC="" SCE= SCU=
-VIEW: LN=.0 CL=1 LE=0 CX=1 CY=0 WI=5 BI=35 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="..\Code\Ext\gtest\include\gtest\gtest-test-part.h"
-BI: MA=1 74 1  TABS=1 5  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=1 SE=1 SN=0 BIN=0 MN=C/C++	HM=0 MF=0 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=1 CL="" SC="" SCE= SCU=
-VIEW: LN=.2215 CL=3 LE=0 CX=3 CY=18 WI=5 BI=33 HT=0 HN=0 HF=0 HC=4
-WINDOW: 160 200 1188 491 -1 -1 N  WF=0 WT=5 "Default Unicode Font,10,0,1"
-BUFFER: BN="GRTest\test.xml"
-VIEW: LN=.2527 CL=44 LE=0 CX=44 CY=37 WI=203 BI=26 HT=0 HN=0 HF=0 HC=4
-WINDOW: 280 125 1188 491 -1 -1 N  WF=0 WT=9 ",,,"
-BUFFER: BN="..\Code\Ext\gtest\include\gtest\internal\gtest-internal.h"
-VIEW: LN=.25719 CL=21 LE=0 CX=21 CY=20 WI=221 BI=35 HT=0 HN=0 HF=0 HC=4
-WINDOW: 340 200 1188 491 -1 -1 N  WF=0 WT=11 "Default Unicode Font,10,0,1"
-BUFFER: BN="..\Code\testSimpleVersioning.xml"
-VIEW: LN=.148 CL=59 LE=0 CX=59 CY=3 WI=226 BI=32 HT=0 HN=0 HF=0 HC=4
-WINDOW: 0 0 1188 491 -1 -1 N  WF=0 WT=12 ",,,"
-BUFFER: BN="..\Code\Libs\Stream\Stream.h"
-VIEW: LN=.3077 CL=35 LE=0 CX=35 CY=35 WI=253 BI=39 HT=0 HN=0 HF=0 HC=4
-WINDOW: 120 150 1188 491 -1 -1 N  WF=0 WT=18 "Default Unicode Font,10,0,1"
-BUFFER: BN="..\Code\testComplexMultipleInheritanceCasting.xml"
-VIEW: LN=.630 CL=1 LE=0 CX=1 CY=11 WI=297 BI=53 HT=0 HN=0 HF=0 HC=4
-WINDOW: 260 100 1188 491 -1 -1 N  WF=0 WT=8 ",,,"
-BUFFER: BN="..\Code\Ext\gtest\include\gtest\gtest-test-part.h"
-VIEW: LN=.2215 CL=3 LE=0 CX=3 CY=18 WI=201 BI=33 HT=0 HN=0 HF=0 HC=4
-WINDOW: 200 25 1188 491 -1 -1 N  WF=0 WT=20 ",,,"
-BUFFER: BN="..\Code\Core\Windows\MacrosWin.h"
-VIEW: LN=.1804 CL=75 LE=0 CX=75 CY=21 WI=316 BI=55 HT=0 HN=0 HF=0 HC=4
-WINDOW: 140 175 1188 491 -1 -1 N  WF=0 WT=19 "Default Unicode Font,10,0,1"
-BUFFER: BN="GRTest\testCastingWVirtuals.xml"
-VIEW: LN=.529 CL=10 LE=0 CX=10 CY=9 WI=303 BI=44 HT=0 HN=0 HF=0 HC=4
-WINDOW: 220 50 1188 491 -1 -1 N  WF=0 WT=21 "Default Unicode Font,10,0,1"
-BUFFER: BN="GRTest\testCastingWVirtualBase.xml"
-VIEW: LN=.0 CL=1 LE=0 CX=1 CY=0 WI=312 BI=27 HT=0 HN=0 HF=0 HC=4
-WINDOW: 220 50 1188 491 -1 -1 N  WF=0 WT=6 ",,,"
+VIEW: LN=.621 CL=1 LE=0 CX=1 CY=14 WI=5 BI=25 HT=0 HN=0 HF=0 HC=4
 BUFFER: BN="..\Code\Libs\Reflection\UnitTests\ReflectionAliasing_UnitTest.cpp"
-VIEW: LN=.6391 CL=52 LE=0 CX=52 CY=20 WI=198 BI=4 HT=0 HN=0 HF=0 HC=4
-WINDOW: 240 75 1188 491 -1 -1 N  WF=0 WT=2 ",,,"
-BUFFER: BN="..\Code\Libs\Reflection\UnitTests\ReflectionBaseTypes_UnitTest.cpp"
-VIEW: LN=.8660 CL=44 LE=0 CX=44 CY=20 WI=184 BI=22 HT=0 HN=0 HF=0 HC=4
-WINDOW: 20 25 1188 491 -1 -1 N  WF=0 WT=13 ",,,"
-BUFFER: BN="..\Code\Libs\Reflection\UnitTests\ReflectionConversion_UnitTest.cpp"
-VIEW: LN=.7879 CL=55 LE=0 CX=55 CY=20 WI=196 BI=45 HT=0 HN=0 HF=0 HC=4
-WINDOW: 40 50 1188 491 -1 -1 N  WF=0 WT=14 ",,,"
-BUFFER: BN="..\Code\Libs\Reflection\UnitTests\ReflectionFinalization_UnitTest.cpp"
-VIEW: LN=.4044 CL=52 LE=0 CX=52 CY=20 WI=260 BI=42 HT=0 HN=0 HF=0 HC=4
-WINDOW: 60 75 1188 491 -1 -1 N  WF=0 WT=15 ",,,"
-BUFFER: BN="..\Code\Libs\Reflection\UnitTests\ReflectionInheritance_UnitTest.cpp"
-VIEW: LN=.7058 CL=45 LE=0 CX=45 CY=20 WI=197 BI=36 HT=0 HN=0 HF=0 HC=4
-WINDOW: 320 175 1188 491 -1 -1 N  WF=0 WT=10 ",,,"
-BUFFER: BN="..\Code\Libs\Reflection\UnitTests\ReflectionVersioning_UnitTest.cpp"
-VIEW: LN=.4704 CL=50 LE=0 CX=50 CY=20 WI=239 BI=34 HT=0 HN=0 HF=0 HC=4
-WINDOW: 80 100 1188 491 -1 -1 N  WF=0 WT=16 ",,,"
-BUFFER: BN="..\Code\Libs\Reflection\UnitTests\ReflectionNamespaces_UnitTest.cpp"
-VIEW: LN=.3771 CL=34 LE=0 CX=34 CY=20 WI=261 BI=47 HT=0 HN=0 HF=0 HC=4
-WINDOW: 240 75 1188 491 -1 -1 N  WF=0 WT=7 ",,,"
-BUFFER: BN="..\Code\Tests\GRTest.cpp"
-VIEW: LN=.18811 CL=74 LE=0 CX=74 CY=32 WI=209 BI=31 HT=0 HN=0 HF=0 HC=4
-WINDOW: 260 100 1188 491 -1 -1 N  WF=0 WT=3 ",,,"
-BUFFER: BN="..\Code\Libs\Reflection\Reflection.h"
-VIEW: LN=.7574 CL=83 LE=0 CX=83 CY=20 WI=182 BI=23 HT=0 HN=0 HF=0 HC=4
-WINDOW: 280 125 1188 491 -1 -1 N  WF=0 WT=4 ",,,"
+BI: MA=1 74 1  TABS=1 5  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=C/C++	HM=0 MF=1049192 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=1 CL="" SC="" SCE= SCU=
+VIEW: LN=.5555 CL=15 LE=0 CX=15 CY=17 WI=5 BI=33 HT=0 HN=0 HF=0 HC=4
 BUFFER: BN="..\Code\Libs\Reflection\Reflection.cpp"
-VIEW: LN=.37575 CL=24 LE=0 CX=24 CY=13 WI=186 BI=24 HT=0 HN=0 HF=0 HC=4
-WINDOW: 220 50 1188 491 -1 -1 N  WF=0 WT=1 ",,,"
-BUFFER: BN="Todo.txt"
-VIEW: LN=.861 CL=5 LE=0 CX=5 CY=17 WI=188 BI=25 HT=0 HN=0 HF=0 HC=4
-WINDOW: 100 125 1188 491 -1 -1 M  WF=0 WT=17 ",,,"
+BI: MA=1 74 1  TABS=1 5  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=C/C++	HM=0 MF=1180264 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1 CL="" SC="" SCE= SCU=
+VIEW: LN=.25166 CL=60 LE=0 CX=60 CY=23 WI=5 BI=24 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="GRTest\test.xml"
+BI: MA=1 74 1  TABS=1 5  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=XML	HM=0 MF=608 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=70 ESBU2=2 CL="" SC="" SCE= SCU=
+VIEW: LN=.0 CL=1 LE=0 CX=1 CY=0 WI=5 BI=46 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="..\Code\Libs\Reflection\Reflection.h"
+BI: MA=1 74 1  TABS=1 5  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=C/C++	HM=0 MF=65640 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1 CL="" SC="" SCE= SCU=
+VIEW: LN=.5856 CL=25 LE=0 CX=25 CY=24 WI=5 BI=39 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="..\Code\testBaseTypes.xml"
+BI: MA=1 74 1  TABS=1 5  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=XML	HM=0 MF=96 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=70 ESBU2=2 CL="" SC="" SCE= SCU=
+VIEW: LN=.741 CL=40 LE=0 CX=40 CY=12 WI=5 BI=37 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="..\Code\Libs\Reflection\UnitTests\ReflectionBaseTypes_UnitTest.cpp"
+BI: MA=1 74 1  TABS=1 5  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=C/C++	HM=0 MF=1180264 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=1 CL="" SC="" SCE= SCU=
+VIEW: LN=.3388 CL=1 LE=0 CX=1 CY=21 WI=5 BI=32 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="..\Code\Libs\Reflection\UnitTests\ReflectionNamespaces_UnitTest.cpp"
+BI: MA=1 74 1  TABS=1 5  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=C/C++	HM=0 MF=1179752 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=1 CL="" SC="" SCE= SCU=
+VIEW: LN=.7551 CL=17 LE=0 CX=17 CY=20 WI=5 BI=30 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="..\Code\Libs\Reflection\UnitTests\ReflectionVersioning_UnitTest.cpp"
+BI: MA=1 74 1  TABS=1 5  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=C/C++	HM=0 MF=1180264 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=1 CL="" SC="" SCE= SCU=
+VIEW: LN=.4025 CL=17 LE=0 CX=17 CY=19 WI=5 BI=34 HT=0 HN=0 HF=0 HC=4
 BUFFER: BN="..\Code\Libs\Reflection\UnitTests\ReflectionCasting_UnitTest.cpp"
-VIEW: LN=.35469 CL=7 LE=0 CX=7 CY=37 WI=287 BI=51 HT=0 HN=0 HF=0 HC=4
+BI: MA=1 74 1  TABS=1 5  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=C/C++	HM=0 MF=1179688 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=1 CL="" SC="" SCE= SCU=
+VIEW: LN=.35794 CL=5 LE=0 CX=5 CY=20 WI=5 BI=26 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="..\Code\Libs\Reflection\UnitTests\ReflectionConversion_UnitTest.cpp"
+BI: MA=1 74 1  TABS=1 5  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=C/C++	HM=0 MF=1180264 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=1 CL="" SC="" SCE= SCU=
+VIEW: LN=.7265 CL=17 LE=0 CX=17 CY=20 WI=5 BI=36 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="..\Code\Libs\Reflection\UnitTests\ReflectionFinalization_UnitTest.cpp"
+BI: MA=1 74 1  TABS=1 5  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=C/C++	HM=0 MF=131176 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=1 CL="" SC="" SCE= SCU=
+VIEW: LN=.3080 CL=17 LE=0 CX=17 CY=19 WI=5 BI=35 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="..\Code\Libs\Reflection\UnitTests\ReflectionInheritance_UnitTest.cpp"
+BI: MA=1 74 1  TABS=1 5  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=C/C++	HM=0 MF=1180264 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=1 CL="" SC="" SCE= SCU=
+VIEW: LN=.8788 CL=17 LE=0 CX=17 CY=20 WI=5 BI=48 HT=0 HN=0 HF=0 HC=4
+WINDOW: 120 150 1188 491 -1 -1 N  WF=0 WT=3 ",,,"
+BUFFER: BN="..\Code\Libs\Reflection\UnitTests\ReflectionCasting_UnitTest.cpp"
+VIEW: LN=.35794 CL=5 LE=0 CX=5 CY=20 WI=11 BI=26 HT=0 HN=0 HF=0 HC=4
+WINDOW: 280 125 1188 491 -1 -1 N  WF=0 WT=10 ",,,"
+BUFFER: BN="..\Code\Libs\Reflection\UnitTests\ReflectionConversion_UnitTest.cpp"
+VIEW: LN=.7265 CL=17 LE=0 CX=17 CY=20 WI=364 BI=36 HT=0 HN=0 HF=0 HC=4
+WINDOW: 320 175 1188 491 -1 -1 N  WF=0 WT=11 ",,,"
+BUFFER: BN="..\Code\Libs\Reflection\UnitTests\ReflectionFinalization_UnitTest.cpp"
+VIEW: LN=.3080 CL=17 LE=0 CX=17 CY=19 WI=193 BI=35 HT=0 HN=0 HF=0 HC=4
+WINDOW: 140 175 1188 491 -1 -1 N  WF=0 WT=4 ",,,"
+BUFFER: BN="..\Code\Libs\Reflection\UnitTests\ReflectionInheritance_UnitTest.cpp"
+VIEW: LN=.8788 CL=17 LE=0 CX=17 CY=20 WI=236 BI=48 HT=0 HN=0 HF=0 HC=4
+WINDOW: 160 200 1188 491 -1 -1 N  WF=0 WT=5 ",,,"
+BUFFER: BN="..\Code\Libs\Reflection\UnitTests\ReflectionNamespaces_UnitTest.cpp"
+VIEW: LN=.7551 CL=17 LE=0 CX=17 CY=20 WI=251 BI=30 HT=0 HN=0 HF=0 HC=4
+WINDOW: 240 75 1188 491 -1 -1 N  WF=0 WT=9 ",,,"
+BUFFER: BN="..\Code\Libs\Reflection\UnitTests\ReflectionVersioning_UnitTest.cpp"
+VIEW: LN=.4025 CL=17 LE=0 CX=17 CY=19 WI=246 BI=34 HT=0 HN=0 HF=0 HC=4
+WINDOW: 180 0 1188 491 -1 -1 N  WF=0 WT=6 ",,,"
+BUFFER: BN="Todo.txt"
+VIEW: LN=.621 CL=1 LE=0 CX=1 CY=14 WI=275 BI=25 HT=0 HN=0 HF=0 HC=4
+WINDOW: 220 50 1188 491 -1 -1 N  WF=0 WT=8 ",,,"
+BUFFER: BN="..\Code\Libs\Reflection\UnitTests\ReflectionBaseTypes_UnitTest.cpp"
+VIEW: LN=.3388 CL=1 LE=0 CX=1 CY=21 WI=249 BI=32 HT=0 HN=0 HF=0 HC=4
+WINDOW: 200 25 1188 491 -1 -1 N  WF=0 WT=7 ",,,"
+BUFFER: BN="..\Code\Libs\Reflection\UnitTests\ReflectionAliasing_UnitTest.cpp"
+VIEW: LN=.5555 CL=15 LE=0 CX=15 CY=17 WI=250 BI=33 HT=0 HN=0 HF=0 HC=4
+WINDOW: 100 125 1188 491 -1 -1 N  WF=0 WT=2 ",,,"
+BUFFER: BN="..\Code\Tests\GRTest.cpp"
+VIEW: LN=.7502 CL=5 LE=0 CX=5 CY=20 WI=241 BI=31 HT=0 HN=0 HF=0 HC=4
+WINDOW: 80 100 1188 491 -1 -1 N  WF=0 WT=1 ",,,"
+BUFFER: BN="..\Code\Libs\Reflection\Reflection.h"
+VIEW: LN=.5814 CL=20 LE=0 CX=20 CY=23 WI=313 BI=39 HT=0 HN=0 HF=0 HC=4
+WINDOW: 340 200 1188 491 -1 -1 N  WF=0 WT=12 "Default Unicode Font,10,0,1"
+BUFFER: BN="..\Code\testBaseTypes.xml"
+VIEW: LN=.741 CL=40 LE=0 CX=40 CY=12 WI=213 BI=37 HT=0 HN=0 HF=0 HC=4
+WINDOW: 0 0 1188 491 -1 -1 N  WF=0 WT=13 "Default Unicode Font,10,0,1"
+BUFFER: BN="GRTest\test.xml"
+VIEW: LN=.1284 CL=27 LE=0 CX=27 CY=21 WI=214 BI=46 HT=0 HN=0 HF=0 HC=4
+WINDOW: 40 50 1188 491 -1 -1 M  WF=0 WT=14 ",,,"
+BUFFER: BN="..\Code\Libs\Reflection\Reflection.cpp"
+VIEW: LN=.2774 CL=15 LE=0 CX=15 CY=13 WI=201 BI=24 HT=0 HN=0 HF=0 HC=4
 FILEHIST: 9
-..\Code\Libs\Reflection\UnitTests\ReflectionFinalization_UnitTest.cpp
 ..\Code\Libs\Reflection\UnitTests\ReflectionInheritance_UnitTest.cpp
-..\Code\Libs\Reflection\UnitTests\ReflectionVersioning_UnitTest.cpp
-..\Code\Libs\Reflection\UnitTests\ReflectionNamespaces_UnitTest.cpp
+Todo.txt
+..\Code\Libs\Reflection\UnitTests\ReflectionBaseTypes_UnitTest.cpp
+..\Code\Libs\Reflection\UnitTests\ReflectionAliasing_UnitTest.cpp
+..\Code\testBaseTypes.xml
+GRTest\test.xml
 ..\Code\Tests\GRTest.cpp
 ..\Code\Libs\Reflection\Reflection.h
 ..\Code\Libs\Reflection\Reflection.cpp
-Todo.txt
-..\Code\Libs\Reflection\UnitTests\ReflectionCasting_UnitTest.cpp
 DEBUG: 0 0 0 0 3 0 gdb
 printf
 strcpy

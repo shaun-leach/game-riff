@@ -66,7 +66,7 @@ public:
 
     static void VersioningFunc(
         IStructuredTextStream * stream, 
-        ReflClassDesc         * desc, 
+        ReflTypeDesc         * desc, 
         unsigned                version, 
         ReflClass             * inst
     ) {
@@ -100,10 +100,10 @@ public:
 
 REFL_IMPL_CLASS_BEGIN(ReflClass, SimpleVersioningClass);
     REFL_DO_MANUAL_VERSIONING(VersioningFunc, 2);
-    REFL_MEMBER(SimpleVersioningClass, baseUint32Test);
-    REFL_MEMBER(SimpleVersioningClass, baseFloat32Test);
-    REFL_MEMBER_DEPRECATED(SimpleVersioningClass, oldUint32Test, uint32);
-    REFL_MEMBER_DEPRECATED(SimpleVersioningClass, oldFloat32Test, float32);
+    REFL_MEMBER(baseUint32Test);
+    REFL_MEMBER(baseFloat32Test);
+    REFL_MEMBER_DEPRECATED(oldUint32Test, uint32);
+    REFL_MEMBER_DEPRECATED(oldFloat32Test, float32);
 REFL_IMPL_CLASS_END(SimpleVersioningClass);
 
 //====================================================

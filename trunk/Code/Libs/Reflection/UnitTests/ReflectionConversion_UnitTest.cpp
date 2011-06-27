@@ -85,9 +85,9 @@ public:
 };
 
 REFL_IMPL_CLASS_BEGIN(ReflClass, SimpleConversionClass);
-    REFL_MEMBER(SimpleConversionClass, baseUint32Test);
+    REFL_MEMBER(baseUint32Test);
         REFL_ADD_MEMBER_CONVERSION(baseUint32Test, ConvertMember);
-    REFL_MEMBER(SimpleConversionClass, baseFloat32Test);
+    REFL_MEMBER(baseFloat32Test);
 REFL_IMPL_CLASS_END(SimpleConversionClass);
 
 //====================================================
@@ -144,9 +144,9 @@ public:
 };
 
 REFL_IMPL_CLASS_BEGIN(ReflClass, SimpleAliasingConversionClass);
-    REFL_MEMBER(SimpleAliasingConversionClass, baseInt32Test);
+    REFL_MEMBER(baseInt32Test);
         REFL_ADD_MEMBER_ALIAS_W_CONVERSION(baseInt32Test, floatTest, ConvertMember);
-    REFL_MEMBER(SimpleAliasingConversionClass, baseFloat32Test);
+    REFL_MEMBER(baseFloat32Test);
 REFL_IMPL_CLASS_END(SimpleAliasingConversionClass);
 
 //====================================================
@@ -203,9 +203,9 @@ public:
 };
 
 REFL_IMPL_CLASS_BEGIN(ReflClass, SimpleClassConversionClass);
-    REFL_MEMBER(SimpleClassConversionClass, baseUint32Test);
+    REFL_MEMBER(baseUint32Test);
         REFL_ADD_MEMBER_ALIAS_W_CONVERSION(baseUint32Test, classMemberTest, ConvertMember);
-    REFL_MEMBER(SimpleClassConversionClass, baseFloat32Test);
+    REFL_MEMBER(baseFloat32Test);
 REFL_IMPL_CLASS_END(SimpleClassConversionClass);
 
 //====================================================
