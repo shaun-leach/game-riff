@@ -522,6 +522,12 @@ ReflIndex ReflMember::DetermineTypeIndex(ReflHash typeHash) const {
 
 //====================================================
 void ReflMember::Finalize() {
+    if (m_index == REFL_INDEX_CLASS) {
+        const ReflTypeDesc * desc = ReflLibrary::GetClassDesc(m_typeHash);
+        ASSERTMSGGR(desc != NULL, "Unregistered class type");
+        if (desc->IsEnumType()) 
+            m_index = REFL_INDEX_ENUM;
+    }
 }
 
 //====================================================
@@ -533,11 +539,6 @@ bool ReflMember::Matches(ReflHash hash) const {
 void ReflMember::RegisterConversionFunc(ReflConversionFunc func) {
     ASSERTMSGGR(m_convFunc == NULL, "Conversion fucntion already registered");
     m_convFunc = func;
-}
-
-//====================================================
-void ReflMember::SetIsEnum() {
-    m_index = REFL_INDEX_ENUM;
 }
 
 //====================================================
@@ -1071,6 +1072,11 @@ void ReflTypeDesc::InitInst(void * inst) const {
         ReflClass * base = reinterpret_cast<ReflClass *>(inst);
         base->SetTypeHash(m_typeHash);
     }
+}
+
+//====================================================
+bool ReflTypeDesc::IsEnumType() const {
+    return m_enumValues != NULL;
 }
 
 //====================================================

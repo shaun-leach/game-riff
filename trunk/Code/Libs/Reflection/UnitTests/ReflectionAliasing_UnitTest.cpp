@@ -168,7 +168,7 @@ REFL_ENUM_IMPL_BEGIN(EAliasValue);
 REFL_ENUM_IMPL_END(EAliasValue);
 
 REFL_IMPL_CLASS_BEGIN(ReflClass, SimpleEnumAliasingClass);
-    REFL_MEMBER_ENUM(baseEnumTest);
+    REFL_MEMBER(baseEnumTest);
     REFL_MEMBER(baseUint32Test);
 REFL_IMPL_CLASS_END(SimpleEnumAliasingClass);
 
