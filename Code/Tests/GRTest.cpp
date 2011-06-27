@@ -110,9 +110,9 @@ private:
 
 REFL_IMPL_CLASS_BEGIN(ReflClass, BaseClass);
     REFL_ADD_CLASS_ALIAS(BaseClass, OldBaseClass);
-    REFL_MEMBER(BaseClass, basei32test);
-    REFL_MEMBER(BaseClass, basef32test);
-    REFL_MEMBER(BaseClass, basei16test);
+    REFL_MEMBER(basei32test);
+    REFL_MEMBER(basef32test);
+    REFL_MEMBER(basei16test);
 REFL_IMPL_CLASS_END(BaseClass);
 
 class BaseBaseClass2 : public ReflClass {
@@ -133,9 +133,9 @@ private:
 };
 
 REFL_IMPL_CLASS_BEGIN(ReflClass, BaseBaseClass2);
-    REFL_MEMBER(BaseBaseClass2, basebase2i32test);
-    REFL_MEMBER(BaseBaseClass2, basebase2f32test);
-    REFL_MEMBER(BaseBaseClass2, basebase2u16test);
+    REFL_MEMBER(basebase2i32test);
+    REFL_MEMBER(basebase2f32test);
+    REFL_MEMBER(basebase2u16test);
 REFL_IMPL_CLASS_END(BaseBaseClass2);
 
 class BaseClass2 : public BaseBaseClass2 {
@@ -156,10 +156,10 @@ private:
 };
 
 REFL_IMPL_CLASS_BEGIN(BaseBaseClass2, BaseClass2);
-    REFL_ADD_PARENT(BaseClass2, BaseBaseClass2);
-    REFL_MEMBER(BaseClass2, base2i32test);
-    REFL_MEMBER(BaseClass2, base2f32test);
-    REFL_MEMBER(BaseClass2, base2u16test);
+    REFL_ADD_PARENT(BaseBaseClass2);
+    REFL_MEMBER(base2i32test);
+    REFL_MEMBER(base2f32test);
+    REFL_MEMBER(base2u16test);
 REFL_IMPL_CLASS_END(BaseClass2);
 
 namespace SubNameSpace {
@@ -180,8 +180,8 @@ private:
 };
 
 REFL_IMPL_CLASS_BEGIN_NAMESPACE(ReflClass, SubNameSpace, BaseSubClass);
-    REFL_MEMBER(BaseSubClass, basesubitest);
-    REFL_MEMBER(BaseSubClass, basesubftest);
+    REFL_MEMBER(basesubitest);
+    REFL_MEMBER(basesubftest);
 REFL_IMPL_CLASS_END(BaseSubClass);
 
 class SubClass : public BaseSubClass {
@@ -200,15 +200,27 @@ private:
 };
 
 REFL_IMPL_CLASS_BEGIN_NAMESPACE(BaseSubClass, SubNameSpace, SubClass);
-    REFL_ADD_PARENT_NAMESPACE(SubClass, SubNameSpace, BaseSubClass);
-    REFL_MEMBER(SubClass, subitest);
-    REFL_MEMBER(SubClass, subftest);
+    REFL_ADD_PARENT_NAMESPACE(SubNameSpace, BaseSubClass);
+    REFL_MEMBER(subitest);
+    REFL_MEMBER(subftest);
 REFL_IMPL_CLASS_END(SubClass);
 }
+
+enum EInternal {
+    INTERNAL_VALUE1,
+    INTERNAL_VALUE2
+};
+
+REFL_ENUM_IMPL_BEGIN(EInternal);
+    REFL_ENUM_VALUE(INTERNAL_VALUE1, Start);
+    REFL_ENUM_VALUE(INTERNAL_VALUE2, Stop);
+    REFL_ENUM_ALIAS(INTERNAL_VALUE2, INTERNAL_VALUE3, Run);
+REFL_ENUM_IMPL_END(EInternal);
 
 class Dummy : public BaseClass, public BaseClass2 {
 public:
     REFL_DEFINE_CLASS(Dummy);
+    REFL_DEFINE_CLASS_ENUM(EInternal);
     Dummy() :
         i32test(4),
         f32test(10.9f),
@@ -274,11 +286,6 @@ public:
        }
     }
 private:
-    enum EInternal {
-        INTERNAL_VALUE1,
-        INTERNAL_VALUE2
-    };
-
     int32       i32test;
     float32     f32test;
     int8        i8test;
@@ -291,24 +298,21 @@ private:
 };
 
 REFL_IMPL_CLASS_BEGIN(BaseClass, Dummy);
-    REFL_ADD_PARENT(Dummy, BaseClass);
-    REFL_ADD_PARENT(Dummy, BaseClass2);
-    REFL_MEMBER(Dummy, i32test);
+    REFL_ADD_PARENT(BaseClass);
+    REFL_ADD_PARENT(BaseClass2);
+    REFL_MEMBER(i32test);
     REFL_ADD_MEMBER_ALIAS_W_CONVERSION(i32test, itest, ConvertITest);
-    REFL_MEMBER(Dummy, f32test);
-    REFL_MEMBER(Dummy, i8test);
-    REFL_MEMBER(Dummy, class_alias_test);
+    REFL_MEMBER(f32test);
+    REFL_MEMBER(i8test);
+    REFL_MEMBER(class_alias_test);
     REFL_ADD_MEMBER_ALIAS_W_CONVERSION(class_alias_test, mcTest, ConvertClassTest);
-    REFL_MEMBER(Dummy, btest);
+    REFL_MEMBER(btest);
     REFL_ADD_MEMBER_CONVERSION(btest, Convert);
-    REFL_MEMBER_ENUM(Dummy, etest);
-        REFL_ENUM_VALUE(etest, INTERNAL_VALUE1);
-        REFL_ENUM_VALUE(etest, INTERNAL_VALUE2);
-        REFL_ENUM_ALIAS(etest, INTERNAL_VALUE2, INTERNAL_VALUE3);
-    REFL_MEMBER(Dummy, pertest);
-    REFL_MEMBER(Dummy, angtest);
+    REFL_MEMBER_ENUM(etest);
+    REFL_MEMBER(pertest);
+    REFL_MEMBER(angtest);
     REFL_ADD_MEMBER_ALIAS(angtest, atest);
-    REFL_MEMBER(Dummy, ctest);
+    REFL_MEMBER(ctest);
 REFL_IMPL_CLASS_END(Dummy);
 
 class SimpleCastBaseClass : public ReflClass {
@@ -327,8 +331,8 @@ public:
 };
 
 REFL_IMPL_CLASS_BEGIN(ReflClass, SimpleCastBaseClass);
-    REFL_MEMBER(SimpleCastBaseClass, baseUint32Test);
-    REFL_MEMBER(SimpleCastBaseClass, baseFloat32Test);
+    REFL_MEMBER(baseUint32Test);
+    REFL_MEMBER(baseFloat32Test);
 REFL_IMPL_CLASS_END(SimpleCastBaseClass);
 
 class SimpleCastBaseClass2 : public ReflClass {
@@ -347,8 +351,8 @@ public:
 };
 
 REFL_IMPL_CLASS_BEGIN(ReflClass, SimpleCastBaseClass2);
-    REFL_MEMBER(SimpleCastBaseClass2, base2Uint32Test);
-    REFL_MEMBER(SimpleCastBaseClass2, base2Float32Test);
+    REFL_MEMBER(base2Uint32Test);
+    REFL_MEMBER(base2Float32Test);
 REFL_IMPL_CLASS_END(SimpleCastBaseClass2);
 
 class SimpleCastBaseClass3 : public SimpleCastBaseClass2 {
@@ -367,9 +371,9 @@ public:
 };
 
 REFL_IMPL_CLASS_BEGIN(SimpleCastBaseClass2, SimpleCastBaseClass3);
-    REFL_ADD_PARENT(SimpleCastBaseClass3, SimpleCastBaseClass2);
-    REFL_MEMBER(SimpleCastBaseClass3, base3Uint32Test);
-    REFL_MEMBER(SimpleCastBaseClass3, base3Float32Test);
+    REFL_ADD_PARENT(SimpleCastBaseClass2);
+    REFL_MEMBER(base3Uint32Test);
+    REFL_MEMBER(base3Float32Test);
 REFL_IMPL_CLASS_END(SimpleCastBaseClass3);
 
 class ComplexInheritanceCastClass : public SimpleCastBaseClass, public SimpleCastBaseClass3 {
@@ -390,11 +394,11 @@ public:
 };
 
 REFL_IMPL_CLASS_BEGIN(SimpleCastBaseClass, ComplexInheritanceCastClass);
-    REFL_ADD_PARENT(ComplexInheritanceCastClass, SimpleCastBaseClass);
-    REFL_ADD_PARENT(ComplexInheritanceCastClass, SimpleCastBaseClass3);
-    REFL_MEMBER(ComplexInheritanceCastClass, derivedBoolTest);
-    REFL_MEMBER(ComplexInheritanceCastClass, derivedInt16Test);
-    REFL_MEMBER(ComplexInheritanceCastClass, derivedInt16Test2);
+    REFL_ADD_PARENT(SimpleCastBaseClass);
+    REFL_ADD_PARENT(SimpleCastBaseClass3);
+    REFL_MEMBER(derivedBoolTest);
+    REFL_MEMBER(derivedInt16Test);
+    REFL_MEMBER(derivedInt16Test2);
 REFL_IMPL_CLASS_END(ComplexInheritanceCastClass);
 
 //====================================================
@@ -466,8 +470,8 @@ public:
 };
 
 REFL_IMPL_CLASS_BEGIN(ReflClass, VirtualBaseClass);
-    REFL_MEMBER(VirtualBaseClass, basevUint32Test);
-    REFL_MEMBER(VirtualBaseClass, basevFloat32Test);
+    REFL_MEMBER(basevUint32Test);
+    REFL_MEMBER(basevFloat32Test);
 REFL_IMPL_CLASS_END(VirtualBaseClass);
 
 class CastWithVirtualsInBase : public VirtualBaseClass {
@@ -488,10 +492,10 @@ public:
 };
 
 REFL_IMPL_CLASS_BEGIN(VirtualBaseClass, CastWithVirtualsInBase);
-    REFL_ADD_PARENT(CastWithVirtualsInBase, VirtualBaseClass);
-    REFL_MEMBER(CastWithVirtualsInBase, derivedBoolTest);
-    REFL_MEMBER(CastWithVirtualsInBase, derivedInt16Test);
-    REFL_MEMBER(CastWithVirtualsInBase, derivedInt16Test2);
+    REFL_ADD_PARENT(VirtualBaseClass);
+    REFL_MEMBER(derivedBoolTest);
+    REFL_MEMBER(derivedInt16Test);
+    REFL_MEMBER(derivedInt16Test2);
 REFL_IMPL_CLASS_END(CastWithVirtualsInBase);
 
 //====================================================
@@ -555,10 +559,10 @@ public:
 };
 
 REFL_IMPL_CLASS_BEGIN(SimpleCastBaseClass, SimpleCastWithVirtualsNonreflectedBase);
-    REFL_ADD_PARENT(SimpleCastWithVirtualsNonreflectedBase, SimpleCastBaseClass);
-    REFL_MEMBER(SimpleCastWithVirtualsNonreflectedBase, derivedBoolTest);
-    REFL_MEMBER(SimpleCastWithVirtualsNonreflectedBase, derivedInt16Test);
-    REFL_MEMBER(SimpleCastWithVirtualsNonreflectedBase, derivedInt16Test2);
+    REFL_ADD_PARENT(SimpleCastBaseClass);
+    REFL_MEMBER(derivedBoolTest);
+    REFL_MEMBER(derivedInt16Test);
+    REFL_MEMBER(derivedInt16Test2);
 REFL_IMPL_CLASS_END(SimpleCastWithVirtualsNonreflectedBase);
 
 //====================================================
@@ -612,11 +616,11 @@ public:
 };
 
 REFL_IMPL_CLASS_BEGIN(SimpleCastBaseClass, CastWithVirtualsIn2ndBase);
-    REFL_ADD_PARENT(CastWithVirtualsIn2ndBase, VirtualBaseClass);
-    REFL_ADD_PARENT(CastWithVirtualsIn2ndBase, SimpleCastBaseClass);
-    REFL_MEMBER(CastWithVirtualsIn2ndBase, derivedBoolTest);
-    REFL_MEMBER(CastWithVirtualsIn2ndBase, derivedInt16Test);
-    REFL_MEMBER(CastWithVirtualsIn2ndBase, derivedInt16Test2);
+    REFL_ADD_PARENT(VirtualBaseClass);
+    REFL_ADD_PARENT(SimpleCastBaseClass);
+    REFL_MEMBER(derivedBoolTest);
+    REFL_MEMBER(derivedInt16Test);
+    REFL_MEMBER(derivedInt16Test2);
 REFL_IMPL_CLASS_END(CastWithVirtualsIn2ndBase);
 
 //====================================================
@@ -668,8 +672,8 @@ int main(int argc,  char * argv[]) {
 
     Dummy testClass;
  
-    ReflLibrary::Serialize(testStream, &testClass);
-    testClass.Serialize(testStream);
+    ReflLibrary::Serialize(testStream, static_cast<BaseClass *>(&testClass));
+    //testClass.Serialize(testStream);
 
     testStream->Save();
 //*/
@@ -678,8 +682,8 @@ int main(int argc,  char * argv[]) {
    TestCastingWVirtualsNonreflectedBase();    
    TestCastingWVirtualsInBase();    
    TestCastingFromMultipleBases();
-//*
 
+//*
     IStructuredTextStream * testStream = StreamOpenXML(L"test.xml");
 
     Dummy testClass;

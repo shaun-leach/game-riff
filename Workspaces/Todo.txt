@@ -16,20 +16,12 @@
 ---Too many stack strings with hardcoded values
 --------------
 -flesh out reflection more
---Use specialized template functions to get class type for members
---Have serialization use a template function to eliminate the cast
---eliminate virtuals in ReflClass base
----Need better method for calculating reflOffset
----Add support for casting from ReflClass of 2nd parent
----Add support for casting from multiple ReflClass parents(ambiguous if there's multiple inheritance)
-----Don't pass inst through cast functions, use void * instead
-----Re-enable tests
---Clean up header so class functions are organized better by functionality
---How do I want to allocate reflected members? It would be preferred to allocate in contiguous arrays
----However how do we handle ref counting and deletion?
---Use table instead of linked list for members?
---Need to support enums not tied to a class
----Need designer friendly names for all enums
+--Need to support enums tied to a class
+---Add test for class with multiple enum members
+---Include support for private enums
+---Need to handle different sizes enums
+***Need to use actual enum type instead of just enum
+***Need designer friendly names for all enums
 --add code to finalize entire reflection library
 ---Finalize when reflection library is initialized
 ---Verify that every member of type "class" has a registered ReflClassDesc
@@ -39,11 +31,20 @@
 ---make sure that there are no duplicate class names, include aliases
 ---Verify that a class doesn't reflect members of a base class
 ---If using 32 bit hashes, verify that there are no collisions
---can I trap missing parents?
---Prep everything for precompiled hashes
+---can I trap missing parents?
 --Designer friendly names???
---Can I use typeid to get member name strings at compile time only? And do I need this?
 --Add support for classes that can't derive off of ReflClass
+--Have serialization use a template function to eliminate the cast?
+--eliminate virtuals in ReflClass base
+---Need better method for calculating reflOffset
+---Add support for casting from ReflClass of 2nd parent
+---Add support for casting from multiple ReflClass parents(ambiguous if there's multiple inheritance)
+----Don't pass inst through cast functions, use void * instead?
+----Re-enable tests
+--How do I want to allocate reflected members? It would be preferred to allocate in contiguous arrays
+---However how do we handle ref counting and deletion?
+--Prep everything for precompiled hashes
+--Can I use typeid to get member name strings at compile time only? And do I need this?
 --How do I return loaded data to outside world
 ---Think about use cases for how loaded data will be used
 ***All handled through the resource manager
@@ -164,6 +165,10 @@
 ***Useful for classes I don't control, however can't access private members. Test this
 ***Yes with template functions, though can't do a full implementation
 ***Fix casting to use m_reflOffset
+**Use table instead of linked list for members? Not needed and doesn't work
+**Use specialized template functions to get class type for members
+***Can I do something similar for dealing with namespaces? No.
+**Clean up header so class functions are organized better by functionality
 ----------
 -Create tools platform
 --Layer tools functionality on top of platform

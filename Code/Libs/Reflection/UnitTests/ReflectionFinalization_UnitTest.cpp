@@ -78,8 +78,8 @@ public:
 
 REFL_IMPL_CLASS_BEGIN(ReflClass, SimpleFinalizationClass);
     REFL_FINALIZATION_FUNC(SimpleFinalizationClass::Finalize);
-    REFL_MEMBER(SimpleFinalizationClass, baseUint32Test);
-    REFL_MEMBER(SimpleFinalizationClass, baseFloat32Test);
+    REFL_MEMBER(baseUint32Test);
+    REFL_MEMBER(baseFloat32Test);
 REFL_IMPL_CLASS_END(SimpleFinalizationClass);
 
 //====================================================

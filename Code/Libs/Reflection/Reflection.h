@@ -28,7 +28,7 @@
 */
 
 class ReflClass;
-class ReflClassDesc;
+class ReflTypeDesc;
 class DataStream;
 class IStructuredTextStream;
 
@@ -38,7 +38,7 @@ typedef Hash32      ReflHash;
 typedef void * (*ReflCreateFunc)(unsigned count, MemFlags memFlags);
 typedef void (*ReflFinalizationFunc)(ReflClass * inst);
 typedef void (*ReflConversionFunc)(ReflClass * inst, ReflHash name, ReflHash oldType, void * data);
-typedef void (*ReflVersioningFunc)(IStructuredTextStream * stream, ReflClassDesc * desc, unsigned version, ReflClass * inst);
+typedef void (*ReflVersioningFunc)(IStructuredTextStream * stream, ReflTypeDesc * desc, unsigned version, ReflClass * inst);
 
 const ReflHash ReflTypeBool(L"bool");
 const ReflHash ReflTypeInt32(L"int32");
@@ -52,7 +52,7 @@ struct ReflAlias {
 class ReflMember {
 public:
     ReflMember(
-        ReflClassDesc * container,
+        ReflTypeDesc * container,
         ReflHash        typeHash,
         const chargr  * name, 
         unsigned        size,
@@ -60,7 +60,7 @@ public:
     );
 
     ReflMember(
-        ReflClassDesc * container,
+        ReflTypeDesc * container,
         ReflHash        typeHash,
         const chargr  * name, 
         unsigned        size,
@@ -102,17 +102,6 @@ public:
     bool Serialize(DataStream * stream, const ReflClass * inst, unsigned offset) const;
     bool Deserialize(DataStream * stream, ReflHash nameHash, ReflClass * inst, void * base, unsigned offset) const;
 
-    struct EnumValue {
-        EnumValue     * next;
-        unsigned        value;
-        const chargr  * name;
-        ReflHash        nameHash;
-    };
-
-    void RegisterEnumValue(EnumValue * value);
-    const EnumValue * GetEnumValue(int value) const;
-    const EnumValue * GetEnumValue(const chargr * str, unsigned len) const;
-
     void RegisterConversionFunc(ReflConversionFunc func);
 
     void RegisterTempBinding(void * data) {
@@ -121,6 +110,8 @@ public:
     void ClearTempBinding() {
         m_tempBinding = NULL;
     }
+
+    void SetIsEnum();
 
 private:
 
@@ -145,27 +136,26 @@ private:
     }
 
 private:
-    ReflHash        m_nameHash;
-    ReflHash        m_typeHash;
+    ReflHash            m_nameHash;
+    ReflHash            m_typeHash;
 
-    const chargr  * m_name;
-    ReflIndex       m_index;
+    const chargr      * m_name;
+    ReflIndex           m_index;
 
-    unsigned        m_size;
-    unsigned        m_offset;
+    unsigned            m_size;
+    unsigned            m_offset;
 
-    EnumValue     * m_enumValues;
-    ReflMember    * m_next;
+    ReflMember        * m_next;
 
     ReflConversionFunc  m_convFunc;
 
-    bool            m_deprecated; // Need bit flags class
-    void          * m_tempBinding;
+    bool                m_deprecated; // Need bit flags class
+    void              * m_tempBinding;
 };
 
-class ReflClassDesc {
+class ReflTypeDesc {
 public:
-    ReflClassDesc(
+    ReflTypeDesc(
         const chargr  * name, 
         unsigned        size,
         unsigned        baseOffset,
@@ -174,6 +164,18 @@ public:
     );
 
     void Finalize();
+
+    ReflHash GetHash() const {
+        return m_typeHash;
+    }
+
+    const chargr * GetTypeName() const {
+        return m_typeName;
+    }
+
+    unsigned GetVersion() const {
+        return m_version;
+    }
 
     unsigned            NumMembers() const;
     const ReflMember  & GetMember(unsigned index) const;
@@ -212,20 +214,23 @@ public:
     };
     void AddParent(Parent * parent);
 
-    const ReflClassDesc * GetNext() const {
+    const ReflTypeDesc * GetNext() const {
         return m_next;
     }
-    void SetNext(ReflClassDesc * next);
-
-    ReflHash GetHash() const {
-        return m_typeHash;
-    }
-
-    unsigned GetVersion() const {
-        return m_version;
-    }
+    void SetNext(ReflTypeDesc * next);
 
     void RegisterMemberAlias(ReflAlias * alias);
+
+    struct EnumValue {
+        EnumValue     * next;
+        unsigned        value;
+        const chargr  * name;
+        ReflHash        nameHash;
+    };
+
+    void RegisterEnumValue(EnumValue * value);
+    const EnumValue * GetEnumValue(int value) const;
+    const EnumValue * GetEnumValue(const chargr * str, unsigned len) const;
 
     void * CastTo(ReflClass * inst, ReflHash givenType, ReflHash targetType) const;
     const void * CastTo(const ReflClass * inst, ReflHash givenType, ReflHash targetType) const;
@@ -240,11 +245,12 @@ private:
     ReflClass * CastToReflClass(void * inst) const;
 
     void FinalizeInst(void * inst) const;
+
     const ReflMember  * FindMember(const chargr * name, unsigned * offset) const;
     const ReflMember  * FindMember(ReflHash name, unsigned * offset) const;
-    ReflMember  * FindMember(ReflHash name);
-
+    ReflMember        * FindMember(ReflHash name);
     const ReflMember  * FindLocalMember(ReflHash name) const;
+
     Parent * FindParent(ReflHash parentHash) const;
     Parent * FindParentRecursive(ReflHash parentHash) const;
     bool FindParentOffset(ReflHash parentHash, unsigned * offset, unsigned * reflOffset) const;
@@ -269,13 +275,15 @@ private:
     ReflFinalizationFunc    m_finalizeFunc;
     ReflVersioningFunc      m_versioningFunc;
 
-    ReflClassDesc         * m_next;
+    ReflTypeDesc          * m_next;
 
     Parent                * m_parents;
 
     ReflMember            * m_members;
 
     ReflAlias             * m_memberAliases;
+
+    EnumValue             * m_enumValues;
 };
 
 class ReflClass {
@@ -306,10 +314,10 @@ template<typename t_Type>
 
 class ReflLibrary {
 public:
-    static const ReflClassDesc * GetClassDesc(ReflHash nameHash);
-    static const ReflClassDesc * GetClassDesc(const ReflClass * inst);
+    static const ReflTypeDesc * GetClassDesc(ReflHash nameHash);
+    static const ReflTypeDesc * GetClassDesc(const ReflClass * inst);
 
-    static void RegisterClassDesc(ReflClassDesc * classDesc);
+    static void RegisterClassDesc(ReflTypeDesc * classDesc);
     static void RegisterClassDescAlias(ReflAlias * classDescAlias);
 
     static ReflClass * Deserialize(IStructuredTextStream * stream, MemFlags memFlags);
@@ -350,7 +358,7 @@ const t_cast * ReflCast(const t_given * inst) {
     template<typename t_Type>                                               \
         ReflHash ReflGetTypeHash(const t_Type & reflType);                  \
     template<>                                                              \
-    inline ReflHash ReflGetTypeHash<type>(const type & reflType) {          \
+    static inline ReflHash ReflGetTypeHash<type>(const type & reflType) {   \
         return ReflHash(TOWSTR(type));                                      \
     }
 
@@ -359,8 +367,9 @@ const t_cast * ReflCast(const t_given * inst) {
         static ReflHash s_className;                                        \
     public:                                                                 \
         static void * Create(unsigned count, MemFlags memFlags);            \
-        static const ReflClassDesc * GetReflectionInfo();                   \
-        static ReflClassDesc * CreateReflClassDesc();                       \
+        static const ReflTypeDesc * GetReflectionInfo();                    \
+        template<typename t_reflType>                                       \
+        static ReflTypeDesc * ReflCreateClassDesc();                        \
         inline static ReflHash GetReflType() {                              \
             return s_className;                                             \
         }                                                                   \
@@ -371,7 +380,7 @@ const t_cast * ReflCast(const t_given * inst) {
         name * inst = new(memFlags) name;                                   \
         return inst;                                                        \
     }                                                                       \
-    const ReflClassDesc * name::GetReflectionInfo() {                       \
+    const ReflTypeDesc * name::GetReflectionInfo() {                        \
         return ReflLibrary::GetClassDesc(s_className);                      \
     }                                                                       \
     void name::InitReflType() {                                             \
@@ -382,13 +391,14 @@ const t_cast * ReflCast(const t_given * inst) {
 #define REFL_IMPL_CLASS_BEGIN(base, name)                                   \
     REFL_DEFINE_USER_TYPE(name);                                            \
     REFL_IMPL_CLASS_INTERNAL(base, name, TOWSTR(name));                     \
-    ReflClassDesc * name::CreateReflClassDesc() {                           \
-        static ReflClassDesc s_reflInfo(                                    \
+    template<typename t_reflType>                                           \
+    ReflTypeDesc * name::ReflCreateClassDesc() {                            \
+        static ReflTypeDesc s_reflInfo(                                     \
             TOWSTR(name),                                                   \
-            sizeof(name),                                                   \
-            CLASSOFFSETOF(base, name),                                      \
+            sizeof(t_reflType),                                             \
+            CLASSOFFSETOF(base, t_reflType),                                \
             CLASSOFFSETOF(ReflClass, base),                                 \
-            name::Create                                                    \
+            t_reflType::Create                                              \
         )
                                 
 #define REFL_IMPL_CLASS_BEGIN_NAMESPACE(base, ns, name)                     \
@@ -396,13 +406,14 @@ const t_cast * ReflCast(const t_given * inst) {
     REFL_DEFINE_USER_TYPE(ns::name);                                        \
     namespace ns {                                                          \
     REFL_IMPL_CLASS_INTERNAL(base, name, TOWSTR(ns::name));                 \
-    ReflClassDesc * name::CreateReflClassDesc() {                           \
-        static ReflClassDesc s_reflInfo(                                    \
+    template<typename t_reflType>                                           \
+    ReflTypeDesc * name::ReflCreateClassDesc() {                            \
+        static ReflTypeDesc s_reflInfo(                                     \
             TOWSTR(ns::name),                                               \
-            sizeof(name),                                                   \
-            CLASSOFFSETOF(base, name),                                      \
+            sizeof(t_reflType),                                             \
+            CLASSOFFSETOF(base, t_reflType),                                \
             CLASSOFFSETOF(ReflClass, base),                                 \
-            name::Create                                                    \
+            t_reflType::Create                                              \
         )
                                 
 #define REFL_IMPL_CLASS_END(name)                                           \
@@ -411,7 +422,8 @@ const t_cast * ReflCast(const t_given * inst) {
     class ReflAutoRegister##name {                                          \
     public:                                                                 \
         ReflAutoRegister##name() {                                          \
-            ReflLibrary::RegisterClassDesc(name::CreateReflClassDesc());    \
+            ReflTypeDesc * desc = name::ReflCreateClassDesc<name>();        \
+            ReflLibrary::RegisterClassDesc(desc);                           \
         }                                                                   \
     };                                                                      \
     static ReflAutoRegister##name s_autoRegister##name
@@ -437,19 +449,19 @@ const t_cast * ReflCast(const t_given * inst) {
             };                                                              \
             ReflLibrary::RegisterClassDescAlias(&s_alias##alias)
 
-#define REFL_ADD_PARENT(derived, parent)                                    \
-            static ReflClassDesc::Parent s_parent##parent = {               \
+#define REFL_ADD_PARENT(parent)                                             \
+            static ReflTypeDesc::Parent s_parent##parent = {                \
                 NULL,                                                       \
-                CLASSOFFSETOF(parent, derived),                             \
+                CLASSOFFSETOF(parent, t_reflType),                          \
                 CLASSOFFSETOF(ReflClass, parent),                           \
                 ReflHash(TOWSTR(parent))                                    \
             };                                                              \
             s_reflInfo.AddParent(&s_parent##parent)
 
-#define REFL_ADD_PARENT_NAMESPACE(derived, ns, parent)                      \
-            static ReflClassDesc::Parent s_parent##parent = {               \
+#define REFL_ADD_PARENT_NAMESPACE(ns, parent)                               \
+            static ReflTypeDesc::Parent s_parent##parent = {                \
                 NULL,                                                       \
-                CLASSOFFSETOF(parent, derived),                             \
+                CLASSOFFSETOF(parent, t_reflType),                          \
                 CLASSOFFSETOF(ReflClass, parent),                           \
                 ReflHash(TOWSTR(ns::parent))                                \
             };                                                              \
@@ -458,37 +470,36 @@ const t_cast * ReflCast(const t_given * inst) {
 #define REFL_FINALIZATION_FUNC(func)                                        \
             s_reflInfo.RegisterFinalizationFunc(func)
 
-#define REFL_MEMBER_INTERNAL(parent, name, typeHash)                        \
+#define REFL_MEMBER_INTERNAL(name, typeHash)                                \
             static ReflMember s_member##name(                               \
                 &s_reflInfo,                                                \
                 typeHash,                                                   \
                 TOWSTR(name),                                               \
-                SIZEOF(parent, name),                                       \
-                OFFSETOF(parent, name)                                      \
+                SIZEOF(t_reflType, name),                                   \
+                OFFSETOF(t_reflType, name)                                  \
             )
 
-#define REFL_MEMBER(parent, name)                                           \
+#define REFL_MEMBER(name)                                                   \
             REFL_MEMBER_INTERNAL(                                           \
-                parent,                                                     \
                 name,                                                       \
-                ReflGetTypeHash((((parent *)(0x0))->name))                  \
+                ::ReflGetTypeHash((((t_reflType *)(0x0))->name))            \
             )                           
 
-#define REFL_MEMBER_DEPRECATED(parent, name, type)                          \
+#define REFL_MEMBER_DEPRECATED(name, type)                                  \
             static ReflMember s_member##name(                               \
                 &s_reflInfo,                                                \
-                ReflGetTypeHash(*((type *) (0x0))),                         \
+                ::ReflGetTypeHash(*((type *) (0x0))),                       \
                 TOWSTR(name),                                               \
                 sizeof(type),                                               \
                 true                                                        \
             )
 
-#define REFL_MEMBER_ENUM(parent, name)                                      \
+#define REFL_MEMBER_ENUM(name)                                              \
             REFL_MEMBER_INTERNAL(                                           \
-                parent,                                                     \
                 name,                                                       \
-                ReflHash(TOWSTR(enum))                                      \
-            )                           
+                ReflGetTypeHash((((t_reflType *)(0x0))->name))              \
+            );                                                              \
+            s_member##name.SetIsEnum()
 
 #define REFL_ADD_MEMBER_CONVERSION(name, conv)                              \
             s_member##name.RegisterConversionFunc(conv)
@@ -505,23 +516,75 @@ const t_cast * ReflCast(const t_given * inst) {
             REFL_ADD_MEMBER_ALIAS(name, alias);                             \
             REFL_ADD_MEMBER_CONVERSION(name, conv)
 
-#define REFL_ENUM_VALUE(enumName, value)                                    \
-            static ReflMember::EnumValue s_enumValue##value = {             \
-                NULL,                                                       \
-                value,                                                      \
-                TOWSTR(value),                                              \
-                ReflHash(TOWSTR(value))                                     \
-            };                                                              \
-            s_member##enumName.RegisterEnumValue(&s_enumValue##value)
+#define REFL_DEFINE_CLASS_ENUM(type)                                        \
+    template<typename t_reflType>                                           \
+    static ReflTypeDesc * ReflCreateEnumDesc##type();                       \
+    REFL_DEFINE_USER_TYPE(type)
 
-#define REFL_ENUM_ALIAS(enumName, value, oldValue)                          \
-            static ReflMember::EnumValue s_enumValue##oldValue = {          \
-                NULL,                                                       \
-                value,                                                      \
-                TOWSTR(oldValue),                                           \
-                ReflHash(TOWSTR(oldValue))                                  \
-            };                                                              \
-            s_member##enumName.RegisterEnumValue(&s_enumValue##oldValue)
+#define REFL_ENUM_IMPL_BEGIN(name)                                          \
+    REFL_DEFINE_USER_TYPE(name);                                            \
+    template<typename t_reflType>                                           \
+    ReflTypeDesc * ReflCreateEnumDesc##name() {                             \
+        static ReflTypeDesc s_typeDesc(                                     \
+            TOWSTR(name),                                                   \
+            sizeof(t_reflType),                                             \
+            0,                                                              \
+            0,                                                              \
+            NULL                                                            \
+        )
+
+#define REFL_CLASS_ENUM_IMPL_BEGIN(className, name)                         \
+    template<typename t_reflType>                                           \
+    ReflTypeDesc * className::ReflCreateEnumDesc##name() {                  \
+        static ReflTypeDesc s_typeDesc(                                     \
+            TOWSTR(name),                                                   \
+            sizeof(t_reflType),                                             \
+            0,                                                              \
+            0,                                                              \
+            NULL                                                            \
+        )
+
+#define REFL_ENUM_VALUE(value, displayName)                                 \
+        static ReflTypeDesc::EnumValue s_enumValue##value = {               \
+            NULL,                                                           \
+            value,                                                          \
+            TOWSTR(displayName),                                            \
+            ReflHash(TOWSTR(value))                                         \
+        };                                                                  \
+        s_typeDesc.RegisterEnumValue(&s_enumValue##value)
+
+#define REFL_ENUM_ALIAS(value, oldValue, oldDisplay)                        \
+        static ReflTypeDesc::EnumValue s_enumValue##oldValue = {            \
+            NULL,                                                           \
+            value,                                                          \
+            TOWSTR(oldDisplay),                                             \
+            ReflHash(TOWSTR(oldValue))                                      \
+        };                                                                  \
+        s_typeDesc.RegisterEnumValue(&s_enumValue##oldValue)
+
+#define REFL_ENUM_IMPL_END(name)                                            \
+        return &s_typeDesc;                                                 \
+    }                                                                       \
+    class ReflAutoRegister##name {                                          \
+    public:                                                                 \
+        ReflAutoRegister##name() {                                          \
+            ReflTypeDesc * desc = ReflCreateEnumDesc##name<name>();         \
+            ReflLibrary::RegisterClassDesc(desc);                           \
+        }                                                                   \
+    };                                                                      \
+    static ReflAutoRegister##name s_autoRegister##name
+
+#define REFL_CLASS_ENUM_IMPL_END(className, name)                           \
+        return &s_typeDesc;                                                 \
+    }                                                                       \
+    class ReflAutoRegister##name {                                          \
+    public:                                                                 \
+        ReflAutoRegister##name() {                                          \
+            ReflTypeDesc * desc = className::ReflCreateEnumDesc##name<name>();    \
+            ReflLibrary::RegisterClassDesc(desc);                           \
+        }                                                                   \
+    };                                                                      \
+    static ReflAutoRegister##name s_autoRegister##name
 
 REFL_DEFINE_USER_TYPE(bool);
 REFL_DEFINE_USER_TYPE(int8);

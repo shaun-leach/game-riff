@@ -53,6 +53,18 @@ static const float     s_percentValue    = 0.20f;
 // Test simple types
 //
 
+enum ETestEnum {
+    TEST_ENUM_VALUE1,
+    TEST_ENUM_VALUE2,
+    TEST_ENUM_VALUE3
+};
+
+REFL_ENUM_IMPL_BEGIN(ETestEnum);
+    REFL_ENUM_VALUE(TEST_ENUM_VALUE1, Large);
+    REFL_ENUM_VALUE(TEST_ENUM_VALUE2, Medium);
+    REFL_ENUM_VALUE(TEST_ENUM_VALUE3, Small);
+REFL_ENUM_IMPL_END(ETestEnum);
+
 class TestBaseTypes : public ReflClass {
 public:
     REFL_DEFINE_CLASS(TestBaseTypes);
@@ -92,12 +104,6 @@ public:
     //float16   float16Test;
     float32     float32Test;
 
-    enum ETestEnum {
-        TEST_ENUM_VALUE1,
-        TEST_ENUM_VALUE2,
-        TEST_ENUM_VALUE3
-    };
-
     ETestEnum   enumTest;
 
     angle       angleTest;
@@ -105,25 +111,22 @@ public:
 };
 
 REFL_IMPL_CLASS_BEGIN(ReflClass, TestBaseTypes);
-    REFL_MEMBER(TestBaseTypes, boolTest);
-    REFL_MEMBER(TestBaseTypes, int8Test);
-    REFL_MEMBER(TestBaseTypes, uint8Test);
-    REFL_MEMBER(TestBaseTypes, int16Test);
-    REFL_MEMBER(TestBaseTypes, uint16Test);
-    REFL_MEMBER(TestBaseTypes, int32Test);
-    REFL_MEMBER(TestBaseTypes, uint32Test);
-    REFL_MEMBER(TestBaseTypes, int64Test);
-    REFL_MEMBER(TestBaseTypes, uint64Test);
-    REFL_MEMBER(TestBaseTypes, float32Test);
-    REFL_MEMBER_ENUM(TestBaseTypes, enumTest);
-        REFL_ENUM_VALUE(enumTest, TEST_ENUM_VALUE1);
-        REFL_ENUM_VALUE(enumTest, TEST_ENUM_VALUE2);
-        REFL_ENUM_VALUE(enumTest, TEST_ENUM_VALUE3);
+    REFL_MEMBER(boolTest);
+    REFL_MEMBER(int8Test);
+    REFL_MEMBER(uint8Test);
+    REFL_MEMBER(int16Test);
+    REFL_MEMBER(uint16Test);
+    REFL_MEMBER(int32Test);
+    REFL_MEMBER(uint32Test);
+    REFL_MEMBER(int64Test);
+    REFL_MEMBER(uint64Test);
+    REFL_MEMBER(float32Test);
+    REFL_MEMBER_ENUM(enumTest);
     //REFL_MEMBER(TestBaseTypes, angleTest);
     //REFL_MEMBER(TestBaseTypes, percentTest);
 REFL_IMPL_CLASS_END(TestBaseTypes);
 
-static const TestBaseTypes::ETestEnum   s_enumValue    =  TestBaseTypes::TEST_ENUM_VALUE2;
+static const ETestEnum   s_enumValue    =  TEST_ENUM_VALUE2;
 
 //====================================================
 TEST(ReflectionTest, TestBaseTypes) {
@@ -197,8 +200,8 @@ public:
 };
 
 REFL_IMPL_CLASS_BEGIN(ReflClass, MemberClass);
-    REFL_MEMBER(MemberClass, memberUint32Test);
-    REFL_MEMBER(MemberClass, memberFloat32Test);
+    REFL_MEMBER(memberUint32Test);
+    REFL_MEMBER(memberFloat32Test);
 REFL_IMPL_CLASS_END(MemberClass);
 
 class TestMemberClass : public ReflClass {
@@ -218,9 +221,9 @@ public:
 };
 
 REFL_IMPL_CLASS_BEGIN(ReflClass, TestMemberClass);
-    REFL_MEMBER(TestMemberClass, containerUint16Test);
-    REFL_MEMBER(TestMemberClass, containerBoolTest);
-    REFL_MEMBER(TestMemberClass, classMemberTest);
+    REFL_MEMBER(containerUint16Test);
+    REFL_MEMBER(containerBoolTest);
+    REFL_MEMBER(classMemberTest);
 REFL_IMPL_CLASS_END(TestMemberClass);
 
 //====================================================

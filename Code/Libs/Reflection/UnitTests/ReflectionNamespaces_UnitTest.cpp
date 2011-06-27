@@ -71,8 +71,8 @@ public:
 };
 
 REFL_IMPL_CLASS_BEGIN_NAMESPACE(ReflClass, TestSpace, SimpleNamespaceClass);
-    REFL_MEMBER(SimpleNamespaceClass, baseUint32Test);
-    REFL_MEMBER(SimpleNamespaceClass, baseFloat32Test);
+    REFL_MEMBER(baseUint32Test);
+    REFL_MEMBER(baseFloat32Test);
 REFL_IMPL_CLASS_END(SimpleNamespaceClass);
 
 } // namespace TestSpace
@@ -129,8 +129,8 @@ public:
 };
 
 REFL_IMPL_CLASS_BEGIN_NAMESPACE(ReflClass, TestSpaceParent, SimpleNamespaceParentClass);
-    REFL_MEMBER(SimpleNamespaceParentClass, baseUint32Test);
-    REFL_MEMBER(SimpleNamespaceParentClass, baseFloat32Test);
+    REFL_MEMBER(baseUint32Test);
+    REFL_MEMBER(baseFloat32Test);
 REFL_IMPL_CLASS_END(SimpleNamespaceParentClass);
 
 } // namespace TestSpaceParent
@@ -151,9 +151,9 @@ public:
 };
 
 REFL_IMPL_CLASS_BEGIN(TestSpaceParent::SimpleNamespaceParentClass, SimpleParentNamespaceClass);
-    REFL_ADD_PARENT_NAMESPACE(SimpleParentNamespaceClass, TestSpaceParent, SimpleNamespaceParentClass);
-    REFL_MEMBER(SimpleParentNamespaceClass, int16Test);
-    REFL_MEMBER(SimpleParentNamespaceClass, int8Test);
+    REFL_ADD_PARENT_NAMESPACE(TestSpaceParent, SimpleNamespaceParentClass);
+    REFL_MEMBER(int16Test);
+    REFL_MEMBER(int8Test);
 REFL_IMPL_CLASS_END(SimpleParentNamespaceClass);
 
 //====================================================
@@ -215,10 +215,10 @@ public:
 
 REFL_IMPL_CLASS_BEGIN(ReflClass, SimpleAliasedNamespaceClass);
     REFL_ADD_CLASS_ALIAS_NAMESPACE(SimpleAliasedNamespaceClass, OldNamespace, SimpleAliasedNamespaceClass);
-    REFL_MEMBER(SimpleAliasedNamespaceClass, baseUint8Test0);
-    REFL_MEMBER(SimpleAliasedNamespaceClass, baseUint8Test1);
-    REFL_MEMBER(SimpleAliasedNamespaceClass, baseUint8Test2);
-    REFL_MEMBER(SimpleAliasedNamespaceClass, baseUint16Test0);
+    REFL_MEMBER(baseUint8Test0);
+    REFL_MEMBER(baseUint8Test1);
+    REFL_MEMBER(baseUint8Test2);
+    REFL_MEMBER(baseUint16Test0);
 REFL_IMPL_CLASS_END(SimpleAliasedNamespaceClass);
 
 //====================================================

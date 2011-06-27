@@ -1,9 +1,9 @@
 <?xml version="1.0" ?>
 <Class Type="Dummy" Version="0x1">
-    <BaseClass Type="OldBaseClass" Version="0x1">
-        <DataMember Name="basei32test" Type="int32">876</DataMember>
-        <DataMember Name="basef32test" Type="float32">8.76</DataMember>
-        <DataMember Name="basei16test" Type="int16">-678</DataMember>
+    <BaseClass Type="BaseClass" Version="0x1">
+        <DataMember Name="basei32test" Type="int32">392</DataMember>
+        <DataMember Name="basef32test" Type="float32">4.000000</DataMember>
+        <DataMember Name="basei16test" Type="int16">1600</DataMember>
     </BaseClass>
     <BaseClass Type="BaseClass2" Version="0x1">
         <BaseClass Type="BaseBaseClass2" Version="0x1">
@@ -15,32 +15,22 @@
         <DataMember Name="base2f32test" Type="float32">596.000000</DataMember>
         <DataMember Name="base2u16test" Type="uint16">4000</DataMember>
     </BaseClass>
-    <DataMember Name="itest" Type="float32">4.7</DataMember>
+    <DataMember Name="i32test" Type="int32">4</DataMember>
     <DataMember Name="f32test" Type="float32">10.900000</DataMember>
-    <DataMember Name="i8test" Type="int8">b</DataMember>
-    <DataMember Name="mcTest" Type="class">
-        <Class Type="SubNameSpace::SubClass" Version="0x1">
-            <BaseClass Type="SubNameSpace::BaseSubClass" Version="0x1">
-                <DataMember Name="basesubitest" Type="int32">778899</DataMember>
-                <DataMember Name="basesubftest" Type="float32">77.8899</DataMember>
-            </BaseClass>
-            <DataMember Name="subitest" Type="int32">492</DataMember>
-            <DataMember Name="subftest" Type="float32">-15.678</DataMember>
-        </Class>
-    </DataMember>
-    <DataMember Name="btest" Type="int32">10</DataMember>
-    <DataMember Name="etest" Type="enum">INTERNAL_VALUE3</DataMember>
-    <DataMember Name="ptest" Type="percentage">40.000</DataMember>
-    <DataMember Name="atest" Type="angle">45.0</DataMember>
+    <DataMember Name="i8test" Type="int8">98</DataMember>
+    <DataMember Name="class_alias_test" Type="int32">0</DataMember>
+    <DataMember Name="btest" Type="bool">true</DataMember>
+    <DataMember Name="etest" Type="EInternal">Start</DataMember>
+    <DataMember Name="pertest" Type="float32">1.000000</DataMember>
+    <DataMember Name="angtest" Type="float32">2.570000</DataMember>
     <DataMember Name="ctest" Type="class">
         <Class Type="SubNameSpace::SubClass" Version="0x1">
             <BaseClass Type="SubNameSpace::BaseSubClass" Version="0x1">
-                <DataMember Name="basesubitest" Type="int32">778899</DataMember>
-                <DataMember Name="basesubftest" Type="float32">77.8899</DataMember>
+                <DataMember Name="basesubitest" Type="int32">1110587893</DataMember>
+                <DataMember Name="basesubftest" Type="float32">0.000000</DataMember>
             </BaseClass>
-            <DataMember Name="subitest" Type="int32">492</DataMember>
-            <DataMember Name="subftest" Type="float32">-15.678</DataMember>
+            <DataMember Name="subitest" Type="int32">1139059753</DataMember>
+            <DataMember Name="subftest" Type="float32">-107374176.000000</DataMember>
         </Class>
     </DataMember>
-    <DataMember Name="oldValue" Type="int32">45.0</DataMember>
 </Class>

@@ -69,8 +69,8 @@ public:
 };
 
 REFL_IMPL_CLASS_BEGIN(ReflClass, SimpleBaseClass);
-    REFL_MEMBER(SimpleBaseClass, baseUint32Test);
-    REFL_MEMBER(SimpleBaseClass, baseFloat32Test);
+    REFL_MEMBER(baseUint32Test);
+    REFL_MEMBER(baseFloat32Test);
 REFL_IMPL_CLASS_END(SimpleBaseClass);
 
 class SimpleDerivedClass : public SimpleBaseClass {
@@ -91,10 +91,10 @@ public:
 };
 
 REFL_IMPL_CLASS_BEGIN(SimpleBaseClass, SimpleDerivedClass);
-    REFL_ADD_PARENT(SimpleDerivedClass, SimpleBaseClass);
-    REFL_MEMBER(SimpleDerivedClass, derivedBoolTest);
-    REFL_MEMBER(SimpleDerivedClass, derivedInt16Test);
-    REFL_MEMBER(SimpleDerivedClass, derivedInt16Test2);
+    REFL_ADD_PARENT(SimpleBaseClass);
+    REFL_MEMBER(derivedBoolTest);
+    REFL_MEMBER(derivedInt16Test);
+    REFL_MEMBER(derivedInt16Test2);
 REFL_IMPL_CLASS_END(SimpleDerivedClass);
 
 //====================================================
@@ -155,10 +155,10 @@ public:
 };
 
 REFL_IMPL_CLASS_BEGIN(SimpleDerivedClass, MoreDerivedClass);
-    REFL_ADD_PARENT(MoreDerivedClass, SimpleDerivedClass);
-    REFL_MEMBER(MoreDerivedClass, moreDerivedBoolTest);
-    REFL_MEMBER(MoreDerivedClass, moreDerivedFloat32Test);
-    REFL_MEMBER(MoreDerivedClass, moreDerivedBoolTest2);
+    REFL_ADD_PARENT(SimpleDerivedClass);
+    REFL_MEMBER(moreDerivedBoolTest);
+    REFL_MEMBER(moreDerivedFloat32Test);
+    REFL_MEMBER(moreDerivedBoolTest2);
 REFL_IMPL_CLASS_END(MoreDerivedClass);
 
 //====================================================
@@ -223,8 +223,8 @@ public:
 };
 
 REFL_IMPL_CLASS_BEGIN(ReflClass, SimpleBaseClass2);
-    REFL_MEMBER(SimpleBaseClass2, base2Uint32Test);
-    REFL_MEMBER(SimpleBaseClass2, base2Float32Test);
+    REFL_MEMBER(base2Uint32Test);
+    REFL_MEMBER(base2Float32Test);
 REFL_IMPL_CLASS_END(SimpleBaseClass2);
 
 class MultipleInheritanceClass : public SimpleBaseClass, public SimpleBaseClass2 {
@@ -245,11 +245,11 @@ public:
 };
 
 REFL_IMPL_CLASS_BEGIN(SimpleBaseClass, MultipleInheritanceClass);
-    REFL_ADD_PARENT(MultipleInheritanceClass, SimpleBaseClass);
-    REFL_ADD_PARENT(MultipleInheritanceClass, SimpleBaseClass2);
-    REFL_MEMBER(MultipleInheritanceClass, derivedBoolTest);
-    REFL_MEMBER(MultipleInheritanceClass, derivedInt16Test);
-    REFL_MEMBER(MultipleInheritanceClass, derivedInt16Test2);
+    REFL_ADD_PARENT(SimpleBaseClass);
+    REFL_ADD_PARENT(SimpleBaseClass2);
+    REFL_MEMBER(derivedBoolTest);
+    REFL_MEMBER(derivedInt16Test);
+    REFL_MEMBER(derivedInt16Test2);
 REFL_IMPL_CLASS_END(MultipleInheritanceClass);
 
 //====================================================
