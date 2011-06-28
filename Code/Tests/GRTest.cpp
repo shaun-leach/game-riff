@@ -217,10 +217,26 @@ REFL_ENUM_IMPL_BEGIN(EInternal);
     REFL_ENUM_ALIAS(INTERNAL_VALUE2, INTERNAL_VALUE3, Run);
 REFL_ENUM_IMPL_END(EInternal);
 
+class NonreflectedClass {
+public:
+    NonreflectedClass() :
+        nfUint32Test(0),
+        nfFloat32Test(0.0f)
+    {
+    }
+
+    virtual ~NonreflectedClass() {
+    }
+//private:
+    uint32      nfUint32Test;
+    float32     nfFloat32Test;
+};
+
+//REFL_DEFINE_USER_TYPE(NonreflectedClass);
+
 class Dummy : public BaseClass, public BaseClass2 {
 public:
     REFL_DEFINE_CLASS(Dummy);
-    REFL_DEFINE_CLASS_ENUM(EInternal);
     Dummy() :
         i32test(4),
         f32test(10.9f),
@@ -294,7 +310,8 @@ private:
     EInternal   etest;
     float       pertest;
     float       angtest;
-    SubNameSpace::SubClass    ctest;
+    SubNameSpace::SubClass      ctest;
+    NonreflectedClass           nrtest;
 };
 
 REFL_IMPL_CLASS_BEGIN(BaseClass, Dummy);
@@ -313,6 +330,7 @@ REFL_IMPL_CLASS_BEGIN(BaseClass, Dummy);
     REFL_MEMBER(angtest);
     REFL_ADD_MEMBER_ALIAS(angtest, atest);
     REFL_MEMBER(ctest);
+//  REFL_MEMBER(nrtest);
 REFL_IMPL_CLASS_END(Dummy);
 
 class SimpleCastBaseClass : public ReflClass {
@@ -526,21 +544,6 @@ void TestCastingWVirtualsInBase() {
     loadTypes = NULL;
 }
 
-class NonreflectedClass {
-public:
-    NonreflectedClass() :
-        nfUint32Test(0),
-        nfFloat32Test(0.0f)
-    {
-    }
-
-    virtual ~NonreflectedClass() {
-    }
-//private:
-    uint32      nfUint32Test;
-    float32     nfFloat32Test;
-};
-
 class SimpleCastWithVirtualsNonreflectedBase : public NonreflectedClass, public SimpleCastBaseClass {
 public:
     REFL_DEFINE_CLASS(SimpleCastWithVirtualsNonreflectedBase);
@@ -667,6 +670,9 @@ void TestCastingWVirtualsIn2ndBase() {
 
 int main(int argc,  char * argv[]) {
    InitializeObjects();
+
+   ReflInitialize();
+
 /*    
     IStructuredTextStream * testStream = StreamCreateXML(L"test.xml");
 
