@@ -59,14 +59,6 @@ public:
         unsigned        offset
     );
 
-    ReflMember(
-        ReflTypeDesc * container,
-        ReflHash        typeHash,
-        const chargr  * name, 
-        unsigned        size,
-        bool            deprecated
-    );
-
     const chargr * Name() const {
         return m_name;
     }
@@ -90,6 +82,9 @@ public:
     void SetNext(ReflMember * next);
 
     void AdjustOffset(unsigned offset);
+    unsigned GetOffset() const {
+        return m_offset;
+    }
 
     void Finalize();
 
@@ -111,6 +106,12 @@ public:
         m_tempBinding = NULL;
     }
 
+    void MarkDeprecated() {
+        m_deprecated = true;
+    }
+    bool IsDeprecated() const {
+        return m_deprecated;
+    }
 private:
 
     bool DeserializeClassMember(IStructuredTextStream * stream, void * inst, unsigned offset) const;
@@ -140,7 +141,6 @@ private:
     const chargr      * m_name;
     ReflIndex           m_index;
 
-    unsigned            m_size;
     unsigned            m_offset;
 
     ReflMember        * m_next;
@@ -212,6 +212,9 @@ public:
     };
     void AddParent(Parent * parent);
 
+    ReflTypeDesc * GetNext() {
+        return m_next;
+    }
     const ReflTypeDesc * GetNext() const {
         return m_next;
     }
@@ -323,6 +326,8 @@ public:
     static bool Serialize(IStructuredTextStream * stream, const ReflClass * inst);
     static bool Deserialize(IStructuredTextStream * stream, ReflClass * inst);
 };
+
+void ReflInitialize();
 
 void ReflInitType(void * inst, ReflHash type);
 
@@ -453,7 +458,7 @@ const t_cast * ReflCast(const t_given * inst) {
                 NULL,                                                       \
                 CLASSOFFSETOF(parent, t_reflType),                          \
                 CLASSOFFSETOF(ReflClass, parent),                           \
-                ReflHash(TOWSTR(parent))                                    \
+                ::ReflGetTypeHash(*((parent *) 0x0))                        \
             };                                                              \
             s_reflInfo.AddParent(&s_parent##parent)
 
@@ -490,8 +495,9 @@ const t_cast * ReflCast(const t_given * inst) {
                 ::ReflGetTypeHash(*((type *) (0x0))),                       \
                 TOWSTR(name),                                               \
                 sizeof(type),                                               \
-                true                                                        \
-            )
+                0                                                           \
+            );                                                              \
+            s_member##name.MarkDeprecated()
 
 #define REFL_ADD_MEMBER_CONVERSION(name, conv)                              \
             s_member##name.RegisterConversionFunc(conv)

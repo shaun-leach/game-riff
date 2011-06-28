@@ -311,7 +311,6 @@ ReflMember::ReflMember(
     m_name(name),
     m_index(REFL_INDEX_ENDTYPE),
     m_typeHash(typeHash),
-    m_size(size),
     m_offset(offset),
     m_next(NULL),
     m_convFunc(NULL),
@@ -324,34 +323,8 @@ ReflMember::ReflMember(
         // If it's not registered, assume it's a user type
         m_index = REFL_INDEX_CLASS;
     }
-
-    container->RegisterMember(this);
-}
-
-//====================================================
-ReflMember::ReflMember(
-    ReflTypeDesc * container,
-    ReflHash        typeHash, 
-    const chargr  * name, 
-    unsigned        size,
-    bool            deprecated
-) :
-    m_nameHash(name),
-    m_name(name),
-    m_index(REFL_INDEX_ENDTYPE),
-    m_typeHash(typeHash),
-    m_size(size),
-    m_offset(0),
-    m_next(NULL),
-    m_convFunc(NULL),
-    m_deprecated(deprecated),
-    m_tempBinding(NULL)
-{
-    m_index = DetermineTypeIndex(typeHash);
-
-    if (m_index == REFL_INDEX_ENDTYPE) {
-        // If it's not registered, assume it's a user type
-        m_index = REFL_INDEX_CLASS;
+    else{
+        ASSERTMSGGR(size == s_typeDesc[m_index].typeSize, "Type sizze doesn't match");
     }
 
     container->RegisterMember(this);
@@ -879,6 +852,7 @@ void ReflTypeDesc::Finalize() {
         parent          = m_parents;
 
         const ReflTypeDesc * parentDesc = ReflLibrary::GetClassDesc(parent->parentHash);
+        ASSERTMSGGR(parentDesc != NULL, "Unregistered parent descriptor");
 
         m_parents       = next;
     }
@@ -899,6 +873,15 @@ void ReflTypeDesc::Finalize() {
     }
 
     m_members = head;
+
+    if (head != NULL) {
+        unsigned offset = head->GetOffset();
+        head = head->GetNext();
+        for (; head != NULL; head = head->GetNext()) {
+            ASSERTMSGGR(offset < head->GetOffset() || head->IsDeprecated(), "Members are misordered");
+            offset = head->GetOffset();
+        }
+    }
 
     EnumValue * enumHead = NULL;
     while (m_enumValues != NULL) {
@@ -1234,6 +1217,28 @@ const void * ReflCanCastTo(const ReflClass * inst, ReflHash actualType, ReflHash
 }
 
 //====================================================
+void ReflInitialize() {
+    for (ReflTypeDesc * desc = s_descHead; desc != NULL; desc = desc->GetNext()) {
+        desc->Finalize();
+    }
+
+    for (ReflTypeDesc * desc = s_descHead; desc != NULL; desc = desc->GetNext()) {
+        for (ReflTypeDesc * compare = desc->GetNext(); compare != NULL; compare = compare->GetNext()) {
+            ASSERTMSGGR(StrCmp(desc->GetTypeName(), compare->GetTypeName(), 256) != 0, "Duplicate class names");
+            ASSERTMSGGR(desc->GetHash() != compare->GetHash(), "Hash conflict");
+        }
+
+        for (ReflAlias * alias = s_classAliasHead; alias != NULL; alias = alias->next) 
+            ASSERTMSGGR(alias->oldHash != desc->GetHash(), "Alias conflicts with existing class");
+    }
+
+    for (ReflAlias * alias = s_classAliasHead; alias != NULL; alias = alias->next) {
+        const ReflTypeDesc * desc = ReflLibrary::GetClassDesc(alias->newHash);
+        ASSERTMSGGR(desc != NULL, "Missing class for alias");
+    }
+}
+
+//====================================================
 void ReflInitType(void * inst, ReflHash type) {
     const ReflTypeDesc * desc = ReflLibrary::GetClassDesc(type);
     if (desc != NULL) 
@@ -1308,8 +1313,6 @@ const ReflTypeDesc * ReflLibrary::GetClassDesc(const ReflClass * inst) {
 void ReflLibrary::RegisterClassDesc(ReflTypeDesc * classDesc) {
     classDesc->SetNext(s_descHead);
     s_descHead = classDesc;
-
-    classDesc->Finalize();
 }
 
 //====================================================

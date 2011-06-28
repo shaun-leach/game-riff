@@ -23,16 +23,17 @@
 ---Need to support enums tied to a class
 ----Include support for private enums
 --add code to finalize entire reflection library
----Finalize when reflection library is initialized
----Verify that every member of type "class" has a registered ReflClassDesc
----Verify that every parent class has a registered ReflClassDesc
----Verify that members are the correct size
----Verify that member offsets are monotonic?
 ---make sure that there are no duplicate class names, include aliases
 ---Verify that a class doesn't reflect members of a base class
 ---If using 32 bit hashes, verify that there are no collisions
 ---can I trap missing parents?
 ***Get rid of SetIsEnum and determine at finalization time
+***Finalize when reflection library is initialized
+***Verify that every member of type "class" has a registered ReflClassDesc
+***Verify that every parent class has a registered ReflClassDesc
+***Remove size from refl members
+****Verify size when constructing member
+***Verify that member offsets are monotonic?
 --Designer friendly names
 --Add support for classes that can't derive off of ReflClass
 --Have serialization use a template function to eliminate the cast?
