@@ -109,7 +109,7 @@ private:
 };
 
 REFL_IMPL_CLASS_BEGIN(ReflClass, BaseClass);
-    REFL_ADD_CLASS_ALIAS(BaseClass, OldBaseClass);
+    REFL_ADD_DEPRECATED_CLASS(BaseClass, OldBaseClass);
     REFL_MEMBER(basei32test);
     REFL_MEMBER(basef32test);
     REFL_MEMBER(basei16test);
@@ -126,7 +126,7 @@ public:
       InitReflType();
    }
 
-private:
+protected:
    int32 basebase2i32test;
    float32 basebase2f32test;
    uint16 basebase2u16test;
@@ -157,6 +157,7 @@ private:
 
 REFL_IMPL_CLASS_BEGIN(BaseBaseClass2, BaseClass2);
     REFL_ADD_PARENT(BaseBaseClass2);
+    REFL_MEMBER(basebase2i32test);
     REFL_MEMBER(base2i32test);
     REFL_MEMBER(base2f32test);
     REFL_MEMBER(base2u16test);

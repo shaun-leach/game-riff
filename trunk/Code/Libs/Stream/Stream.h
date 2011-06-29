@@ -69,6 +69,8 @@ class IStructuredTextStream {
 public:
     virtual ~IStructuredTextStream() { }
 
+    virtual const chargr * GetName() const = 0;
+
     virtual EStreamError Save() = 0;
 
     virtual EStreamError WriteNode(const chargr * name) = 0;

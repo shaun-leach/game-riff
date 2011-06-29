@@ -892,6 +892,19 @@ void ReflTypeDesc::Finalize() {
     }
 
     m_enumValues = enumHead;
+
+    for (ReflMember * memb = m_members; memb != NULL; memb = memb->GetNext()) {
+        for (ReflMember * comp = memb->GetNext(); comp != NULL; comp = comp->GetNext()) {
+            ASSERTMSGGR(StrCmp(memb->Name(), comp->Name(), 256) != 0, "Duplicate members");
+            ASSERTMSGGR(memb->NameHash() != comp->NameHash(), "Hash Collision");
+        }
+
+        for (Parent * parent = m_parents; parent != NULL; parent = parent->next) {
+            const ReflTypeDesc * desc = ReflLibrary::GetClassDesc(parent->parentHash);
+            ASSERTMSGGR(desc->FindMember(memb->NameHash()) == NULL, "Derived class is reflecting parent member");
+        }
+
+    }
 }
 
 //====================================================
@@ -1268,8 +1281,10 @@ ReflClass * ReflLibrary::Deserialize(IStructuredTextStream * stream, MemFlags me
 
             }
         }
-        else
+        else {
+            LOG(LOG_PRIORITY_ERROR, "Missing Type node in file: %s", stream->GetName());
             ASSERTMSGGR(false, "Need to log this error message");
+        }
     } while (stream->ReadNextNode() != STREAM_ERROR_NODEDOESNTEXIST);
 
     stream->ReadParentNode();
@@ -1316,7 +1331,7 @@ void ReflLibrary::RegisterClassDesc(ReflTypeDesc * classDesc) {
 }
 
 //====================================================
-void ReflLibrary::RegisterClassDescAlias(ReflAlias * classDescAlias) {
+void ReflLibrary::RegisterDeprecatedClassDesc(ReflAlias * classDescAlias) {
     classDescAlias->next = s_classAliasHead;
     s_classAliasHead = classDescAlias;
 }

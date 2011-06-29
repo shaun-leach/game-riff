@@ -1,7 +1,10 @@
 -Get everything compiling with gcc for another platform
 -Move compilation files out of the source tree
 -Wrap system math functions and call those
--Clean up system headers
+-Clean up system header usage
+----------
+-logging
+--each module should prefix itself to the log message. Preferably do this automatically, + function & line number
 --------------
 -Types
 --Create color, angle, percentage, euler types
@@ -23,17 +26,7 @@
 ---Need to support enums tied to a class
 ----Include support for private enums
 --add code to finalize entire reflection library
----make sure that there are no duplicate class names, include aliases
----Verify that a class doesn't reflect members of a base class
----If using 32 bit hashes, verify that there are no collisions
 ---can I trap missing parents?
-***Get rid of SetIsEnum and determine at finalization time
-***Finalize when reflection library is initialized
-***Verify that every member of type "class" has a registered ReflClassDesc
-***Verify that every parent class has a registered ReflClassDesc
-***Remove size from refl members
-****Verify size when constructing member
-***Verify that member offsets are monotonic?
 --Designer friendly names
 --Add support for classes that can't derive off of ReflClass
 --Have serialization use a template function to eliminate the cast?
@@ -75,21 +68,10 @@
 ---Need to test all types
 ----Test currently unimplemented types
 ---Test const casting
-****Currently implemented types
-****Test that int8 deserialization works if the member is packed
 ---Need to test missing/extra types
 ----Need to log these
 ---Missing aliases(this is really just an extra type)
 ----Need to log these
-***Complex inheritance
-***Manual versioning
-***Multiple aliases
-***Simple class hierarchy
-***multiple inheritance
-***Simple aliasing
-***Aliasing with conversion
-***Conversion
-***Namespaces
 --Need to remove strings in "gold" builds
 --Improve upon embedded class reading(would be nice to have one function that reads single classes, subclasses and embedded classes out of a file)
 --Need to support deserializing reflected classes that are embedded in other xml
@@ -100,6 +82,58 @@
 --Think about whether things like maps, textures, geometry buffers, etc use reflection or more manual system
 ---I think it really depends on how good I can make the versioning
 -*Need to handle varargs and scanf(not perfect, but it works for the moment)
+----------
+-Create tools platform
+--Layer tools functionality on top of platform
+--Add string class under tools platform?
+----------
+-Improve hash system
+--Compile time hashing
+--associate string with hash
+----------
+-Containers
+--Bit field
+--Array(fixed, dynamic)
+--hash
+--test against STL
+--Can all of these have a fixed memory allocator?
+----------
+-Ref counted type
+-Smart pointers
+--Use on streams
+-Weak pointers
+----------
+-Flesh out memory manager
+--memory leak checker
+----------
+-exception handler
+----------
+-Asserts
+--Add printf support to assertmsg
+----------
+-very fast curve evaluation lib
+----------
+-job manager
+----------
+-tools framework(javascript?)
+----------
+-Fix up unit tests?
+----------
+----------
+*convert asserts to wide char
+*rename types/functions away from UL
+*flags to MemFlags for whether allocation can fail or not
+*copyright notices
+*compiler assert
+*TESTME
+*Str version of scanf
+*nammespace internals
+*come up with better xml deserialization method(deal with const cast)
+xxIterators with explicit control over going to siblings and children
+xxHow to create a pure virtual iterator that doesn't require memory allocation
+*switch radian conversion functions to use PI
+*Check UL standard to see what I say about spaces between while(
+*Reflection
 **Add code for finalizing reflected data after it's been deserialized
 **Need to write data member value
 **64 & 128 bit types
@@ -173,54 +207,26 @@
 **Clean up header so class functions are organized better by functionality
 **Need to use actual enum type instead of just enum
 **Need designer friendly names for all enums
-----------
--Create tools platform
---Layer tools functionality on top of platform
---Add string class under tools platform?
-----------
--Improve hash system
---Compile time hashing
---associate string with hash
-----------
--Containers
---Bit field
---Array(fixed, dynamic)
---hash
---test against STL
---Can all of these have a fixed memory allocator?
-----------
--Ref counted type
--Smart pointers
--Weak pointers
-----------
--Flesh out memory manager
---memory leak checker
-----------
--logging
---each module should prefix itself to the log message. Preferably do this automatically
-----------
--exception handler
-----------
--very fast curve evaluation lib
-----------
--job manager
-----------
--tools framework(javascript?)
-----------
--Fix up unit tests?
-----------
-----------
-*convert asserts to wide char
-*rename types/functions away from UL
-*flags to MemFlags for whether allocation can fail or not
-*copyright notices
-*compiler assert
-*TESTME
-*Str version of scanf
-*nammespace internals
-*come up with better xml deserialization method(deal with const cast)
-xxIterators with explicit control over going to siblings and children
-xxHow to create a pure virtual iterator that doesn't require memory allocation
-*switch radian conversion functions to use PI
-*Check UL standard to see what I say about spaces between while(
+***Verify that a class doesn't reflect members of a base class
+***If using 32 bit hashes, verify that there are no collisions
+***make sure that there are no duplicate class names, include aliases
+***Get rid of SetIsEnum and determine at finalization time
+***Finalize when reflection library is initialized
+***Verify that every member of type "class" has a registered ReflClassDesc
+***Verify that every parent class has a registered ReflClassDesc
+***Remove size from refl members
+****Verify size when constructing member
+***Verify that member offsets are monotonic?
+**Test
+***Complex inheritance
+***Manual versioning
+***Multiple aliases
+***Simple class hierarchy
+***multiple inheritance
+***Simple aliasing
+***Aliasing with conversion
+***Conversion
+***Namespaces
+***Currently implemented types
+***Test that int8 deserialization works if the member is packed
 

@@ -53,6 +53,8 @@ public:
     EStreamError Save();
     void Close();
 
+    const chargr * GetName() const;
+
     EStreamError WriteNode(const chargr * name);
     EStreamError WriteNodeValue(const chargr * value);
     EStreamError EndNode();
@@ -147,6 +149,11 @@ void XMLTextStream::Close() {
         m_document = NULL;
     }
     m_currentNode = NULL;
+}
+
+//====================================================
+const chargr * XMLTextStream::GetName() const {
+    return L"";
 }
 
 //====================================================

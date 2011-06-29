@@ -69,7 +69,7 @@ public:
 };
 
 REFL_IMPL_CLASS_BEGIN(ReflClass, SimpleAliasingClass);
-    REFL_ADD_CLASS_ALIAS(SimpleAliasingClass, OldAliasingClass);
+    REFL_ADD_DEPRECATED_CLASS(SimpleAliasingClass, OldAliasingClass);
     REFL_MEMBER(baseUint32Test);
     REFL_MEMBER(baseFloat32Test);
 REFL_IMPL_CLASS_END(SimpleAliasingClass);

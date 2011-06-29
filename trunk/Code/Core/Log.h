@@ -1,6 +1,6 @@
 /*
    GameRiff - Framework for creating various video game services
-   Header file for including all core services
+   Interface for logging
    Copyright (C) 2011, Shaun Leach.
 
    Redistribution and use in source and binary forms, with or without
@@ -27,24 +27,15 @@
    OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef WIN32
-#define WIN32 // Hack for now
-#endif
+enum ELogPriority {
+    LOG_PRIORITY_INFO,
+    LOG_PRIORITY_WARN,
+    LOG_PRIORITY_ERROR
+};
 
-#if defined(_XENON)
-    // Nothing for now
-#elif defined(WIN32)
-    // Nothing for now
-#else
-    #error "Undefined platform"
-#endif
+void Log(ELogPriority pri, const chargr * file, unsigned lineNum, const chargr * format, ...);
+void Log(ELogPriority pri, const chargr * file, unsigned lineNum, const char   * format, ...);
 
-#include "System.h"
+#define LOG(pri, format, ...)                                               \
+    Log(pri, TOWSTR(__FILE__), __LINE__, format, __VA_ARGS__)                          
 
-#include "Types.h"
-#include "Macros.h"
-#include "Platform.h"
-#include "AssertGR.h"
-#include "Mem.h"
-#include "Str.h"
-#include "Log.h"
