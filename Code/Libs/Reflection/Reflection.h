@@ -320,7 +320,7 @@ public:
     static const ReflTypeDesc * GetClassDesc(const ReflClass * inst);
 
     static void RegisterClassDesc(ReflTypeDesc * classDesc);
-    static void RegisterClassDescAlias(ReflAlias * classDescAlias);
+    static void RegisterDeprecatedClassDesc(ReflAlias * classDescAlias);
 
     static ReflClass * Deserialize(IStructuredTextStream * stream, MemFlags memFlags);
     static bool Serialize(IStructuredTextStream * stream, const ReflClass * inst);
@@ -437,21 +437,21 @@ const t_cast * ReflCast(const t_given * inst) {
             func,                                                           \
             version                                                         \
         )
-#define REFL_ADD_CLASS_ALIAS(name, alias)                                   \
+#define REFL_ADD_DEPRECATED_CLASS(name, alias)                              \
             static ReflAlias s_alias##alias = {                             \
                 NULL,                                                       \
                 ReflHash(TOWSTR(alias)),                                    \
                 ReflHash(TOWSTR(name))                                      \
             };                                                              \
-            ReflLibrary::RegisterClassDescAlias(&s_alias##alias)
+            ReflLibrary::RegisterDeprecatedClassDesc(&s_alias##alias)
 
-#define REFL_ADD_CLASS_ALIAS_NAMESPACE(name, ns, alias)                     \
+#define REFL_ADD_DEPRECATED_CLASS_NAMESPACE(name, ns, alias)                \
             static ReflAlias s_alias##alias = {                             \
                 NULL,                                                       \
                 ReflHash(TOWSTR(ns::alias)),                                \
                 ReflHash(TOWSTR(name))                                      \
             };                                                              \
-            ReflLibrary::RegisterClassDescAlias(&s_alias##alias)
+            ReflLibrary::RegisterDeprecatedClassDesc(&s_alias##alias)
 
 #define REFL_ADD_PARENT(parent)                                             \
             static ReflTypeDesc::Parent s_parent##parent = {                \

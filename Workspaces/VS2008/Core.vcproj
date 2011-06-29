@@ -158,6 +158,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\Code\Core\Log.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\Code\Core\Macros.h"
 				>
 			</File>
@@ -199,11 +203,15 @@
 			>
 		</File>
 		<File
+			RelativePath="..\..\Code\Core\Log.cpp"
+			>
+		</File>
+		<File
 			RelativePath="..\..\Code\Core\Mem.cpp"
 			>
 		</File>
 		<File
-			RelativePath="..\..\Code\Core\Windows\Pch.cpp"
+			RelativePath="..\..\Code\Core\Pch.cpp"
 			>
 			<FileConfiguration
 				Name="Debug|Win32"
@@ -215,7 +223,7 @@
 			</FileConfiguration>
 		</File>
 		<File
-			RelativePath="..\..\Code\Core\Pch.cpp"
+			RelativePath="..\..\Code\Core\Windows\Pch.cpp"
 			>
 			<FileConfiguration
 				Name="Debug|Win32"

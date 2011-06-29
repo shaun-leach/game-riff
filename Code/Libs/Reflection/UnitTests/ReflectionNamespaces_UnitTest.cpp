@@ -214,7 +214,7 @@ public:
 };
 
 REFL_IMPL_CLASS_BEGIN(ReflClass, SimpleAliasedNamespaceClass);
-    REFL_ADD_CLASS_ALIAS_NAMESPACE(SimpleAliasedNamespaceClass, OldNamespace, SimpleAliasedNamespaceClass);
+    REFL_ADD_DEPRECATED_CLASS_NAMESPACE(SimpleAliasedNamespaceClass, OldNamespace, SimpleAliasedNamespaceClass);
     REFL_MEMBER(baseUint8Test0);
     REFL_MEMBER(baseUint8Test1);
     REFL_MEMBER(baseUint8Test2);
