@@ -29,6 +29,8 @@
 
 #include "Pch.h"
 
+LOG_DEFINE_MODULE(Reflection);
+
 //////////////////////////////////////////////////////
 //
 // Constants
@@ -169,10 +171,24 @@ void ConvertToString<REFL_INDEX_UINT8, uint8>(const ReflMember * , const byte * 
 //====================================================
 template<>
 void ConvertToString<REFL_INDEX_ENUM, char>(const ReflMember * memberDesc, const byte * data, const chargr * format, chargr * string, unsigned len) {
-    int * idata = (int *) data;
+    int64 idata = 0;
+    switch (memberDesc->GetSize()) {
+        case sizeof(char):
+            idata = *reinterpret_cast<const int8 *>(data);
+            break;
+        case sizeof(short):
+            idata = *reinterpret_cast<const int16 *>(data);
+            break;
+        case sizeof(int):
+            idata = *reinterpret_cast<const int32 *>(data);
+            break;
+        case sizeof(int64):
+            idata = *reinterpret_cast<const int64 *>(data);
+            break;
+    }
     const ReflTypeDesc * enumDesc = ReflLibrary::GetClassDesc(memberDesc->TypeHash());
     ASSERTMSGGR(enumDesc != NULL, "Unregistered enum type");
-    const ReflTypeDesc::EnumValue * enumValue = enumDesc->GetEnumValue(*data);
+    const ReflTypeDesc::EnumValue * enumValue = enumDesc->GetEnumValue(idata);
     if (enumValue != NULL) 
         StrPrintf(string, len, L"%s", enumValue->name);
     else {
@@ -233,11 +249,23 @@ void ConvertFromString<REFL_INDEX_ENUM, char>(const ReflMember * memberDesc, byt
     ASSERTMSGGR(enumDesc != NULL, "Unregistered enum type");
     const ReflTypeDesc::EnumValue * enumValue = enumDesc->GetEnumValue(string, len);
     if (enumValue != NULL) {
-        *((int *) data) = enumValue->value;
+        switch (memberDesc->GetSize()) {
+            case sizeof(char):
+                *reinterpret_cast<int8 *>(data) = static_cast<int8>(enumValue->value);
+                break;
+            case sizeof(short):
+                *reinterpret_cast<int16 *>(data) = static_cast<int16>(enumValue->value);
+                break;
+            case sizeof(int):
+                *reinterpret_cast<int32 *>(data) = static_cast<int32>(enumValue->value);
+                break;
+            case sizeof(int64):
+                *reinterpret_cast<int64 *>(data) = static_cast<int64>(enumValue->value);
+                break;
+        }
     }
     else {
         ASSERTMSGGR(false, "Unregistered enum value");
-        //Need to log a message here?
     }
 }
 
@@ -312,6 +340,7 @@ ReflMember::ReflMember(
     m_index(REFL_INDEX_ENDTYPE),
     m_typeHash(typeHash),
     m_offset(offset),
+    m_size(size),
     m_next(NULL),
     m_convFunc(NULL),
     m_deprecated(false),
@@ -324,7 +353,7 @@ ReflMember::ReflMember(
         m_index = REFL_INDEX_CLASS;
     }
     else{
-        ASSERTMSGGR(size == s_typeDesc[m_index].typeSize, "Type sizze doesn't match");
+        ASSERTMSGGR(size == s_typeDesc[m_index].typeSize, "Type size doesn't match for member: %s::%s", container->GetTypeName(), m_name);
     }
 
     container->RegisterMember(this);
@@ -337,10 +366,10 @@ void ReflMember::AdjustOffset(unsigned offset) {
 
 //====================================================
 bool ReflMember::ConvertClassMember(
-    IStructuredTextStream * stream, 
-    ReflHash                nameHash,
-    ReflClass             * inst, 
-    ReflIndex               oldType
+    IStructuredTextStreamPtr    stream, 
+    ReflHash                    nameHash,
+    ReflClass                 * inst, 
+    ReflIndex                   oldType
 ) const {
     if (stream->ReadChildNode() == STREAM_ERROR_NODEDOESNTEXIST) 
         return true;
@@ -351,17 +380,18 @@ bool ReflMember::ConvertClassMember(
 
         if (StrICmp(nodeName, L"DataMember", 10) == 0) {
             chargr name[256];
-            EStreamError result = stream->ReadNodeAttribute(L"Name", name, 256);
-            ASSERTMSGGR(result == STREAM_ERROR_OK, "Need to log this error message");
+            EStreamError result = stream->ReadNodeAttribute(L"Name", 4, name, 256);
+            ASSERTMSGGR(result == STREAM_ERROR_OK, "Malformed XML file: %s. DetaMember(%s) node is missing Name attribute", stream->GetName(), m_name);
             ReflHash nameHash(name);
 
             chargr type[256];
-            result = stream->ReadNodeAttribute(L"Type", type, 256);
-            ASSERTMSGGR(result == STREAM_ERROR_OK, "Need to log this error message");
+            result = stream->ReadNodeAttribute(L"Type", 4, type, 256);
+            ASSERTMSGGR(result == STREAM_ERROR_OK, "Malformed XML file: %s. DataMember(%s) node is missing Type attribute", stream->GetName(), m_name);
             ReflHash typeHash(type);
 
             ReflIndex oldType = DetermineTypeIndex(typeHash);
-            ASSERTMSGGR(oldType != REFL_INDEX_ENDTYPE, "Log: Unsupported type?");
+            if (oldType == REFL_INDEX_ENDTYPE) 
+                LOG(LOG_PRIORITY_INFO, "Trying to convert unknown class type: %s");
 
             ConvertDataMember(stream, nameHash, inst, oldType);
         }
@@ -377,10 +407,10 @@ bool ReflMember::ConvertClassMember(
 
 //====================================================
 bool ReflMember::ConvertDataMember(
-    IStructuredTextStream * stream, 
-    ReflHash                nameHash,
-    ReflClass             * inst, 
-    ReflIndex               oldType
+    IStructuredTextStreamPtr    stream, 
+    ReflHash                    nameHash,
+    ReflClass                 * inst, 
+    ReflIndex                   oldType
 ) const {
     chargr value[256];
     stream->ReadNodeValue(value, 256);
@@ -393,22 +423,21 @@ bool ReflMember::ConvertDataMember(
 }
 
 //====================================================
-bool ReflMember::Deserialize(
-    IStructuredTextStream * stream, 
-    ReflHash                nameHash, 
-    ReflClass             * inst,
-    void                  * base, 
-    unsigned                offset
+void ReflMember::Deserialize(
+    IStructuredTextStreamPtr    stream, 
+    ReflHash                    nameHash, 
+    ReflClass                 * inst,
+    void                      * base, 
+    unsigned                    offset
 ) const {
     chargr type[256];
-    EStreamError result = stream->ReadNodeAttribute(L"Type", type, 256);
-    ASSERTMSGGR(result == STREAM_ERROR_OK, "Need to log this error message");
+    EStreamError result = stream->ReadNodeAttribute(L"Type", 4, type, 256);
+    ASSERTMSGGR(result == STREAM_ERROR_OK, "Malformed XML File: %s. Member(%s) is missing Type attribute", stream->GetName(), m_name);
     ReflHash typeHash(type);
 
-    bool retResult = true;
     if (s_typeDesc[TypeIndex()].TypeMatches(typeHash, m_typeHash)) {
         if (m_index == REFL_INDEX_CLASS) {
-            retResult = DeserializeClassMember(stream, base, offset);
+            DeserializeClassMember(stream, base, offset);
         }
         else {
             chargr value[256];
@@ -417,7 +446,7 @@ bool ReflMember::Deserialize(
             if (!m_deprecated) 
                 member += m_offset + offset;
             else {
-                ASSERTMSGGR(m_tempBinding != NULL, "Need to log this");
+                ASSERTMSGGR(m_tempBinding != NULL, "No temp binding or conversion function supplied for deprecated member(%s)", m_name);
                 member = reinterpret_cast<byte *>(m_tempBinding);
             }
             s_typeDesc[TypeIndex()].fromString(this, member, s_typeDesc[TypeIndex()].format, value, 256);
@@ -425,50 +454,48 @@ bool ReflMember::Deserialize(
     }
     else if (m_convFunc != NULL) {
         ReflIndex oldType = DetermineTypeIndex(typeHash);
-        ASSERTMSGGR(oldType != REFL_INDEX_ENDTYPE, "Log: Unsupported type?");
+        ASSERTMSGGR(oldType != REFL_INDEX_ENDTYPE, "Trying to convert from unsupported type");
 
         if (oldType == REFL_INDEX_CLASS) {
             if (stream->ReadChildNode() == STREAM_ERROR_NODEDOESNTEXIST) 
-                return true;
-            retResult = ConvertClassMember(stream, nameHash, inst, oldType);
+                return;
+            ConvertClassMember(stream, nameHash, inst, oldType);
             stream->ReadParentNode();
         }
         else {
-            retResult = ConvertDataMember(stream, nameHash, inst, oldType);
+            ConvertDataMember(stream, nameHash, inst, oldType);
         }
     }
-    
-    return retResult;
 }
 
 //====================================================
-bool ReflMember::DeserializeClassMember(IStructuredTextStream * stream, void * base, unsigned offset) const {
+bool ReflMember::DeserializeClassMember(IStructuredTextStreamPtr stream, void * base, unsigned offset) const {
     const ReflTypeDesc * subClass = ReflLibrary::GetClassDesc(m_typeHash);
     if (subClass != NULL) {
         if (stream->ReadChildNode() == STREAM_ERROR_NODEDOESNTEXIST) {
-            ASSERTMSGGR(false, "Need to log an error here");
+            ASSERTMSGGR(false, "Malformed XML file: %s. DataMember node of type Class(%s) is missing", stream->GetName(), m_name);
             return true;
         }
         chargr nodeName[64];
         stream->ReadNodeName(nodeName, 64);
         if (StrICmp(nodeName, L"Class", 5) != 0) {
-            ASSERTMSGGR(false, "Need to log an error here");
+            ASSERTMSGGR(false, "Malformed XML file: %s. DataMember node of type Class(%s) is not named Class", stream->GetName(), subClass->GetTypeName());
             return true;
         }
 
         chargr typeName[256];
-        if (stream->ReadNodeAttribute(L"Type", typeName, 256) == STREAM_ERROR_OK) {
+        if (stream->ReadNodeAttribute(L"Type", 4, typeName, 256) == STREAM_ERROR_OK) {
             if (ReflHash(typeName) == m_typeHash) 
                 subClass->Deserialize(stream, base, offset + m_offset);
         }
         else 
-            ASSERTMSGGR(false, "Need to log this error message");
+            ASSERTMSGGR(false, "Malformed XML file: %s. DataMember node of type Class(%s) is missing Type attribute", stream->GetName(), subClass->GetTypeName());
 
         stream->ReadParentNode();
     }
     else {
         // Need to log error
-        ASSERTMSGGR(false, "Unregistered type, log error");
+        LOG(LOG_PRIORITY_INFO, "XML File %S contains unregistered class type", stream->GetName());
     }
 
     return true;
@@ -497,7 +524,7 @@ ReflIndex ReflMember::DetermineTypeIndex(ReflHash typeHash) const {
 void ReflMember::Finalize() {
     if (m_index == REFL_INDEX_CLASS) {
         const ReflTypeDesc * desc = ReflLibrary::GetClassDesc(m_typeHash);
-        ASSERTMSGGR(desc != NULL, "Unregistered class type");
+        ASSERTMSGGR(desc != NULL, "Unregistered class type for member: %s", m_name);
         if (desc->IsEnumType()) 
             m_index = REFL_INDEX_ENUM;
     }
@@ -510,7 +537,7 @@ bool ReflMember::Matches(ReflHash hash) const {
 
 //====================================================
 void ReflMember::RegisterConversionFunc(ReflConversionFunc func) {
-    ASSERTMSGGR(m_convFunc == NULL, "Conversion fucntion already registered");
+    ASSERTMSGGR(m_convFunc == NULL, "Conversion fucntion already registered for member(%s)", m_name);
     m_convFunc = func;
 }
 
@@ -521,10 +548,10 @@ void ReflMember::SetNext(ReflMember * next) {
 
 //====================================================
 bool ReflMember::Serialize(
-    IStructuredTextStream * stream, 
-    const ReflClass       * inst, 
-    const void            * base,
-    unsigned                offset
+    IStructuredTextStreamPtr    stream, 
+    const ReflClass           * inst, 
+    const void                * base,
+    unsigned                    offset
 ) const {
     if (m_deprecated) 
         return true;
@@ -538,7 +565,7 @@ bool ReflMember::Serialize(
             typeDesc->Serialize(stream, inst, offset + m_offset);
         else {
             // Need to log error
-            ASSERTMSGGR(false, "Unregistered type, log error");
+            ASSERTMSGGR(false, "Unregistered type for member(%s)", Name());
         }
     }
     else {
@@ -750,25 +777,25 @@ void ReflTypeDesc::ClearTempBinding(ReflHash memberHash, ReflHash typeHash) {
 
 //====================================================
 bool ReflTypeDesc::Deserialize(
-    IStructuredTextStream * stream, 
-    ReflClass             * inst
+    IStructuredTextStreamPtr    stream, 
+    ReflClass                 * inst
 ) const {
     return Deserialize(stream, CastToBase(inst), 0);
 }
 
 //====================================================
 bool ReflTypeDesc::Deserialize(
-    IStructuredTextStream * stream, 
-    void                  * inst, 
-    unsigned                offset
+    IStructuredTextStreamPtr    stream, 
+    void                      * inst, 
+    unsigned                    offset
 ) const {
     chargr versionStr[32];
     unsigned version = 0;
-    if (stream->ReadNodeAttribute(L"Version", versionStr, 32) == STREAM_ERROR_OK) {
+    if (stream->ReadNodeAttribute(L"Version", 7, versionStr, 32) == STREAM_ERROR_OK) {
         StrReadValue(versionStr, 32, L"%x", &version);
     }
     else 
-        ASSERTMSGGR(false, "Need to log this error");
+        ASSERTMSGGR(false, "Malformed XML file: %s. Class node(%s) is missing Version attribute", stream->GetName(), GetTypeName());
 
     if (m_versioningFunc != NULL) {
         m_versioningFunc(stream, const_cast<ReflTypeDesc *>(this), version, CastToReflClass(inst));
@@ -784,17 +811,17 @@ bool ReflTypeDesc::Deserialize(
 
 //====================================================
 bool ReflTypeDesc::DeserializeMembers(
-    IStructuredTextStream * stream, 
-    void                  * inst
+    IStructuredTextStreamPtr    stream, 
+    void                      * inst
 ) const {
     return DeserializeMembers(stream, inst, 0);
 }
 
 //====================================================
 bool ReflTypeDesc::DeserializeMembers(
-    IStructuredTextStream * stream, 
-    void                  * inst, 
-    unsigned                offset
+    IStructuredTextStreamPtr    stream, 
+    void                      * inst, 
+    unsigned                    offset
 ) const {
     if (stream->ReadChildNode() == STREAM_ERROR_NODEDOESNTEXIST) 
         return true;
@@ -806,8 +833,8 @@ bool ReflTypeDesc::DeserializeMembers(
         if (StrICmp(nodeName, L"DataMember", 10) == 0) {
 
             chargr name[256];
-            EStreamError result = stream->ReadNodeAttribute(L"Name", name, 256);
-            ASSERTMSGGR(result == STREAM_ERROR_OK, "Need to log this error message");
+            EStreamError result = stream->ReadNodeAttribute(L"Name", 4, name, 256);
+            ASSERTMSGGR(result == STREAM_ERROR_OK, "Malformed XML file: %s. DataMember node is missing Name attribute", stream->GetName());
             ReflHash nameHash(name);
             unsigned memberOffset = 0;
             const ReflMember * member = FindMember(nameHash, &memberOffset);
@@ -823,7 +850,7 @@ bool ReflTypeDesc::DeserializeMembers(
         }
         else if (StrICmp(nodeName, L"BaseClass", 9) == 0) {
             chargr baseClassName[256];
-            EStreamError result = stream->ReadNodeAttribute(L"Type", baseClassName, 256);
+            EStreamError result = stream->ReadNodeAttribute(L"Type", 4, baseClassName, 256);
             if (result == STREAM_ERROR_OK) {
                 const ReflTypeDesc * parentDesc = ReflLibrary::GetClassDesc(ReflHash(baseClassName));
                 if (parentDesc != NULL) {
@@ -833,7 +860,7 @@ bool ReflTypeDesc::DeserializeMembers(
                 }
             }
             else {
-                ASSERTMSGGR(result == STREAM_ERROR_OK, "Need to log this error message");
+                ASSERTMSGGR(result == STREAM_ERROR_OK, "Malformed XML file: %s. BaseClass node(%s) is missing Type attribute", stream->GetName(), baseClassName);
             }
         }
     } while (stream->ReadNextNode() != STREAM_ERROR_NODEDOESNTEXIST);
@@ -852,7 +879,7 @@ void ReflTypeDesc::Finalize() {
         parent          = m_parents;
 
         const ReflTypeDesc * parentDesc = ReflLibrary::GetClassDesc(parent->parentHash);
-        ASSERTMSGGR(parentDesc != NULL, "Unregistered parent descriptor");
+        ASSERTMSGGR(parentDesc != NULL, "Unregistered parent descriptor for type: %s", GetTypeName());
 
         m_parents       = next;
     }
@@ -901,7 +928,13 @@ void ReflTypeDesc::Finalize() {
 
         for (Parent * parent = m_parents; parent != NULL; parent = parent->next) {
             const ReflTypeDesc * desc = ReflLibrary::GetClassDesc(parent->parentHash);
-            ASSERTMSGGR(desc->FindMember(memb->NameHash()) == NULL, "Derived class is reflecting parent member");
+            ASSERTMSGGR(
+                desc->FindMember(memb->NameHash()) == NULL, 
+                "Derived class(%s) is reflecting parent member(%s::%s)", 
+                GetTypeName(), 
+                desc->GetTypeName(), 
+                memb->Name()
+            );
         }
 
     }
@@ -1023,7 +1056,7 @@ bool ReflTypeDesc::FindParentOffset(ReflHash parentHash, unsigned * offset, unsi
 }
 
 //====================================================
-const ReflTypeDesc::EnumValue * ReflTypeDesc::GetEnumValue(int value) const {
+const ReflTypeDesc::EnumValue * ReflTypeDesc::GetEnumValue(int64 value) const {
     const EnumValue * val = m_enumValues;
     while (val != NULL) {
         if (val->value == value) 
@@ -1143,15 +1176,14 @@ bool ReflTypeDesc::RegisterTempBinding(ReflHash memberHash, ReflHash typeHash, v
 
 //====================================================
 bool ReflTypeDesc::SerializeMembers(
-    IStructuredTextStream * stream, 
-    const ReflClass       * inst,
-    const void            * base, 
-    unsigned                offset
+    IStructuredTextStreamPtr    stream, 
+    const ReflClass           * inst,
+    const void                * base, 
+    unsigned                    offset
 ) const {
     if (m_parents != NULL) {
         for (Parent * parent = m_parents; parent != NULL; parent = parent->next) {
             const ReflTypeDesc * parentDesc = ReflLibrary::GetClassDesc(parent->parentHash);
-            ASSERTMSGGR(parentDesc != NULL, "Missing parent descriptor");
             stream->WriteNode(L"BaseClass");
             stream->WriteNodeAttribute(L"Type", parentDesc->m_typeName);
             chargr versionStr[32];
@@ -1174,9 +1206,9 @@ bool ReflTypeDesc::SerializeMembers(
 
 //====================================================
 bool ReflTypeDesc::Serialize(
-    IStructuredTextStream * stream, 
-    const ReflClass       * inst, 
-    unsigned                offset
+    IStructuredTextStreamPtr    stream, 
+    const ReflClass           * inst, 
+    unsigned                    offset
 ) const {
     stream->WriteNode(L"Class");
     stream->WriteNodeAttribute(L"Type", this->m_typeName);
@@ -1231,18 +1263,19 @@ const void * ReflCanCastTo(const ReflClass * inst, ReflHash actualType, ReflHash
 
 //====================================================
 void ReflInitialize() {
+    LOG(LOG_PRIORITY_INFO, "Initializing Reflection Library");
     for (ReflTypeDesc * desc = s_descHead; desc != NULL; desc = desc->GetNext()) {
         desc->Finalize();
     }
 
     for (ReflTypeDesc * desc = s_descHead; desc != NULL; desc = desc->GetNext()) {
         for (ReflTypeDesc * compare = desc->GetNext(); compare != NULL; compare = compare->GetNext()) {
-            ASSERTMSGGR(StrCmp(desc->GetTypeName(), compare->GetTypeName(), 256) != 0, "Duplicate class names");
+            ASSERTMSGGR(StrCmp(desc->GetTypeName(), compare->GetTypeName(), 256) != 0, "Duplicate class names: %s", desc->GetTypeName());
             ASSERTMSGGR(desc->GetHash() != compare->GetHash(), "Hash conflict");
         }
 
         for (ReflAlias * alias = s_classAliasHead; alias != NULL; alias = alias->next) 
-            ASSERTMSGGR(alias->oldHash != desc->GetHash(), "Alias conflicts with existing class");
+            ASSERTMSGGR(alias->oldHash != desc->GetHash(), "Alias conflicts with existing class: %s", desc->GetTypeName());
     }
 
     for (ReflAlias * alias = s_classAliasHead; alias != NULL; alias = alias->next) {
@@ -1259,7 +1292,7 @@ void ReflInitType(void * inst, ReflHash type) {
 }
 
 //====================================================
-ReflClass * ReflLibrary::Deserialize(IStructuredTextStream * stream, MemFlags memFlags) {
+ReflClass * ReflLibrary::Deserialize(IStructuredTextStreamPtr stream, MemFlags memFlags) {
     ReflClass * ret = NULL;
 
     do {
@@ -1269,7 +1302,7 @@ ReflClass * ReflLibrary::Deserialize(IStructuredTextStream * stream, MemFlags me
             continue;
 
         chargr typeName[256];
-        if (stream->ReadNodeAttribute(L"Type", typeName, 256) == STREAM_ERROR_OK) {
+        if (stream->ReadNodeAttribute(L"Type", 4, typeName, 256) == STREAM_ERROR_OK) {
             const ReflTypeDesc * desc = GetClassDesc(ReflHash(typeName));
 
             if (desc != NULL) {
@@ -1282,8 +1315,7 @@ ReflClass * ReflLibrary::Deserialize(IStructuredTextStream * stream, MemFlags me
             }
         }
         else {
-            LOG(LOG_PRIORITY_ERROR, "Missing Type node in file: %s", stream->GetName());
-            ASSERTMSGGR(false, "Need to log this error message");
+            ASSERTMSGGR(false, "Malformed XML file: %s. Class node(%s) is missing Type attribute", stream->GetName(), nodeName);
         }
     } while (stream->ReadNextNode() != STREAM_ERROR_NODEDOESNTEXIST);
 
@@ -1292,7 +1324,7 @@ ReflClass * ReflLibrary::Deserialize(IStructuredTextStream * stream, MemFlags me
 }
 
 //====================================================
-bool ReflLibrary::Deserialize(IStructuredTextStream * stream, ReflClass * inst) {
+bool ReflLibrary::Deserialize(IStructuredTextStreamPtr stream, ReflClass * inst) {
     const ReflTypeDesc * desc = GetClassDesc(inst);
 
     return desc->Deserialize(stream, inst);
@@ -1337,7 +1369,7 @@ void ReflLibrary::RegisterDeprecatedClassDesc(ReflAlias * classDescAlias) {
 }
 
 //====================================================
-bool ReflLibrary::Serialize(IStructuredTextStream * stream, const ReflClass * inst) {
+bool ReflLibrary::Serialize(IStructuredTextStreamPtr stream, const ReflClass * inst) {
     const ReflTypeDesc * desc = GetClassDesc(inst);
 
     return desc->Serialize(stream, inst);

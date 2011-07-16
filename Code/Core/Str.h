@@ -29,8 +29,8 @@
 
 #pragma once
 
-unsigned StrLen(const chargr  * str);
-unsigned StrLen(const charsys * str);
+unsigned StrLen(const chargr  * str, unsigned len);
+unsigned StrLen(const charsys * str, unsigned len);
 
 int StrCmp(const chargr  * strA, const chargr * strB, unsigned len);
 int StrCmp(const charsys * strA, const charsys * strB, unsigned len);
@@ -41,20 +41,27 @@ int StrICmp(const charsys * strA, const charsys * strB, unsigned len);
 int StrICmp(const chargr  * strA, const charsys * strB, unsigned len);
 int StrICmp(const charsys  * strA, const chargr * strB, unsigned len);
 
+int StrCopy(chargr  * dest, unsigned len, const chargr  * src);
+//int StrCopy(chargr  * dest, unsigned len, const charsys * src);
+//int StrCopy(charsys * dest, unsigned len, const chargr  * src);
+int StrCopy(charsys * dest, unsigned len, const charsys * src);
+
 void StrConvertToUtf8(const chargr * src, charsys * dest, unsigned len);
 charsys * StrCreateUtf8(const chargr * src, MemFlags flags);
 
 void StrUtf8ConvertToCharGr(const charsys * src, chargr * dest, unsigned len);
 chargr * StrCreateCharGr(const charsys * src, MemFlags flags);
 
-int StrPrintf(charsys * dest, unsigned len, const chargr * format, ...);
+int StrPrintf(charsys * dest, unsigned len, const charsys * format, ...);
 int StrPrintf(chargr  * dest, unsigned len, const chargr * format, ...);
+int StrPrintfV(charsys * dest, unsigned len, const charsys * format, va_list vargs);
+int StrPrintfV(chargr  * dest, unsigned len, const chargr * format, va_list vargs);
 
 int StrReadValue(const chargr * src, unsigned len, const chargr * format, ...);
 
 class StrStackConverter {
 public:
-    StrStackConverter(const chargr * str);
+    StrStackConverter(const chargr * str, unsigned maxLen);
     ~StrStackConverter();
 
     operator const charsys * () {

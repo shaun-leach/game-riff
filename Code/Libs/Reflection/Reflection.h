@@ -31,6 +31,7 @@ class ReflClass;
 class ReflTypeDesc;
 class DataStream;
 class IStructuredTextStream;
+DECLARE_SMARTPTR(IStructuredTextStream);
 
 typedef unsigned    ReflIndex;
 typedef Hash32      ReflHash;
@@ -38,7 +39,7 @@ typedef Hash32      ReflHash;
 typedef void * (*ReflCreateFunc)(unsigned count, MemFlags memFlags);
 typedef void (*ReflFinalizationFunc)(ReflClass * inst);
 typedef void (*ReflConversionFunc)(ReflClass * inst, ReflHash name, ReflHash oldType, void * data);
-typedef void (*ReflVersioningFunc)(IStructuredTextStream * stream, ReflTypeDesc * desc, unsigned version, ReflClass * inst);
+typedef void (*ReflVersioningFunc)(IStructuredTextStreamPtr stream, ReflTypeDesc * desc, unsigned version, ReflClass * inst);
 
 const ReflHash ReflTypeBool(L"bool");
 const ReflHash ReflTypeInt32(L"int32");
@@ -91,11 +92,11 @@ public:
     bool ConvertToString(const byte * data, chargr * str, unsigned len) const;
     bool ConvertFromString(const byte * data, chargr * str, unsigned len) const;
 
-    bool Serialize(IStructuredTextStream * stream, const ReflClass * inst, const void * base, unsigned offset) const;
-    bool Deserialize(IStructuredTextStream * stream, ReflHash nameHash, ReflClass * inst, void * base, unsigned offset) const;
+    bool Serialize(IStructuredTextStreamPtr stream, const ReflClass * inst, const void * base, unsigned offset) const;
+    void Deserialize(IStructuredTextStreamPtr stream, ReflHash nameHash, ReflClass * inst, void * base, unsigned offset) const;
 
     bool Serialize(DataStream * stream, const ReflClass * inst, unsigned offset) const;
-    bool Deserialize(DataStream * stream, ReflHash nameHash, ReflClass * inst, void * base, unsigned offset) const;
+    void Deserialize(DataStream * stream, ReflHash nameHash, ReflClass * inst, void * base, unsigned offset) const;
 
     void RegisterConversionFunc(ReflConversionFunc func);
 
@@ -112,20 +113,24 @@ public:
     bool IsDeprecated() const {
         return m_deprecated;
     }
+
+    unsigned GetSize() const {
+        return m_size;
+    }
 private:
 
-    bool DeserializeClassMember(IStructuredTextStream * stream, void * inst, unsigned offset) const;
+    bool DeserializeClassMember(IStructuredTextStreamPtr stream, void * inst, unsigned offset) const;
     bool ConvertDataMember(
-        IStructuredTextStream * stream, 
-        ReflHash                nameHash,
-        ReflClass             * inst, 
-        ReflIndex               oldType
+        IStructuredTextStreamPtr    stream, 
+        ReflHash                    nameHash,
+        ReflClass                 * inst, 
+        ReflIndex                   oldType
     ) const;
     bool ConvertClassMember(
-        IStructuredTextStream * stream, 
-        ReflHash                nameHash, 
-        ReflClass             * inst, 
-        ReflIndex               oldType
+        IStructuredTextStreamPtr    stream, 
+        ReflHash                    nameHash, 
+        ReflClass                 * inst, 
+        ReflIndex                   oldType
     ) const;
 
     ReflIndex DetermineTypeIndex(ReflHash typeHash) const;
@@ -142,6 +147,7 @@ private:
     ReflIndex           m_index;
 
     unsigned            m_offset;
+    unsigned            m_size;
 
     ReflMember        * m_next;
 
@@ -194,11 +200,11 @@ public:
 
     void InitInst(void * inst) const;
 
-    bool Serialize(IStructuredTextStream * stream, const ReflClass * inst, unsigned offset = 0) const;
-    bool Deserialize(IStructuredTextStream * stream, ReflClass * inst) const;
-    bool Deserialize(IStructuredTextStream * stream, void * inst, unsigned offset) const;
-    bool DeserializeMembers(IStructuredTextStream * stream, void * inst) const;
-    bool DeserializeMembers(IStructuredTextStream * stream, void * inst, unsigned offset) const;
+    bool Serialize(IStructuredTextStreamPtr stream, const ReflClass * inst, unsigned offset = 0) const;
+    bool Deserialize(IStructuredTextStreamPtr stream, ReflClass * inst) const;
+    bool Deserialize(IStructuredTextStreamPtr stream, void * inst, unsigned offset) const;
+    bool DeserializeMembers(IStructuredTextStreamPtr stream, void * inst) const;
+    bool DeserializeMembers(IStructuredTextStreamPtr stream, void * inst, unsigned offset) const;
 
     bool RegisterTempBinding(ReflHash memberHash, ReflHash typeHash, void * data);
     void ClearTempBinding(ReflHash memberHash, ReflHash typeHash);
@@ -224,13 +230,13 @@ public:
 
     struct EnumValue {
         EnumValue     * next;
-        unsigned        value;
+        int64           value;
         const chargr  * name;
         ReflHash        nameHash;
     };
 
     void RegisterEnumValue(EnumValue * value);
-    const EnumValue * GetEnumValue(int value) const;
+    const EnumValue * GetEnumValue(int64 value) const;
     const EnumValue * GetEnumValue(const chargr * str, unsigned len) const;
     bool IsEnumType() const;
 
@@ -258,10 +264,10 @@ private:
     bool FindParentOffset(ReflHash parentHash, unsigned * offset, unsigned * reflOffset) const;
 
     bool SerializeMembers(
-        IStructuredTextStream * stream, 
-        const ReflClass       * inst,
-        const void            * base, 
-        unsigned                offset
+        IStructuredTextStreamPtr    stream, 
+        const ReflClass           * inst,
+        const void                * base, 
+        unsigned                    offset
     ) const;
 
 private:
@@ -322,9 +328,9 @@ public:
     static void RegisterClassDesc(ReflTypeDesc * classDesc);
     static void RegisterDeprecatedClassDesc(ReflAlias * classDescAlias);
 
-    static ReflClass * Deserialize(IStructuredTextStream * stream, MemFlags memFlags);
-    static bool Serialize(IStructuredTextStream * stream, const ReflClass * inst);
-    static bool Deserialize(IStructuredTextStream * stream, ReflClass * inst);
+    static ReflClass * Deserialize(IStructuredTextStreamPtr stream, MemFlags memFlags);
+    static bool Serialize(IStructuredTextStreamPtr stream, const ReflClass * inst);
+    static bool Deserialize(IStructuredTextStreamPtr stream, ReflClass * inst);
 };
 
 void ReflInitialize();
@@ -514,10 +520,38 @@ const t_cast * ReflCast(const t_given * inst) {
             REFL_ADD_MEMBER_ALIAS(name, alias);                             \
             REFL_ADD_MEMBER_CONVERSION(name, conv)
 
-#define REFL_DEFINE_CLASS_ENUM(type)                                        \
+#define REFL_ENUM_CLASS_IMPL_BEGIN(scope, type)                             \
+    REFL_DEFINE_USER_TYPE(scope::type);                                     \
     template<typename t_reflType>                                           \
-    static ReflTypeDesc * ReflCreateEnumDesc##type();                       \
-    REFL_DEFINE_USER_TYPE(type)
+    ReflTypeDesc * ReflCreateEnumDesc##type() {                             \
+        static ReflTypeDesc s_typeDesc(                                     \
+            TOWSTR(scope::type),                                            \
+            sizeof(t_reflType),                                             \
+            0,                                                              \
+            0,                                                              \
+            NULL                                                            \
+        )
+
+#define REFL_ENUM_CLASS_VALUE(scope, value, displayName)                    \
+        static ReflTypeDesc::EnumValue s_enumValue##value = {               \
+            NULL,                                                           \
+            scope::value,                                                   \
+            TOWSTR(displayName),                                            \
+            ReflHash(TOWSTR(scope::value))                                  \
+        };                                                                  \
+        s_typeDesc.RegisterEnumValue(&s_enumValue##value)
+
+#define REFL_ENUM_CLASS_IMPL_END(scope, name)                               \
+        return &s_typeDesc;                                                 \
+    }                                                                       \
+    class ReflAutoRegister##name {                                          \
+    public:                                                                 \
+        ReflAutoRegister##name() {                                          \
+            ReflTypeDesc * desc = ReflCreateEnumDesc##name<scope::name>();  \
+            ReflLibrary::RegisterClassDesc(desc);                           \
+        }                                                                   \
+    };                                                                      \
+    static ReflAutoRegister##name s_autoRegister##name
 
 #define REFL_ENUM_IMPL_BEGIN(name)                                          \
     REFL_DEFINE_USER_TYPE(name);                                            \

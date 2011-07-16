@@ -40,6 +40,16 @@ int StrICmp(const charsys * strA, const charsys * strB, unsigned len) {
 }
 
 //====================================================
+int StrCopy(chargr * dest, unsigned len, const chargr * src) {
+    return wcsncpy_s(dest, len, src, len);
+}
+
+//====================================================
+int StrCopy(charsys * dest, unsigned len, const charsys * src) {
+    return strncpy_s(dest, len, src, len);
+}
+
+//====================================================
 void StrConvertToUtf8(const chargr * src, charsys * dest, unsigned len) {
     size_t bytesConverted = 0;
     wcstombs_s(&bytesConverted, dest, len, src, len);
@@ -53,16 +63,26 @@ void StrUtf8ConvertToCharGr(const charsys * src, chargr * dest, unsigned len) {
 
 //====================================================
 int StrPrintf(chargr * dest, unsigned len, const chargr * format, ...) {
-    va_list args;
-    va_start(args, format);
-    return vswprintf_s(dest, len, format, args);
+    va_list vargs;
+    va_start(vargs, format);
+    return StrPrintfV(dest, len, format, vargs);
 }
 
 //====================================================
 int StrPrintf(charsys * dest, unsigned len, const charsys * format, ...) {
-    va_list args;
-    va_start(args, format);
-    return vsprintf_s(dest, len, format, args);
+    va_list vargs;
+    va_start(vargs, format);
+    return StrPrintfV(dest, len, format, vargs);
+}
+
+//====================================================
+int StrPrintfV(chargr * dest, unsigned len, const chargr * format, va_list vargs) {
+    return vswprintf_s(dest, len, format, vargs);
+}
+
+//====================================================
+int StrPrintfV(charsys  * dest, unsigned len, const charsys * format, va_list vargs) {
+    return vsprintf_s(dest, len, format, vargs);
 }
 
 //====================================================

@@ -33,9 +33,40 @@ enum ELogPriority {
     LOG_PRIORITY_ERROR
 };
 
-void Log(ELogPriority pri, const chargr * file, unsigned lineNum, const chargr * format, ...);
-void Log(ELogPriority pri, const chargr * file, unsigned lineNum, const char   * format, ...);
+void LogInit();
+void LogFlushAndCloseAll();
+void LogClose();
+
+class LogModuleId {
+public:
+
+private:
+    const char    * m_idName;
+    uint64          m_id;
+};
+
+#define LOG_DECLARE_MODULE(module)                                          \
+    
+#define LOG_DEFINE_MODULE(module)                                           \
+    static chargr * s_logModuleId = TOWSTR(module)
+
 
 #define LOG(pri, format, ...)                                               \
-    Log(pri, TOWSTR(__FILE__), __LINE__, format, __VA_ARGS__)                          
+    Log(pri, s_logModuleId, __FILE__, __LINE__, format, __VA_ARGS__)                          
+
+#define LOGF(pri, file, line, format, ...)                                  \
+    Log(pri, s_logModuleId, file, line, format, __VA_ARGS__)                          
+
+#define LOGV(pri, file, line, format, vargs)                                \
+    LogV(pri, s_logModuleId, file, line, format, vargs)                          
+
+void Log(ELogPriority pri, const chargr  * moduleID, const chargr  * file, unsigned lineNum, const chargr  * format, ...);
+void Log(ELogPriority pri, const chargr  * moduleID, const chargr  * file, unsigned lineNum, const charsys * format, ...);
+void Log(ELogPriority pri, const chargr  * moduleID, const charsys * file, unsigned lineNum, const chargr  * format, ...);
+void Log(ELogPriority pri, const chargr  * moduleID, const charsys * file, unsigned lineNum, const charsys * format, ...);
+void LogV(ELogPriority pri, const chargr  * moduleID, const chargr  * file, unsigned lineNum, const chargr  * format, va_list vargs);
+void LogV(ELogPriority pri, const chargr  * moduleID, const chargr  * file, unsigned lineNum, const charsys * format, va_list vargs);
+void LogV(ELogPriority pri, const chargr  * moduleID, const charsys * file, unsigned lineNum, const chargr  * format, va_list vargs);
+void LogV(ELogPriority pri, const chargr  * moduleID, const charsys * file, unsigned lineNum, const charsys * format, va_list vargs);
+
 

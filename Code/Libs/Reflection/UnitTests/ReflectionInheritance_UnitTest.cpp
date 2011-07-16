@@ -106,13 +106,11 @@ TEST(ReflectionTest, TestSimpleInheritance) {
     testInheritance.derivedInt16Test    = s_int16Value;
     testInheritance.derivedInt16Test2   = s_int16Value;
 
-    IStructuredTextStream * testStream = StreamCreateXML(L"testSimpleInheritance.xml");
+    IStructuredTextStreamPtr testStream = StreamCreateXML(L"testSimpleInheritance.xml");
     ASSERT_TRUE(testStream != NULL);
     bool result = ReflLibrary::Serialize(testStream, &testInheritance);
     EXPECT_EQ(true, result);
     testStream->Save();
-    delete testStream;
-    testStream = NULL;
 
     testStream = StreamOpenXML(L"testSimpleInheritance.xml");
     ASSERT_TRUE(testStream != NULL);
@@ -173,13 +171,11 @@ TEST(ReflectionTest, TestClassHierarchy) {
     testInheritance.moreDerivedFloat32Test  = s_float32Value;
     testInheritance.moreDerivedBoolTest2    = s_boolValue;
 
-    IStructuredTextStream * testStream = StreamCreateXML(L"testClassHierarchy.xml");
+    IStructuredTextStreamPtr testStream = StreamCreateXML(L"testClassHierarchy.xml");
     ASSERT_TRUE(testStream != NULL);
     bool result = ReflLibrary::Serialize(testStream, &testInheritance);
     EXPECT_EQ(true, result);
     testStream->Save();
-    delete testStream;
-    testStream = NULL;
 
     testStream = StreamOpenXML(L"testClassHierarchy.xml");
     ASSERT_TRUE(testStream != NULL);
@@ -263,13 +259,11 @@ TEST(ReflectionTest, TestMultipleInheritance) {
     testInheritance.derivedInt16Test    = s_int16Value;
     testInheritance.derivedInt16Test2   = s_uint16Value;
 
-    IStructuredTextStream * testStream = StreamCreateXML(L"testMultipleInheritance.xml");
+    IStructuredTextStreamPtr testStream = StreamCreateXML(L"testMultipleInheritance.xml");
     ASSERT_TRUE(testStream != NULL);
     bool result = ReflLibrary::Serialize(testStream, static_cast<SimpleBaseClass *>(&testInheritance));
     EXPECT_EQ(true, result);
     testStream->Save();
-    delete testStream;
-    testStream = NULL;
 
     testStream = StreamOpenXML(L"testMultipleInheritance.xml");
     ASSERT_TRUE(testStream != NULL);

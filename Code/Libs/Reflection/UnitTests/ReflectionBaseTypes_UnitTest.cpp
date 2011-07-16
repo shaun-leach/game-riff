@@ -81,7 +81,8 @@ public:
         float32Test(0),
         enumTest(TEST_ENUM_VALUE1),
         angleTest(0.0f),
-        percentTest(0.0f)
+        percentTest(0.0f),
+        memberEnumTest(TEST_TYPE_VALUE0)
     {
         InitReflType();
     }
@@ -108,7 +109,23 @@ public:
 
     angle       angleTest;
     percentage  percentTest;
+
+    enum ETestType {
+        TEST_TYPE_VALUE0,
+        TEST_TYPE_VALUE1,
+        TEST_TYPE_VALUE2,
+        TEST_TYPE_VALUE3
+    };
+
+    ETestType   memberEnumTest;
 };
+
+REFL_ENUM_CLASS_IMPL_BEGIN(TestBaseTypes, ETestType);
+    REFL_ENUM_CLASS_VALUE(TestBaseTypes, TEST_TYPE_VALUE0, "Line");
+    REFL_ENUM_CLASS_VALUE(TestBaseTypes, TEST_TYPE_VALUE1, "Square");
+    REFL_ENUM_CLASS_VALUE(TestBaseTypes, TEST_TYPE_VALUE2, "Circle");
+    REFL_ENUM_CLASS_VALUE(TestBaseTypes, TEST_TYPE_VALUE3, "Triangle");
+REFL_ENUM_CLASS_IMPL_END(TestBaseTypes, ETestType);
 
 REFL_IMPL_CLASS_BEGIN(ReflClass, TestBaseTypes);
     REFL_MEMBER(boolTest);
@@ -124,6 +141,7 @@ REFL_IMPL_CLASS_BEGIN(ReflClass, TestBaseTypes);
     REFL_MEMBER(enumTest);
     //REFL_MEMBER(TestBaseTypes, angleTest);
     //REFL_MEMBER(TestBaseTypes, percentTest);
+    REFL_MEMBER(memberEnumTest);
 REFL_IMPL_CLASS_END(TestBaseTypes);
 
 static const ETestEnum   s_enumValue    =  TEST_ENUM_VALUE2;
@@ -144,14 +162,13 @@ TEST(ReflectionTest, TestBaseTypes) {
     testTypes.enumTest      = s_enumValue;
     //testTypes.angleTest     = s_angleValue;
     //testTypes.percentTest   = s_percentValue;
+    testTypes.memberEnumTest= TestBaseTypes::TEST_TYPE_VALUE2;
 
-    IStructuredTextStream * testStream = StreamCreateXML(L"testBaseTypes.xml");
+    IStructuredTextStreamPtr testStream = StreamCreateXML(L"testBaseTypes.xml");
     ASSERT_TRUE(testStream != NULL);
     bool result = ReflLibrary::Serialize(testStream, &testTypes);
     EXPECT_EQ(true, result);
     testStream->Save();
-    delete testStream;
-    testStream = NULL;
 
     testStream = StreamOpenXML(L"testBaseTypes.xml");
     ASSERT_TRUE(testStream != NULL);
@@ -174,6 +191,7 @@ TEST(ReflectionTest, TestBaseTypes) {
     EXPECT_EQ(s_enumValue,      loadTypes->enumTest);
     //EXPECT_EQ(s_angleValue,     loadTypes->angleTest);
     //EXPECT_EQ(s_percentValue,   loadTypes->percentTest);
+    EXPECT_EQ(TestBaseTypes::TEST_TYPE_VALUE2,      loadTypes->memberEnumTest);
 
     delete loadTypes;
     loadTypes = NULL;
@@ -234,13 +252,11 @@ TEST(ReflectionTest, TestMemberClass) {
     testClassMember.classMemberTest.memberUint32Test    = s_uint32Value;
     testClassMember.classMemberTest.memberFloat32Test   = s_float32Value;
 
-    IStructuredTextStream * testStream = StreamCreateXML(L"testMemberClass.xml");
+    IStructuredTextStreamPtr testStream = StreamCreateXML(L"testMemberClass.xml");
     ASSERT_TRUE(testStream != NULL);
     bool result = ReflLibrary::Serialize(testStream, &testClassMember);
     EXPECT_EQ(true, result);
     testStream->Save();
-    delete testStream;
-    testStream = NULL;
 
     testStream = StreamOpenXML(L"testMemberClass.xml");
     ASSERT_TRUE(testStream != NULL);

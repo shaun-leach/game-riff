@@ -126,13 +126,11 @@ TEST(ReflectionTest, TestSimpleCasting) {
     testCasting.derivedInt16Test    = s_int16Value;
     testCasting.derivedInt16Test2   = s_int16Value;
 
-    IStructuredTextStream * testStream = StreamCreateXML(L"testSimpleCasting.xml");
+    IStructuredTextStreamPtr testStream = StreamCreateXML(L"testSimpleCasting.xml");
     ASSERT_TRUE(testStream != NULL);
     bool result = ReflLibrary::Serialize(testStream, &testCasting);
     EXPECT_EQ(true, result);
     testStream->Save();
-    delete testStream;
-    testStream = NULL;
 
     testStream = StreamOpenXML(L"testSimpleCasting.xml");
     ASSERT_TRUE(testStream != NULL);
@@ -206,13 +204,11 @@ TEST(ReflectionTest, TestClassHierarchyCasting) {
     testCasting.moreDerivedFloat32Test  = s_float32Value;
     testCasting.moreDerivedBoolTest2    = s_boolValue;
 
-    IStructuredTextStream * testStream = StreamCreateXML(L"testClassHierarchyCasting.xml");
+    IStructuredTextStreamPtr testStream = StreamCreateXML(L"testClassHierarchyCasting.xml");
     ASSERT_TRUE(testStream != NULL);
     bool result = ReflLibrary::Serialize(testStream, &testCasting);
     EXPECT_EQ(true, result);
     testStream->Save();
-    delete testStream;
-    testStream = NULL;
 
     testStream = StreamOpenXML(L"testClassHierarchyCasting.xml");
     ASSERT_TRUE(testStream != NULL);
@@ -327,13 +323,11 @@ TEST(ReflectionTest, TestMultipleInheritanceCasting) {
     testCasting.derivedInt16Test    = s_int16Value;
     testCasting.derivedInt16Test2   = s_uint16Value;
 
-    IStructuredTextStream * testStream = StreamCreateXML(L"testMultipleInheritanceCasting.xml");
+    IStructuredTextStreamPtr testStream = StreamCreateXML(L"testMultipleInheritanceCasting.xml");
     ASSERT_TRUE(testStream != NULL);
     bool result = ReflLibrary::Serialize(testStream, static_cast<SimpleCastBaseClass *>(&testCasting));
     EXPECT_EQ(true, result);
     testStream->Save();
-    delete testStream;
-    testStream = NULL;
 
     testStream = StreamOpenXML(L"testMultipleInheritanceCasting.xml");
     ASSERT_TRUE(testStream != NULL);
@@ -446,13 +440,11 @@ TEST(ReflectionTest, TestComplexInheritanceCasting) {
     testCasting.derivedInt16Test    = s_int16Value;
     testCasting.derivedInt16Test2   = s_uint16Value;
 
-    IStructuredTextStream * testStream = StreamCreateXML(L"testComplexMultipleInheritanceCasting.xml");
+    IStructuredTextStreamPtr testStream = StreamCreateXML(L"testComplexMultipleInheritanceCasting.xml");
     ASSERT_TRUE(testStream != NULL);
     bool result = ReflLibrary::Serialize(testStream, static_cast<SimpleCastBaseClass *>(&testCasting));
     EXPECT_EQ(true, result);
     testStream->Save();
-    delete testStream;
-    testStream = NULL;
 
     testStream = StreamOpenXML(L"testComplexMultipleInheritanceCasting.xml");
     ASSERT_TRUE(testStream != NULL);
@@ -521,7 +513,7 @@ TEST(ReflectionTest, TestComplexInheritanceCasting) {
 //====================================================
 TEST(ReflectionTest, TestCastingFromMultipleBases) {
 
-    IStructuredTextStream * testStream = StreamOpenXML(L"testComplexMultipleInheritanceCasting.xml");
+    IStructuredTextStreamPtr testStream = StreamOpenXML(L"testComplexMultipleInheritanceCasting.xml");
     ASSERT_TRUE(testStream != NULL);
 
     ReflClass * inst = ReflLibrary::Deserialize(testStream, MemFlags(MEM_ARENA_DEFAULT, MEM_CAT_TEST));
@@ -651,13 +643,11 @@ TEST(ReflectionTest, TestCastingWVirtualsNonreflectedBase) {
     testCasting.derivedInt16Test    = s_int16Value;
     testCasting.derivedInt16Test2   = s_int16Value;
 
-    IStructuredTextStream * testStream = StreamCreateXML(L"testCastingWVirtualsNonreflectedBase.xml");
+    IStructuredTextStreamPtr testStream = StreamCreateXML(L"testCastingWVirtualsNonreflectedBase.xml");
     ASSERT_TRUE(testStream != NULL);
     bool result = ReflLibrary::Serialize(testStream, &testCasting);
     EXPECT_EQ(true, result);
     testStream->Save();
-    delete testStream;
-    testStream = NULL;
 
     testStream = StreamOpenXML(L"testCastingWVirtualsNonreflectedBase.xml");
     ASSERT_TRUE(testStream != NULL);
@@ -761,13 +751,11 @@ TEST(ReflectionTest, TestCastingWVirtualsInBase) {
     testCasting.derivedInt16Test    = s_int16Value;
     testCasting.derivedInt16Test2   = s_int16Value;
 
-    IStructuredTextStream * testStream = StreamCreateXML(L"testCastingWVirtualBase.xml");
+    IStructuredTextStreamPtr testStream = StreamCreateXML(L"testCastingWVirtualBase.xml");
     ASSERT_TRUE(testStream != NULL);
     bool result = ReflLibrary::Serialize(testStream, &testCasting);
     EXPECT_EQ(true, result);
     testStream->Save();
-    delete testStream;
-    testStream = NULL;
 
     testStream = StreamOpenXML(L"testCastingWVirtualBase.xml");
     ASSERT_TRUE(testStream != NULL);
@@ -837,13 +825,11 @@ TEST(ReflectionTest, TestCastingWVirtualsIn2ndBase) {
     testCasting.derivedInt16Test    = s_int16Value;
     testCasting.derivedInt16Test2   = s_int16Value;
 
-    IStructuredTextStream * testStream = StreamCreateXML(L"testCastingWVirtual2ndBase.xml");
+    IStructuredTextStreamPtr testStream = StreamCreateXML(L"testCastingWVirtual2ndBase.xml");
     ASSERT_TRUE(testStream != NULL);
     bool result = ReflLibrary::Serialize(testStream, static_cast<VirtualBaseClass *>(&testCasting));
     EXPECT_EQ(true, result);
     testStream->Save();
-    delete testStream;
-    testStream = NULL;
 
     testStream = StreamOpenXML(L"testCastingWVirtual2ndBase.xml");
     ASSERT_TRUE(testStream != NULL);
@@ -955,13 +941,11 @@ TEST(ReflectionTest, TestCastingWVirtualsIn2Bases) {
     testCasting.derivedInt16Test    = s_int16Value;
     testCasting.derivedInt16Test2   = s_int16Value;
 
-    IStructuredTextStream * testStream = StreamCreateXML(L"testCastingWVirtual2Bases.xml");
+    IStructuredTextStreamPtr testStream = StreamCreateXML(L"testCastingWVirtual2Bases.xml");
     ASSERT_TRUE(testStream != NULL);
     bool result = ReflLibrary::Serialize(testStream, static_cast<VirtualBaseClass *>(&testCasting));
     EXPECT_EQ(true, result);
     testStream->Save();
-    delete testStream;
-    testStream = NULL;
 
     testStream = StreamOpenXML(L"testCastingWVirtual2Bases.xml");
     ASSERT_TRUE(testStream != NULL);

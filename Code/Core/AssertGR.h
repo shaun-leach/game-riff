@@ -33,14 +33,16 @@ void AssertHandler(
     const chargr * expression,
     const chargr * message,
     const char   * file,
-    unsigned       line
+    unsigned       line,
+    ...
 );
 
 void AssertHandler(
     const chargr * expression,
     const chargr * message,
     const chargr * file,
-    unsigned       line
+    unsigned       line,
+    ...
 );
 
 #define ASSERTGR(exp)                                                          \
@@ -48,10 +50,16 @@ void AssertHandler(
         if (!(exp))                                                            \
             AssertHandler(TOWCHAR(#exp), TOWCHAR(""), __FILE__, __LINE__);     \
     } while(false)
-#define ASSERTMSGGR(exp, msg)                                                  \
+#define ASSERTMSGGR(exp, msg, ...)                                             \
     do {                                                                       \
         if (!(exp))                                                            \
-            AssertHandler(TOWCHAR(#exp), TOWCHAR(msg), __FILE__, __LINE__);    \
+            AssertHandler(                                                     \
+                TOWCHAR(#exp),                                                 \
+                TOWCHAR(msg),                                                  \
+                __FILE__,                                                      \
+                __LINE__,                                                      \
+                __VA_ARGS__                                                    \
+            );                                                                 \
     } while(false)
 
 #ifdef _DEBUG

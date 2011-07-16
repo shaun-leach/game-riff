@@ -30,13 +30,13 @@
 #include "Pch.h"
 
 //====================================================
-unsigned StrLen(const chargr  * str) {
-    return wcslen(str);
+unsigned StrLen(const chargr  * str, unsigned len) {
+    return wcsnlen(str, len);
 }
 
 //====================================================
-unsigned StrLen(const charsys * str) {
-    return strlen(str);
+unsigned StrLen(const charsys * str, unsigned len) {
+    return strnlen(str, len);
 }
 
 //====================================================
@@ -51,31 +51,31 @@ int StrCmp(const charsys * strA, const charsys * strB, unsigned len) {
 
 //====================================================
 int StrCmp(const chargr  * strA, const charsys * strB, unsigned len) {
-    StrStackConverter sysA(strA);
+    StrStackConverter sysA(strA, len);
     return StrCmp(sysA, strB, len);
 }
 
 //====================================================
 int StrCmp(const charsys  * strA, const chargr * strB, unsigned len) {
-    StrStackConverter sysB(strB);
+    StrStackConverter sysB(strB, len);
     return StrCmp(strA, sysB, len);
 }
 
 //====================================================
 int StrICmp(const chargr  * strA, const charsys * strB, unsigned len) {
-    StrStackConverter sysA(strA);
+    StrStackConverter sysA(strA, len);
     return StrCmp(sysA, strB, len);
 }
 
 //====================================================
 int StrICmp(const charsys  * strA, const chargr * strB, unsigned len) {
-    StrStackConverter sysB(strB);
+    StrStackConverter sysB(strB, len);
     return StrCmp(strA, sysB, len);
 }
 
 //====================================================
-StrStackConverter::StrStackConverter(const chargr * str) {
-    unsigned len = StrLen(str);
+StrStackConverter::StrStackConverter(const chargr * str, unsigned maxLen) {
+    unsigned len = StrLen(str, maxLen);
     m_str = new(MemFlags(MEM_ARENA_TEMP, MEM_CAT_STRING)) charsys[len + 1];
     StrConvertToUtf8(str, m_str, len + 1);
 }

@@ -33,5 +33,6 @@
 #include <stdlib.h>
 #include <wchar.h>
 #include <string.h>
+#include <stdarg.h>
 
 #include "Core.h"

@@ -1,6 +1,6 @@
 /*
    GameRiff - Framework for creating various video game services
-   Header file for including all core services
+   Platform agnostic interface for files
    Copyright (C) 2011, Shaun Leach.
 
    Redistribution and use in source and binary forms, with or without
@@ -27,26 +27,23 @@
    OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef WIN32
-#define WIN32 // Hack for now
-#endif
+enum EFileResult {
+    FILE_RESULT_OK,
+    FILE_RESULT_DOESNT_EXIST,
+    FILE_RESULT_FAIL
+};
 
-#if defined(_XENON)
-    // Nothing for now
-#elif defined(WIN32)
-    // Nothing for now
-#else
-    #error "Undefined platform"
-#endif
+class IRawFile : public RefCounted {
+public:
+    virtual void Close() = 0;
 
-#include "System.h"
+    virtual EFileResult Flush() = 0;
 
-#include "Types.h"
-#include "Macros.h"
-#include "Platform.h"
-#include "AssertGR.h"
-#include "Mem.h"
-#include "Ref.h"
-#include "Str.h"
-#include "File.h"
-#include "Log.h"
+    virtual EFileResult Write(const chargr * string, unsigned len) = 0;
+    virtual EFileResult Write(const byte * buffer, unsigned len) = 0;
+};
+
+DECLARE_SMARTPTR(IRawFile);
+
+IRawFilePtr FileOpenRaw(const chargr * filename, EFileResult * result);
+
