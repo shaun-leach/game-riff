@@ -29,13 +29,198 @@
 
 #include "Pch.h"
 
-//====================================================
-void Log(ELogPriority pri, const chargr * file, unsigned lineNum, const chargr * format, ...) {
+//////////////////////////////////////////////////////
+//
+// Internal constants
+//
 
+static chargr * s_logPriorities[] = {
+    L"Info",
+    L"Warning",
+    L"Error"
+};
+
+static const unsigned s_formatLength = 1024;
+static chargr s_localFormat[s_formatLength];
+
+static const unsigned s_bufferLength = 2048;
+static chargr s_stringBuffer[s_bufferLength];
+
+static IRawFilePtr s_errorLog    = NULL;
+static IRawFilePtr s_warnLog     = NULL;
+static IRawFilePtr s_infoLog     = NULL;
+
+static byte s_utf16BOM[2] = {
+    0xFF,
+    0xFE
+};
+
+//////////////////////////////////////////////////////
+//
+// Internal Functions
+//
+
+void LogInternal(ELogPriority pri, const chargr * format, va_list args) {
+    StrPrintfV(s_stringBuffer, s_bufferLength, s_localFormat, args);
+
+    if (pri == LOG_PRIORITY_ERROR) {
+        wprintf(s_stringBuffer);
+        s_errorLog->Write(s_stringBuffer, StrLen(s_stringBuffer, s_bufferLength));
+    }
+    else if (pri == LOG_PRIORITY_WARN) {
+        s_warnLog->Write(s_stringBuffer, StrLen(s_stringBuffer, s_bufferLength));
+    }
+    else if (pri == LOG_PRIORITY_INFO) {
+        s_infoLog->Write(s_stringBuffer, StrLen(s_stringBuffer, s_bufferLength));
+    }
+}
+
+//////////////////////////////////////////////////////
+//
+// External Functions
+//
+
+//====================================================
+void LogInit() {
+    EFileResult result;
+    s_errorLog = FileOpenRaw(L"errors.log", &result);
+    ASSERTMSGGR(s_errorLog != NULL, "Failed to open log file: %s", L"errors.log");
+    s_errorLog->Write(s_utf16BOM, sizeof(s_utf16BOM));
+
+    s_warnLog = FileOpenRaw(L"warnings.log", &result);
+    ASSERTMSGGR(s_warnLog != NULL, "Failed to open log file: %s", L"warnings.log");
+    s_errorLog->Write(s_utf16BOM, sizeof(s_utf16BOM));
+
+    s_infoLog = FileOpenRaw(L"info.log", &result);
+    ASSERTMSGGR(s_infoLog != NULL, "Failed to open log file: %s", L"info.log");
+    s_errorLog->Write(s_utf16BOM, sizeof(s_utf16BOM));
 }
 
 //====================================================
-void Log(ELogPriority pri, const chargr * file, unsigned lineNum, const char   * format, ...) {
+void LogClose() {
+    LogFlushAndCloseAll();
+}
 
+//====================================================
+void LogFlushAndCloseAll() {
+    s_errorLog->Flush();
+    s_errorLog->Close();
+    s_errorLog = NULL;
+
+    s_warnLog->Flush();
+    s_warnLog->Close();
+    s_warnLog = NULL;
+
+    s_infoLog->Flush();
+    s_infoLog->Close();
+    s_infoLog = NULL;
+}
+
+//====================================================
+void Log(
+    ELogPriority    pri, 
+    const chargr  * moduleID, 
+    const charsys * file, 
+    unsigned        lineNum, 
+    const chargr  * format, 
+    ...
+) {
+    va_list args;
+    va_start(args, format);
+    LogV(pri, moduleID, file, lineNum, format, args);
+}
+
+//====================================================
+void Log(
+    ELogPriority    pri, 
+    const chargr  * moduleID, 
+    const charsys * file, 
+    unsigned        lineNum, 
+    const charsys * format, 
+    ...
+) {
+    va_list args;
+    va_start(args, format);
+    LogV(pri, moduleID, file, lineNum, format, args);
+}
+
+//====================================================
+void Log(
+    ELogPriority    pri, 
+    const chargr  * moduleID, 
+    const chargr  * file, 
+    unsigned        lineNum, 
+    const chargr  * format, 
+    ...
+) {
+    va_list args;
+    va_start(args, format);
+    LogV(pri, moduleID, file, lineNum, format, args);
+}
+
+//====================================================
+void Log(
+    ELogPriority    pri, 
+    const chargr  * moduleID, 
+    const chargr  * file, 
+    unsigned        lineNum, 
+    const charsys * format, 
+    ...
+) {
+    va_list args;
+    va_start(args, format);
+    LogV(pri, moduleID, file, lineNum, format, args);
+}
+
+//====================================================
+void LogV(
+    ELogPriority    pri, 
+    const chargr  * moduleID, 
+    const chargr  * file, 
+    unsigned        lineNum, 
+    const chargr  * format, 
+    va_list         vargs
+) {
+    StrPrintf(s_localFormat, s_formatLength, L">:<%s>:<%s>:<%s>:<%d>:<%s\n", s_logPriorities[pri], moduleID, file, lineNum, format);
+    LogInternal(pri, s_localFormat, vargs);
+}
+
+//====================================================
+void LogV(
+    ELogPriority    pri, 
+    const chargr  * moduleID, 
+    const chargr  * file, 
+    unsigned        lineNum, 
+    const charsys * format, 
+    va_list         vargs
+) {
+    StrPrintf(s_localFormat, s_formatLength, L">:<%s>:<%s>:<%s>:<%d>:<%S\n", s_logPriorities[pri], moduleID, file, lineNum, format);
+    LogInternal(pri, s_localFormat, vargs);
+}
+
+//====================================================
+void LogV(
+    ELogPriority    pri, 
+    const chargr  * moduleID, 
+    const charsys * file, 
+    unsigned        lineNum, 
+    const chargr  * format, 
+    va_list         vargs
+) {
+    StrPrintf(s_localFormat, s_formatLength, L">:<%s>:<%s>:<%S>:<%d>:<%s\n", s_logPriorities[pri], moduleID, file, lineNum, format);
+    LogInternal(pri, s_localFormat, vargs);
+}
+
+//====================================================
+void LogV(
+    ELogPriority    pri, 
+    const chargr  * moduleID, 
+    const charsys * file, 
+    unsigned        lineNum, 
+    const charsys * format, 
+    va_list         vargs
+) {
+    StrPrintf(s_localFormat, s_formatLength, L">:<%s>:<%s>:<%S>:<%d>:<%S\n", s_logPriorities[pri], moduleID, file, lineNum, format);
+    LogInternal(pri, s_localFormat, vargs);
 }
 

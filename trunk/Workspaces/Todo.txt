@@ -1,10 +1,32 @@
 -Get everything compiling with gcc for another platform
+--Move away from boost build?
 -Move compilation files out of the source tree
+--Unit test xml files as well
 -Wrap system math functions and call those
 -Clean up system header usage
 ----------
+-Auto registration
+--Need better system for this
+--instead of doing all initialization in global contructors, just register functions and then call them all at the beginning of main
+----------
+-Threads
+----------
+-Atomic 
+--functions
+---Need to use for re-entrancy test in assert?
+--types
+----------
+-Config files
+--Files for preloading configurations for doing stuff like selectively turning off logging from certain modules
+----------
 -logging
---each module should prefix itself to the log message. Preferably do this automatically, + function & line number
+--Seletively disable logging(on the fly) for certain modules
+**What about ANSI color codes? Not supported correctly under windows
+**Basic logging
+**Need to add wide char encoding
+**Convert unit tests to use GR logging system
+**fix jacked strings in asserts
+**each module should prefix itself to the log message. Preferably do this automatically, + function & line number
 --------------
 -Types
 --Create color, angle, percentage, euler types
@@ -22,9 +44,6 @@
 --Enums
 ---Need to handle different sized enums in serialization code
 ----test
----Add test for class with multiple enum members
----Need to support enums tied to a class
-----Include support for private enums
 --add code to finalize entire reflection library
 ---can I trap missing parents?
 --Designer friendly names
@@ -44,7 +63,6 @@
 ---Think about use cases for how loaded data will be used
 ***All handled through the resource manager
 ***Need the ability to safely cast to the appropriate type
---instead of doing all initialization in global contructors, just register functions and then call them all at the beginning of main
 --handle all types
 ---remove basic string type, should either be a hashed file name, or localized string
 ---guid
@@ -82,13 +100,24 @@
 --Think about whether things like maps, textures, geometry buffers, etc use reflection or more manual system
 ---I think it really depends on how good I can make the versioning
 -*Need to handle varargs and scanf(not perfect, but it works for the moment)
+**Log issues in reflection module
+***More verbose log messages
+**Test all error cases
+***Add test for class with multiple enum members
+***Need to support enums tied to a class
+****Include support for private enums(would need to create member function in order to access)
+----------
+-Streams
+--YAML support?
 ----------
 -Create tools platform
 --Layer tools functionality on top of platform
 --Add string class under tools platform?
 ----------
 -Improve hash system
+--Move into core types
 --Compile time hashing
+---Use CBloom's method
 --associate string with hash
 ----------
 -Containers
@@ -98,18 +127,28 @@
 --test against STL
 --Can all of these have a fixed memory allocator?
 ----------
--Ref counted type
--Smart pointers
---Use on streams
+-Handles
+--Needed for VRAM resources
+--Do we use these for all assets??
+--This is essentially what a weak ptr is
 -Weak pointers
+-Smart pointers
+--Is there a way to have a cheaper smartptr that doesn't require so many adds and releases?
+---Yes but it requires manual ref counting
+--If all smart ptr types are defer freed, does that mean they can be multithread safe?
+---As long as I lock all counting during freeing?
+*Ref counted type
+*Smart pointers
+**Use on streams
+**Use on files
 ----------
 -Flesh out memory manager
 --memory leak checker
 ----------
 -exception handler
+--Be sure to flush log on crashes
 ----------
 -Asserts
---Add printf support to assertmsg
 ----------
 -very fast curve evaluation lib
 ----------
@@ -229,4 +268,9 @@ xxHow to create a pure virtual iterator that doesn't require memory allocation
 ***Namespaces
 ***Currently implemented types
 ***Test that int8 deserialization works if the member is packed
+*Asserts
+**Add printf support to assertmsg
+***Need to fix  up Reflection.cpp to take advantage of this
+**Need to stop execution
+**Trap reentrancy
 

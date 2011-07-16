@@ -83,13 +83,11 @@ TEST(ReflectionTest, TestSimpleNamespaces) {
     testNamespaces.baseUint32Test    = s_uint32Value;
     testNamespaces.baseFloat32Test   = s_float32Value;
 
-    IStructuredTextStream * testStream = StreamCreateXML(L"testBasicNamespaces.xml");
+    IStructuredTextStreamPtr testStream = StreamCreateXML(L"testBasicNamespaces.xml");
     ASSERT_TRUE(testStream != NULL);
     bool result = ReflLibrary::Serialize(testStream, &testNamespaces);
     EXPECT_EQ(true, result);
     testStream->Save();
-    delete testStream;
-    testStream = NULL;
 
     testStream = StreamOpenXML(L"testBasicNamespaces.xml");
     ASSERT_TRUE(testStream != NULL);
@@ -164,13 +162,11 @@ TEST(ReflectionTest, TestParentNamespaces) {
     testNamespaces.int16Test        = s_int16Value;
     testNamespaces.int8Test         = s_int8Value;
 
-    IStructuredTextStream * testStream = StreamCreateXML(L"testParentNamespaces.xml");
+    IStructuredTextStreamPtr testStream = StreamCreateXML(L"testParentNamespaces.xml");
     ASSERT_TRUE(testStream != NULL);
     bool result = ReflLibrary::Serialize(testStream, &testNamespaces);
     EXPECT_EQ(true, result);
     testStream->Save();
-    delete testStream;
-    testStream = NULL;
 
     testStream = StreamOpenXML(L"testParentNamespaces.xml");
     ASSERT_TRUE(testStream != NULL);
@@ -224,7 +220,7 @@ REFL_IMPL_CLASS_END(SimpleAliasedNamespaceClass);
 //====================================================
 TEST(ReflectionTest, TestAliasedNamespaces) {
 
-    IStructuredTextStream * testStream = StreamOpenXML(L"testAliasedNamespaces.xml");
+    IStructuredTextStreamPtr testStream = StreamOpenXML(L"testAliasedNamespaces.xml");
     ASSERT_TRUE(testStream != NULL);
 
     ReflClass * inst = ReflLibrary::Deserialize(testStream, MemFlags(MEM_ARENA_DEFAULT, MEM_CAT_TEST));

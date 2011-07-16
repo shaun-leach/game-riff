@@ -65,7 +65,7 @@ public:
     EStreamError WriteBytes(void * bytes, unsigned * bytesWritten);
 };
 
-class IStructuredTextStream {
+class IStructuredTextStream : public RefCounted {
 public:
     virtual ~IStructuredTextStream() { }
 
@@ -82,12 +82,19 @@ public:
     virtual EStreamError ReadNextNode() = 0;
     virtual EStreamError ReadParentNode() = 0;
     virtual EStreamError ReadNodeValue(chargr * value, unsigned len) const = 0;
-    virtual EStreamError ReadNodeAttribute(const chargr * name, chargr * value, unsigned len) const = 0;
+    virtual EStreamError ReadNodeAttribute(
+        const chargr  * name, 
+        unsigned        nameLen,
+        chargr        * value, 
+        unsigned        len
+    ) const = 0;
     virtual EStreamError ReadChildNode() = 0;
 };
 
+DECLARE_SMARTPTR(IStructuredTextStream);
+
 IRawStream * StreamOpenFile(const chargr * fileName);
 IRawStream * StreamOpenMemory(void * memory);
-IStructuredTextStream * StreamOpenXML(const chargr * fileName);
-IStructuredTextStream * StreamCreateXML(const chargr * fileName);
+IStructuredTextStreamPtr StreamOpenXML(const chargr * fileName);
+IStructuredTextStreamPtr StreamCreateXML(const chargr * fileName);
 

@@ -76,7 +76,7 @@ REFL_IMPL_CLASS_END(SimpleAliasingClass);
 
 //====================================================
 TEST(ReflectionTest, TestSimpleClassAliasing) {
-    IStructuredTextStream * testStream = StreamOpenXML(L"testSimpleClassAliasing.xml");
+    IStructuredTextStreamPtr testStream = StreamOpenXML(L"testSimpleClassAliasing.xml");
     ASSERT_TRUE(testStream != NULL);
 
     ReflClass * inst = ReflLibrary::Deserialize(testStream, MemFlags(MEM_ARENA_DEFAULT, MEM_CAT_TEST));
@@ -119,7 +119,7 @@ REFL_IMPL_CLASS_END(SimpleMemberAliasingClass);
 
 //====================================================
 TEST(ReflectionTest, TestSimpleMemberAliasing) {
-    IStructuredTextStream * testStream = StreamOpenXML(L"testSimpleMemberAliasing.xml");
+    IStructuredTextStreamPtr testStream = StreamOpenXML(L"testSimpleMemberAliasing.xml");
     ASSERT_TRUE(testStream != NULL);
 
     ReflClass * inst = ReflLibrary::Deserialize(testStream, MemFlags(MEM_ARENA_DEFAULT, MEM_CAT_TEST));
@@ -174,7 +174,7 @@ REFL_IMPL_CLASS_END(SimpleEnumAliasingClass);
 
 //====================================================
 TEST(ReflectionTest, TestSimpleEnumAliasing) {
-    IStructuredTextStream * testStream = StreamOpenXML(L"testSimpleEnumAliasing.xml");
+    IStructuredTextStreamPtr testStream = StreamOpenXML(L"testSimpleEnumAliasing.xml");
     ASSERT_TRUE(testStream != NULL);
 
     ReflClass * inst = ReflLibrary::Deserialize(testStream, MemFlags(MEM_ARENA_DEFAULT, MEM_CAT_TEST));

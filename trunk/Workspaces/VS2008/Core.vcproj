@@ -158,6 +158,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\Code\Core\File.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\Code\Core\Log.h"
 				>
 			</File>
@@ -174,11 +178,11 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\Code\Core\Windows\Pch.h"
+				RelativePath="..\..\Code\Core\Pch.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\Code\Core\Pch.h"
+				RelativePath="..\..\Code\Core\Windows\Pch.h"
 				>
 			</File>
 			<File
@@ -203,6 +207,10 @@
 			>
 		</File>
 		<File
+			RelativePath="..\..\Code\Core\Windows\FileWin.cpp"
+			>
+		</File>
+		<File
 			RelativePath="..\..\Code\Core\Log.cpp"
 			>
 		</File>
@@ -211,7 +219,7 @@
 			>
 		</File>
 		<File
-			RelativePath="..\..\Code\Core\Pch.cpp"
+			RelativePath="..\..\Code\Core\Windows\Pch.cpp"
 			>
 			<FileConfiguration
 				Name="Debug|Win32"
@@ -223,7 +231,7 @@
 			</FileConfiguration>
 		</File>
 		<File
-			RelativePath="..\..\Code\Core\Windows\Pch.cpp"
+			RelativePath="..\..\Code\Core\Pch.cpp"
 			>
 			<FileConfiguration
 				Name="Debug|Win32"

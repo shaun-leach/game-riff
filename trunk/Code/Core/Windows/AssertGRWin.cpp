@@ -29,13 +29,18 @@
 
 #include "Pch.h"
 
+LOG_DEFINE_MODULE(Assert);
+
 //////////////////////////////////////////////////////
 //
 // Constants
 //
 
-#define BUFFER_SIZE (512)
+#define BUFFER_SIZE (1024)
 static chargr s_stringBuffer[BUFFER_SIZE];
+static chargr s_formatBuffer[BUFFER_SIZE];
+
+static bool s_handlingAssert = false;
 
 //////////////////////////////////////////////////////
 //
@@ -52,12 +57,27 @@ void AssertHandler(
     const chargr * expression,
     const chargr * message,
     const chargr * file,
-    unsigned       line
+    unsigned       line,
+    ...
 ) {
-    StrPrintf(s_stringBuffer, BUFFER_SIZE, L"%s(%d): ASSERT! %s:%s\n", file, line, message, expression);
+    // Handle re-entrancy
+    if (s_handlingAssert) {
+        // We're re-entrant, catch it before we stack overflow
+        DebugBreak();
+    }
+    s_handlingAssert = true;
+
+    va_list vargs;
+    va_start(vargs, line);
+    StrPrintf(s_formatBuffer, BUFFER_SIZE, L"ASSERT!: %s:%s\n", expression, message);
+    LOGV(LOG_PRIORITY_ERROR, file, line, s_formatBuffer, vargs);
+    StrPrintf(s_formatBuffer, BUFFER_SIZE, L"%s(%d): ASSERT! %s:%s\n", file, line, expression, message);
+    StrPrintfV(s_stringBuffer, BUFFER_SIZE, s_formatBuffer, vargs);
     wprintf(s_stringBuffer);
     OutputDebugStringW(s_stringBuffer);
-    DebugBreak();
+    LogClose();
+    abort();
+    // No need to clear s_handlingAssert as execution has stopped
 }
 
 //====================================================
@@ -65,11 +85,27 @@ void AssertHandler(
     const chargr * expression,
     const chargr * message,
     const char   * file,
-    unsigned       line
+    unsigned       line,
+    ...
 ) {
-    StrPrintf(s_stringBuffer, BUFFER_SIZE, L"%S(%d): ASSERT! %s:%s\n", file, line, message, expression);
+    // Handle re-entrancy
+    if (s_handlingAssert) {
+        // We're re-entrant, catch it before we stack overflow
+        DebugBreak();
+    }
+    s_handlingAssert = true;
+
+    va_list vargs;
+    va_start(vargs, line);
+    StrPrintf(s_formatBuffer, BUFFER_SIZE, L"ASSERT!: %s:%s\n", expression, message);
+    LOGV(LOG_PRIORITY_ERROR, file, line, s_formatBuffer, vargs);
+    StrPrintf(s_formatBuffer, BUFFER_SIZE, L"%S(%d): ASSERT! %s:%s\n", file, line, expression, message);
+    StrPrintfV(s_stringBuffer, BUFFER_SIZE, s_formatBuffer, vargs);
     wprintf(s_stringBuffer);
     OutputDebugStringW(s_stringBuffer);
-    DebugBreak();
+    LogClose();
+    abort();
+    // No need to clear s_handlingAssert as execution has stopped
 }
+
 

@@ -30,7 +30,7 @@
                 <DataMember Name="basesubftest" Type="float32">0.000000</DataMember>
             </BaseClass>
             <DataMember Name="subitest" Type="int32">1139059753</DataMember>
-            <DataMember Name="subftest" Type="float32">-107374176.000000</DataMember>
+            <DataMember Name="subftest" Type="float32">0.000000</DataMember>
         </Class>
     </DataMember>
 </Class>

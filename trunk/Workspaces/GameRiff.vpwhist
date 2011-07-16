@@ -5,7 +5,7 @@ Libs.vpj=Debug
 Ext.vpj=Debug
 Tests.vpj=Debug
 [ProjectDates]
-Core.vpj=20110628155202620
+Core.vpj=20110702012620975
 Libs.vpj=20110614012540979
 Ext.vpj=20110506152859902
 Tests.vpj=20110529163410667
@@ -16,15 +16,302 @@ Tests.vpj=20110529163410667
       - UnitTests
       - Windows
 - Ext.vpj
-  + ..\Code
-    - Ext
+  - ..\Code
+    + Ext
+      + android-ndk-r5c
+        + platforms
+          + android-3
+            + arch-arm
+              + usr
+                + include
+                  + android
+                  + arpa
+                  + asm
+                    + arch
+                  + asm-generic
+                    + bitops
+                  + linux
+                    + byteorder
+                    + hdlc
+                    + lockd
+                    + mmc
+                    + mtd
+                    + netfilter
+                    + netfilter_arp
+                    + netfilter_ipv4
+                    + netfilter_ipv6
+                    + nfsd
+                    + raid
+                    + sunrpc
+                  + machine
+                  + mtd
+                  + net
+                  + netinet
+                  + netpacket
+                  + sys
+          + android-4
+            + arch-arm
+              + usr
+                + include
+                  + android
+                  + arpa
+                  + asm
+                    + arch
+                  + asm-generic
+                    + bitops
+                  + GLES
+                  + KHR
+                  + linux
+                    + byteorder
+                    + hdlc
+                    + lockd
+                    + mmc
+                    + mtd
+                    + netfilter
+                    + netfilter_arp
+                    + netfilter_ipv4
+                    + netfilter_ipv6
+                    + nfsd
+                    + raid
+                    + sunrpc
+                  + machine
+                  + mtd
+                  + net
+                  + netinet
+                  + netpacket
+                  + sys
+          + android-5
+            + arch-arm
+              + usr
+                + include
+                  + android
+                  + arpa
+                  + asm
+                    + arch
+                  + asm-generic
+                    + bitops
+                  + GLES
+                  + GLES2
+                  + KHR
+                  + linux
+                    + byteorder
+                    + hdlc
+                    + lockd
+                    + mmc
+                    + mtd
+                    + netfilter
+                    + netfilter_arp
+                    + netfilter_ipv4
+                    + netfilter_ipv6
+                    + nfsd
+                    + raid
+                    + sunrpc
+                  + machine
+                  + mtd
+                  + net
+                  + netinet
+                  + netpacket
+                  + sys
+          + android-8
+            + arch-arm
+              + usr
+                + include
+                  + android
+                  + arpa
+                  + asm
+                    + arch
+                  + asm-generic
+                    + bitops
+                  + GLES
+                  + GLES2
+                  + KHR
+                  + linux
+                    + byteorder
+                    + hdlc
+                    + lockd
+                    + mmc
+                    + mtd
+                    + netfilter
+                    + netfilter_arp
+                    + netfilter_ipv4
+                    + netfilter_ipv6
+                    + nfsd
+                    + raid
+                    + sunrpc
+                  + machine
+                  + mtd
+                  + net
+                  + netinet
+                  + netpacket
+                  + sys
+          + android-9
+            + arch-arm
+              + usr
+                + include
+                  + android
+                  + arpa
+                  + asm
+                    + arch
+                  + asm-generic
+                    + bitops
+                  + EGL
+                  + GLES
+                  + GLES2
+                  + KHR
+                  + linux
+                    + byteorder
+                    + hdlc
+                    + lockd
+                    + mmc
+                    + mtd
+                    + netfilter
+                    + netfilter_arp
+                    + netfilter_ipv4
+                    + netfilter_ipv6
+                    + nfsd
+                    + raid
+                    + sunrpc
+                  + machine
+                  + mtd
+                  + net
+                  + netinet
+                  + netpacket
+                  + SLES
+                  + sys
+        + samples
+          + bitmap-plasma
+            + jni
+          + hello-gl2
+            + jni
+          + hello-jni
+            + jni
+          + hello-neon
+            + jni
+          + module-exports
+            + jni
+              + bar
+              + foo
+              + zoo
+          + native-activity
+            + jni
+          + native-audio
+            + jni
+          + native-plasma
+            + jni
+          + san-angeles
+            + jni
+          + test-libstdc++
+            + jni
+          + two-libs
+            + jni
+        + sources
+          + android
+            + cpufeatures
+            + libthread_db
+              + gdb-6.6
+              + gdb-7.1.x
+            + native_app_glue
+          + cpufeatures
+          + cxx-stl
+            + gnu-libstdc++
+              + include
+                + backward
+                + bits
+                + debug
+                + ext
+                + tr1
+                + tr1_impl
+              + libs
+                + armeabi
+                  + include
+                    + bits
+                + armeabi-v7a
+                  + include
+                    + bits
+            + stlport
+              + src
+                + c_locale_dummy
+                + c_locale_glibc
+                + c_locale_win32
+                + details
+              + stlport
+                + stl
+                  + config
+                  + debug
+                  + pointers
+                + using
+                  + h
+            + system
+              + include
+        + tests
+          + build
+            + multi-module-path
+              + jni
+              + path1
+                + foo
+              + path2
+                + bar
+            + prebuild-stlport
+              + jni
+            + pthread-rwlock-initializer
+              + jni
+            + stdint-c++
+              + jni
+            + test-inet-defs
+              + jni
+          + device
+            + test-basic-exceptions
+              + jni
+            + test-basic-rtti
+              + jni
+            + test-compiler-bug-1
+              + jni
+            + test-cpufeatures
+              + jni
+            + test-gnustl-1
+              + jni
+            + test-gnustl-2
+              + jni
+            + test-gnustl-full
+              + unit
+                + cppunit
+            + test-stlport
+              + unit
+                + cppunit
+            + whole-static-libs
+              + jni
+          + standalone
+            + test-basic-c++
+            + test-fpic
+        + toolchains
+          + arm-eabi-4.4.0
+            + prebuilt
+              + windows
+                + lib
+                  + gcc
+                    + arm-eabi
+                      + 4.4.0
+                        + include
+                        + include-fixed
+                          + sys
+          + arm-linux-androideabi-4.4.3
+            + prebuilt
+              + windows
+                + lib
+                  + gcc
+                    + arm-linux-androideabi
+                      + 4.4.3
+                        + include
+                        + include-fixed
+                          + linux
+                          + sys
       + gtest
         + include
           + gtest
             + internal
         + src
-      - lz4
-      - tinyxml
+      + lz4
+      + tinyxml
 - Libs.vpj
   - ..\Code
     - Libs
@@ -41,100 +328,208 @@ scroll:0
 [State]
 SCREEN: 1920 1200 4 3 1022 726 0 0 M 0 0 0 0 1534 702 0
 CWD: \projects\game-riff\trunk\Code
-BUFFER: BN="..\Code\Tests\GRTest.cpp"
+BUFFER: BN="..\Code\Libs\Stream\Stream.h"
+BI: MA=1 74 1  TABS=1 5  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=C/C++	HM=0 MF=1180520 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1 CL="" SC="" SCE= SCU=
+VIEW: LN=.3128 CL=26 LE=0 CX=26 CY=20 WI=5 BI=61 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="..\Code\Libs\Stream\XMLStream.cpp"
+BI: MA=1 74 1  TABS=1 5  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=C/C++	HM=0 MF=1179752 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=1 CL="" SC="" SCE= SCU=
+VIEW: LN=.2539 CL=33 LE=0 CX=33 CY=22 WI=5 BI=62 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="\Program Files (x86)\Microsoft Visual Studio 9.0\VC\include\swprintf.inl"
+BI: MA=1 74 1  TABS=1 5  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=C/C++	HM=0 MF=864 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=1 CL="" SC="" SCE= SCU=
+VIEW: LN=.2607 CL=1 LE=0 CX=1 CY=20 WI=5 BI=93 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="..\Code\Core\Jamroot"
+BI: MA=1 74 1  TABS=1 5  WWS=1 IWT=0 ST=0 IN=1 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Plain Text	HM=0 MF=0 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=1 CL="" SC="" SCE= SCU=
+VIEW: LN=.0 CL=1 LE=0 CX=1 CY=0 WI=5 BI=51 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="..\Code\Libs\Stream\Stream.cpp"
+BI: MA=1 74 1  TABS=1 5  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=C/C++	HM=0 MF=544 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=1 CL="" SC="" SCE= SCU=
+VIEW: LN=.0 CL=1 LE=0 CX=1 CY=0 WI=5 BI=58 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="..\..\..\Code\Ext\tinyxml\tinyxml.cpp"
+BI: MA=1 74 1  TABS=1 5  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=C/C++	HM=0 MF=96 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=1 CL="" SC="" SCE= SCU=
+VIEW: LN=.17445 CL=7 LE=0 CX=7 CY=20 WI=5 BI=65 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="..\Code\Ext\tinyxml\tinyxml.h"
+BI: MA=1 74 1  TABS=1 5  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=C/C++	HM=0 MF=352 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=1 CL="" SC="" SCE= SCU=
+VIEW: LN=.27706 CL=24 LE=0 CX=24 CY=20 WI=5 BI=63 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="..\Code\Ext\tinyxml\tinyxml.cpp"
+BI: MA=1 74 1  TABS=1 5  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=C/C++	HM=0 MF=352 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=1 CL="" SC="" SCE= SCU=
+VIEW: LN=.18891 CL=23 LE=0 CX=23 CY=17 WI=5 BI=64 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="..\Code\Core\Log.cpp"
 BI: MA=1 74 1  TABS=1 5  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=C/C++	HM=0 MF=1180264 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=1 CL="" SC="" SCE= SCU=
-VIEW: LN=.20983 CL=7 LE=0 CX=7 CY=12 WI=5 BI=31 HT=0 HN=0 HF=0 HC=4
+VIEW: LN=.3949 CL=55 LE=0 CX=55 CY=11 WI=5 BI=59 HT=0 HN=0 HF=0 HC=4
 BUFFER: BN="Todo.txt"
-BI: MA=1 74 1  TABS=1 5  WWS=1 IWT=0 ST=0 IN=1 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Plain Text	HM=0 MF=131072 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1 CL="" SC="" SCE= SCU=
-VIEW: LN=.621 CL=1 LE=0 CX=1 CY=14 WI=5 BI=25 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="..\Code\Libs\Reflection\UnitTests\ReflectionAliasing_UnitTest.cpp"
+BI: MA=1 74 1  TABS=1 5  WWS=1 IWT=0 ST=0 IN=1 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Plain Text	HM=0 MF=0 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1 CL="" SC="" SCE= SCU=
+VIEW: LN=.395 CL=1 LE=0 CX=1 CY=9 WI=5 BI=26 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="..\Code\Core\AssertGR.h"
+BI: MA=1 74 1  TABS=1 5  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=C/C++	HM=0 MF=1049184 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=1 CL="" SC="" SCE= SCU=
+VIEW: LN=.2116 CL=9 LE=0 CX=9 CY=20 WI=5 BI=50 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="..\Code\Core\Core.h"
 BI: MA=1 74 1  TABS=1 5  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=C/C++	HM=0 MF=1049192 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=1 CL="" SC="" SCE= SCU=
-VIEW: LN=.5555 CL=15 LE=0 CX=15 CY=17 WI=5 BI=33 HT=0 HN=0 HF=0 HC=4
+VIEW: LN=.0 CL=1 LE=0 CX=1 CY=0 WI=5 BI=54 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="..\Code\Core\Windows\AssertGRWin.cpp"
+BI: MA=1 74 1  TABS=1 5  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=C/C++	HM=0 MF=1180520 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=1 CL="" SC="" SCE= SCU=
+VIEW: LN=.0 CL=1 LE=0 CX=1 CY=0 WI=5 BI=82 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="..\Code\Libs\Reflection\UnitTests\ReflectionMain_UnitTest.cpp"
+BI: MA=1 74 1  TABS=1 5  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=C/C++	HM=0 MF=1049448 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=1 CL="" SC="" SCE= SCU=
+VIEW: LN=.1604 CL=22 LE=0 CX=22 CY=22 WI=5 BI=24 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="..\Code\Libs\Reflection\UnitTests\ReflectionVersioning_UnitTest.cpp"
+BI: MA=1 74 1  TABS=1 5  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=C/C++	HM=0 MF=96 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=1 CL="" SC="" SCE= SCU=
+VIEW: LN=.4093 CL=12 LE=0 CX=12 CY=20 WI=5 BI=30 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="..\Code\Libs\Reflection\UnitTests\ReflectionBaseTypes_UnitTest.cpp"
+BI: MA=1 74 1  TABS=1 5  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=C/C++	HM=0 MF=96 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=1 CL="" SC="" SCE= SCU=
+VIEW: LN=.8860 CL=1 LE=0 CX=1 CY=40 WI=5 BI=35 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="..\..\..\Code\Ext\gtest\include\gtest\gtest.h"
+BI: MA=1 74 1  TABS=1 5  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=1 SE=1 SN=0 BIN=0 MN=C/C++	HM=0 MF=96 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=1 CL="" SC="" SCE= SCU=
+VIEW: LN=.82313 CL=1 LE=0 CX=1 CY=22 WI=5 BI=23 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="..\..\..\Code\Ext\Src\gtest-1.6.0\samples\sample9_unittest.cc"
+BI: MA=1 74 1  TABS=1 5  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=1 SE=1 SN=0 BIN=0 MN=C/C++	HM=0 MF=864 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=1 CL="" SC="" SCE= SCU=
+VIEW: LN=.5778 CL=2 LE=0 CX=2 CY=29 WI=5 BI=31 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="..\Code\Ext\gtest\include\gtest\gtest.h"
+BI: MA=1 74 1  TABS=1 5  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=1 SE=1 SN=0 BIN=0 MN=C/C++	HM=0 MF=96 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=1 CL="" SC="" SCE= SCU=
+VIEW: LN=.47435 CL=1 LE=0 CX=1 CY=24 WI=5 BI=28 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="..\Code\Core\Log.h"
+BI: MA=1 74 1  TABS=1 5  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=C/C++	HM=0 MF=1180008 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=1 CL="" SC="" SCE= SCU=
+VIEW: LN=.1566 CL=12 LE=0 CX=12 CY=19 WI=5 BI=49 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="..\Code\Core\File.h"
+BI: MA=1 74 1  TABS=1 5  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=C/C++	HM=0 MF=131432 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=1 CL="" SC="" SCE= SCU=
+VIEW: LN=.1756 CL=28 LE=0 CX=28 CY=20 WI=5 BI=80 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="..\Code\Core\Windows\FileWin.cpp"
+BI: MA=1 74 1  TABS=1 5  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=C/C++	HM=0 MF=1049448 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=1 CL="" SC="" SCE= SCU=
+VIEW: LN=.3713 CL=34 LE=0 CX=34 CY=17 WI=5 BI=85 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="..\Code\Core\Str.h"
+BI: MA=1 74 1  TABS=1 5  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=C/C++	HM=0 MF=1180264 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=1 CL="" SC="" SCE= SCU=
+VIEW: LN=.2684 CL=1 LE=0 CX=1 CY=6 WI=5 BI=87 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="..\..\..\Code\Ext\Src\gtest-1.6.0\samples\sample10_unittest.cc"
+BI: MA=1 74 1  TABS=1 5  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=1 SE=1 SN=0 BIN=0 MN=C/C++	HM=0 MF=864 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=1 CL="" SC="" SCE= SCU=
+VIEW: LN=.3714 CL=1 LE=0 CX=1 CY=26 WI=5 BI=29 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="..\Code\Libs\Reflection\Reflection.h"
+BI: MA=1 74 1  TABS=1 5  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=C/C++	HM=0 MF=3342952 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1 CL="" SC="" SCE= SCU=
+VIEW: LN=.3726 CL=9 LE=0 CX=9 CY=20 WI=5 BI=27 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="..\Code\Core\Str.cpp"
+BI: MA=1 74 1  TABS=1 5  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=C/C++	HM=0 MF=1049448 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=1 CL="" SC="" SCE= SCU=
+VIEW: LN=.1537 CL=28 LE=0 CX=28 CY=20 WI=5 BI=73 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="..\Code\Core\Windows\StrWin.cpp"
+BI: MA=1 74 1  TABS=1 5  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=C/C++	HM=0 MF=864 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=1 CL="" SC="" SCE= SCU=
+VIEW: LN=.3297 CL=1 LE=0 CX=1 CY=37 WI=5 BI=74 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="..\Code\Core\Pch.h"
+BI: MA=1 74 1  TABS=1 5  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=C/C++	HM=0 MF=1049448 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=1 CL="" SC="" SCE= SCU=
+VIEW: LN=.0 CL=1 LE=0 CX=1 CY=0 WI=5 BI=78 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="..\Code\Core\Windows\Pch.h"
+BI: MA=1 74 1  TABS=1 5  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=C/C++	HM=0 MF=800 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=1 CL="" SC="" SCE= SCU=
+VIEW: LN=.0 CL=1 LE=0 CX=1 CY=0 WI=5 BI=75 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="..\Code\Tests\GRTest.cpp"
+BI: MA=1 74 1  TABS=1 5  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=C/C++	HM=0 MF=1048680 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=1 CL="" SC="" SCE= SCU=
+VIEW: LN=.21905 CL=16 LE=0 CX=16 CY=38 WI=5 BI=33 HT=0 HN=0 HF=0 HC=4
 BUFFER: BN="..\Code\Libs\Reflection\Reflection.cpp"
 BI: MA=1 74 1  TABS=1 5  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=C/C++	HM=0 MF=1180264 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1 CL="" SC="" SCE= SCU=
-VIEW: LN=.25166 CL=60 LE=0 CX=60 CY=23 WI=5 BI=24 HT=0 HN=0 HF=0 HC=4
+VIEW: LN=.20531 CL=31 LE=0 CX=31 CY=22 WI=5 BI=25 HT=0 HN=0 HF=0 HC=4
 BUFFER: BN="GRTest\test.xml"
 BI: MA=1 74 1  TABS=1 5  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=XML	HM=0 MF=608 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=70 ESBU2=2 CL="" SC="" SCE= SCU=
-VIEW: LN=.0 CL=1 LE=0 CX=1 CY=0 WI=5 BI=46 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="..\Code\Libs\Reflection\Reflection.h"
-BI: MA=1 74 1  TABS=1 5  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=C/C++	HM=0 MF=65640 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1 CL="" SC="" SCE= SCU=
-VIEW: LN=.5856 CL=25 LE=0 CX=25 CY=24 WI=5 BI=39 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="..\Code\testBaseTypes.xml"
-BI: MA=1 74 1  TABS=1 5  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=XML	HM=0 MF=96 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=70 ESBU2=2 CL="" SC="" SCE= SCU=
-VIEW: LN=.741 CL=40 LE=0 CX=40 CY=12 WI=5 BI=37 HT=0 HN=0 HF=0 HC=4
+VIEW: LN=.0 CL=1 LE=0 CX=1 CY=0 WI=5 BI=102 HT=0 HN=0 HF=0 HC=4
+WINDOW: 300 150 1188 491 -1 -1 N  WF=0 WT=7 ",,,"
+BUFFER: BN="..\..\..\Code\Ext\Src\gtest-1.6.0\samples\sample10_unittest.cc"
+VIEW: LN=.3796 CL=1 LE=0 CX=1 CY=12 WI=225 BI=29 HT=0 HN=0 HF=0 HC=4
+WINDOW: 280 125 1188 491 -1 -1 N  WF=0 WT=6 ",,,"
+BUFFER: BN="..\..\..\Code\Ext\Src\gtest-1.6.0\samples\sample9_unittest.cc"
+VIEW: LN=.1931 CL=1 LE=0 CX=1 CY=18 WI=218 BI=31 HT=0 HN=0 HF=0 HC=4
+WINDOW: 340 200 1188 491 -1 -1 N  WF=0 WT=8 ",,,"
 BUFFER: BN="..\Code\Libs\Reflection\UnitTests\ReflectionBaseTypes_UnitTest.cpp"
-BI: MA=1 74 1  TABS=1 5  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=C/C++	HM=0 MF=1180264 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=1 CL="" SC="" SCE= SCU=
-VIEW: LN=.3388 CL=1 LE=0 CX=1 CY=21 WI=5 BI=32 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="..\Code\Libs\Reflection\UnitTests\ReflectionNamespaces_UnitTest.cpp"
-BI: MA=1 74 1  TABS=1 5  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=C/C++	HM=0 MF=1179752 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=1 CL="" SC="" SCE= SCU=
-VIEW: LN=.7551 CL=17 LE=0 CX=17 CY=20 WI=5 BI=30 HT=0 HN=0 HF=0 HC=4
+VIEW: LN=.8860 CL=1 LE=0 CX=1 CY=40 WI=345 BI=35 HT=0 HN=0 HF=0 HC=4
+WINDOW: 100 125 1188 491 -1 -1 N  WF=0 WT=5 ",,,"
 BUFFER: BN="..\Code\Libs\Reflection\UnitTests\ReflectionVersioning_UnitTest.cpp"
-BI: MA=1 74 1  TABS=1 5  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=C/C++	HM=0 MF=1180264 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=1 CL="" SC="" SCE= SCU=
-VIEW: LN=.4025 CL=17 LE=0 CX=17 CY=19 WI=5 BI=34 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="..\Code\Libs\Reflection\UnitTests\ReflectionCasting_UnitTest.cpp"
-BI: MA=1 74 1  TABS=1 5  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=C/C++	HM=0 MF=1179688 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=1 CL="" SC="" SCE= SCU=
-VIEW: LN=.35794 CL=5 LE=0 CX=5 CY=20 WI=5 BI=26 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="..\Code\Libs\Reflection\UnitTests\ReflectionConversion_UnitTest.cpp"
-BI: MA=1 74 1  TABS=1 5  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=C/C++	HM=0 MF=1180264 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=1 CL="" SC="" SCE= SCU=
-VIEW: LN=.7265 CL=17 LE=0 CX=17 CY=20 WI=5 BI=36 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="..\Code\Libs\Reflection\UnitTests\ReflectionFinalization_UnitTest.cpp"
-BI: MA=1 74 1  TABS=1 5  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=C/C++	HM=0 MF=131176 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=1 CL="" SC="" SCE= SCU=
-VIEW: LN=.3080 CL=17 LE=0 CX=17 CY=19 WI=5 BI=35 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="..\Code\Libs\Reflection\UnitTests\ReflectionInheritance_UnitTest.cpp"
-BI: MA=1 74 1  TABS=1 5  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=C/C++	HM=0 MF=1180264 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=1 CL="" SC="" SCE= SCU=
-VIEW: LN=.8788 CL=17 LE=0 CX=17 CY=20 WI=5 BI=48 HT=0 HN=0 HF=0 HC=4
-WINDOW: 120 150 1188 491 -1 -1 N  WF=0 WT=3 ",,,"
-BUFFER: BN="..\Code\Libs\Reflection\UnitTests\ReflectionCasting_UnitTest.cpp"
-VIEW: LN=.35794 CL=5 LE=0 CX=5 CY=20 WI=11 BI=26 HT=0 HN=0 HF=0 HC=4
-WINDOW: 280 125 1188 491 -1 -1 N  WF=0 WT=10 ",,,"
-BUFFER: BN="..\Code\Libs\Reflection\UnitTests\ReflectionConversion_UnitTest.cpp"
-VIEW: LN=.7265 CL=17 LE=0 CX=17 CY=20 WI=364 BI=36 HT=0 HN=0 HF=0 HC=4
-WINDOW: 320 175 1188 491 -1 -1 N  WF=0 WT=11 ",,,"
-BUFFER: BN="..\Code\Libs\Reflection\UnitTests\ReflectionFinalization_UnitTest.cpp"
-VIEW: LN=.3080 CL=17 LE=0 CX=17 CY=19 WI=193 BI=35 HT=0 HN=0 HF=0 HC=4
-WINDOW: 140 175 1188 491 -1 -1 N  WF=0 WT=4 ",,,"
-BUFFER: BN="..\Code\Libs\Reflection\UnitTests\ReflectionInheritance_UnitTest.cpp"
-VIEW: LN=.8788 CL=17 LE=0 CX=17 CY=20 WI=236 BI=48 HT=0 HN=0 HF=0 HC=4
-WINDOW: 160 200 1188 491 -1 -1 N  WF=0 WT=5 ",,,"
-BUFFER: BN="..\Code\Libs\Reflection\UnitTests\ReflectionNamespaces_UnitTest.cpp"
-VIEW: LN=.7551 CL=17 LE=0 CX=17 CY=20 WI=251 BI=30 HT=0 HN=0 HF=0 HC=4
-WINDOW: 240 75 1188 491 -1 -1 N  WF=0 WT=9 ",,,"
-BUFFER: BN="..\Code\Libs\Reflection\UnitTests\ReflectionVersioning_UnitTest.cpp"
-VIEW: LN=.4025 CL=17 LE=0 CX=17 CY=19 WI=246 BI=34 HT=0 HN=0 HF=0 HC=4
-WINDOW: 180 0 1188 491 -1 -1 N  WF=0 WT=6 ",,,"
-BUFFER: BN="Todo.txt"
-VIEW: LN=.621 CL=1 LE=0 CX=1 CY=14 WI=275 BI=25 HT=0 HN=0 HF=0 HC=4
-WINDOW: 220 50 1188 491 -1 -1 N  WF=0 WT=8 ",,,"
-BUFFER: BN="..\Code\Libs\Reflection\UnitTests\ReflectionBaseTypes_UnitTest.cpp"
-VIEW: LN=.3388 CL=1 LE=0 CX=1 CY=21 WI=249 BI=32 HT=0 HN=0 HF=0 HC=4
-WINDOW: 200 25 1188 491 -1 -1 N  WF=0 WT=7 ",,,"
-BUFFER: BN="..\Code\Libs\Reflection\UnitTests\ReflectionAliasing_UnitTest.cpp"
-VIEW: LN=.5555 CL=15 LE=0 CX=15 CY=17 WI=250 BI=33 HT=0 HN=0 HF=0 HC=4
-WINDOW: 100 125 1188 491 -1 -1 N  WF=0 WT=2 ",,,"
+VIEW: LN=.4058 CL=1 LE=0 CX=1 CY=33 WI=296 BI=30 HT=0 HN=0 HF=0 HC=4
+WINDOW: 260 100 1188 491 -1 -1 N  WF=0 WT=19 ",,,"
+BUFFER: BN="..\..\..\Code\Ext\tinyxml\tinyxml.cpp"
+VIEW: LN=.17445 CL=7 LE=0 CX=7 CY=20 WI=234 BI=65 HT=0 HN=0 HF=0 HC=4
+WINDOW: 220 50 1188 491 -1 -1 N  WF=0 WT=17 ",,,"
+BUFFER: BN="..\Code\Ext\tinyxml\tinyxml.h"
+VIEW: LN=.14944 CL=39 LE=0 CX=39 CY=20 WI=282 BI=63 HT=0 HN=0 HF=0 HC=4
+WINDOW: 280 125 1188 491 -1 -1 N  WF=0 WT=20 ",,,"
+BUFFER: BN="..\Code\Libs\Stream\Stream.cpp"
+VIEW: LN=.0 CL=1 LE=0 CX=1 CY=0 WI=294 BI=58 HT=0 HN=0 HF=0 HC=4
+WINDOW: 320 175 1188 491 -1 -1 N  WF=0 WT=22 ",,,"
+BUFFER: BN="..\Code\Core\Jamroot"
+VIEW: LN=.0 CL=1 LE=0 CX=1 CY=0 WI=354 BI=51 HT=0 HN=0 HF=0 HC=4
+WINDOW: 60 75 1188 491 -1 -1 N  WF=0 WT=26 ",,,"
+BUFFER: BN="..\Code\Core\Windows\Pch.h"
+VIEW: LN=.0 CL=1 LE=0 CX=1 CY=0 WI=363 BI=75 HT=0 HN=0 HF=0 HC=4
+WINDOW: 40 50 1188 491 -1 -1 N  WF=0 WT=25 ",,,"
+BUFFER: BN="..\Code\Core\Pch.h"
+VIEW: LN=.1562 CL=19 LE=0 CX=19 CY=35 WI=241 BI=78 HT=0 HN=0 HF=0 HC=4
+WINDOW: 80 100 1188 491 -1 -1 N  WF=0 WT=27 ",,,"
+BUFFER: BN="..\Code\Core\Windows\AssertGRWin.cpp"
+VIEW: LN=.2610 CL=1 LE=0 CX=1 CY=22 WI=321 BI=82 HT=0 HN=0 HF=0 HC=4
+WINDOW: 160 200 1188 491 -1 -1 N  WF=0 WT=14 ",,,"
+BUFFER: BN="..\Code\Core\Core.h"
+VIEW: LN=.1832 CL=17 LE=0 CX=17 CY=25 WI=207 BI=54 HT=0 HN=0 HF=0 HC=4
+WINDOW: 240 75 1188 491 -1 -1 N  WF=0 WT=18 ",,,"
+BUFFER: BN="..\Code\Ext\tinyxml\tinyxml.cpp"
+VIEW: LN=.18891 CL=23 LE=0 CX=23 CY=17 WI=301 BI=64 HT=0 HN=0 HF=0 HC=4
+WINDOW: 120 150 1188 491 -1 -1 N  WF=0 WT=4 ",,,"
 BUFFER: BN="..\Code\Tests\GRTest.cpp"
-VIEW: LN=.7502 CL=5 LE=0 CX=5 CY=20 WI=241 BI=31 HT=0 HN=0 HF=0 HC=4
-WINDOW: 80 100 1188 491 -1 -1 N  WF=0 WT=1 ",,,"
-BUFFER: BN="..\Code\Libs\Reflection\Reflection.h"
-VIEW: LN=.5814 CL=20 LE=0 CX=20 CY=23 WI=313 BI=39 HT=0 HN=0 HF=0 HC=4
-WINDOW: 340 200 1188 491 -1 -1 N  WF=0 WT=12 "Default Unicode Font,10,0,1"
-BUFFER: BN="..\Code\testBaseTypes.xml"
-VIEW: LN=.741 CL=40 LE=0 CX=40 CY=12 WI=213 BI=37 HT=0 HN=0 HF=0 HC=4
-WINDOW: 0 0 1188 491 -1 -1 N  WF=0 WT=13 "Default Unicode Font,10,0,1"
+VIEW: LN=.21905 CL=16 LE=0 CX=16 CY=38 WI=223 BI=33 HT=0 HN=0 HF=0 HC=4
+WINDOW: 0 0 1188 491 -1 -1 N  WF=0 WT=9 ",,,"
+BUFFER: BN="..\Code\Libs\Reflection\UnitTests\ReflectionMain_UnitTest.cpp"
+VIEW: LN=.1813 CL=5 LE=0 CX=5 CY=36 WI=350 BI=24 HT=0 HN=0 HF=0 HC=4
+WINDOW: 80 100 1188 491 -1 -1 N  WF=0 WT=11 ",,,"
+BUFFER: BN="..\..\..\Code\Ext\gtest\include\gtest\gtest.h"
+VIEW: LN=.82313 CL=1 LE=0 CX=1 CY=22 WI=342 BI=23 HT=0 HN=0 HF=0 HC=4
+WINDOW: 220 50 1188 491 -1 -1 N  WF=0 WT=31 ",,,"
+BUFFER: BN="\Program Files (x86)\Microsoft Visual Studio 9.0\VC\include\swprintf.inl"
+VIEW: LN=.1027 CL=71 LE=0 CX=71 CY=18 WI=191 BI=93 HT=0 HN=0 HF=0 HC=4
+WINDOW: 60 75 1188 491 -1 -1 N  WF=0 WT=10 ",,,"
+BUFFER: BN="..\Code\Ext\gtest\include\gtest\gtest.h"
+VIEW: LN=.47435 CL=1 LE=0 CX=1 CY=24 WI=341 BI=28 HT=0 HN=0 HF=0 HC=4
+WINDOW: 140 175 1188 491 -1 -1 N  WF=0 WT=30 ",,,"
+BUFFER: BN="..\Code\Core\Str.h"
+VIEW: LN=.2781 CL=6 LE=0 CX=6 CY=20 WI=284 BI=87 HT=0 HN=0 HF=0 HC=4
+WINDOW: 20 25 1188 491 -1 -1 N  WF=0 WT=24 ",,,"
+BUFFER: BN="..\Code\Core\Windows\StrWin.cpp"
+VIEW: LN=.3297 CL=1 LE=0 CX=1 CY=37 WI=327 BI=74 HT=0 HN=0 HF=0 HC=4
+WINDOW: 0 0 1188 491 -1 -1 N  WF=0 WT=23 ",,,"
+BUFFER: BN="..\Code\Core\Str.cpp"
+VIEW: LN=.1537 CL=28 LE=0 CX=28 CY=20 WI=339 BI=73 HT=0 HN=0 HF=0 HC=4
+WINDOW: 180 0 1188 491 -1 -1 N  WF=0 WT=15 ",,,"
+BUFFER: BN="..\Code\Libs\Stream\Stream.h"
+VIEW: LN=.3128 CL=26 LE=0 CX=26 CY=20 WI=277 BI=61 HT=0 HN=0 HF=0 HC=4
+WINDOW: 200 25 1188 491 -1 -1 N  WF=0 WT=16 ",,,"
+BUFFER: BN="..\Code\Libs\Stream\XMLStream.cpp"
+VIEW: LN=.9324 CL=29 LE=0 CX=29 CY=20 WI=316 BI=62 HT=0 HN=0 HF=0 HC=4
+WINDOW: 140 175 1188 491 -1 -1 N  WF=0 WT=13 ",,,"
+BUFFER: BN="..\Code\Core\Log.h"
+VIEW: LN=.1566 CL=12 LE=0 CX=12 CY=19 WI=273 BI=49 HT=0 HN=0 HF=0 HC=4
+WINDOW: 120 150 1188 491 -1 -1 N  WF=0 WT=29 ",,,"
+BUFFER: BN="..\Code\Core\File.h"
+VIEW: LN=.1756 CL=28 LE=0 CX=28 CY=20 WI=200 BI=80 HT=0 HN=0 HF=0 HC=4
+WINDOW: 0 0 1188 491 -1 -1 N  WF=0 WT=33 "Default Unicode Font,10,0,1"
 BUFFER: BN="GRTest\test.xml"
-VIEW: LN=.1284 CL=27 LE=0 CX=27 CY=21 WI=214 BI=46 HT=0 HN=0 HF=0 HC=4
-WINDOW: 40 50 1188 491 -1 -1 M  WF=0 WT=14 ",,,"
+VIEW: LN=.1284 CL=50 LE=0 CX=50 CY=22 WI=362 BI=102 HT=0 HN=0 HF=0 HC=4
+WINDOW: 120 150 1188 491 -1 -1 N  WF=0 WT=12 ",,,"
+BUFFER: BN="..\Code\Core\AssertGR.h"
+VIEW: LN=.2116 CL=9 LE=0 CX=9 CY=20 WI=308 BI=50 HT=0 HN=0 HF=0 HC=4
+WINDOW: 100 125 1188 491 -1 -1 N  WF=0 WT=3 ",,,"
+BUFFER: BN="..\Code\Libs\Reflection\Reflection.h"
+VIEW: LN=.3726 CL=9 LE=0 CX=9 CY=20 WI=229 BI=27 HT=0 HN=0 HF=0 HC=4
+WINDOW: 100 125 1188 491 -1 -1 N  WF=0 WT=28 ",,,"
+BUFFER: BN="..\Code\Core\Windows\FileWin.cpp"
+VIEW: LN=.3713 CL=34 LE=0 CX=34 CY=17 WI=324 BI=85 HT=0 HN=0 HF=0 HC=4
+WINDOW: 80 100 1188 491 -1 -1 N  WF=0 WT=2 ",,,"
 BUFFER: BN="..\Code\Libs\Reflection\Reflection.cpp"
-VIEW: LN=.2774 CL=15 LE=0 CX=15 CY=13 WI=201 BI=24 HT=0 HN=0 HF=0 HC=4
+VIEW: LN=.20531 CL=31 LE=0 CX=31 CY=22 WI=12 BI=25 HT=0 HN=0 HF=0 HC=4
+WINDOW: 300 150 1188 491 -1 -1 N  WF=0 WT=21 ",,,"
+BUFFER: BN="..\Code\Core\Log.cpp"
+VIEW: LN=.3949 CL=55 LE=0 CX=55 CY=11 WI=312 BI=59 HT=0 HN=0 HF=0 HC=4
+WINDOW: 60 75 1188 491 -1 -1 M  WF=0 WT=1 ",,,"
+BUFFER: BN="Todo.txt"
+VIEW: LN=.395 CL=59 LE=0 CX=59 CY=9 WI=271 BI=26 HT=0 HN=0 HF=0 HC=4
 FILEHIST: 9
-..\Code\Libs\Reflection\UnitTests\ReflectionInheritance_UnitTest.cpp
-Todo.txt
-..\Code\Libs\Reflection\UnitTests\ReflectionBaseTypes_UnitTest.cpp
-..\Code\Libs\Reflection\UnitTests\ReflectionAliasing_UnitTest.cpp
-..\Code\testBaseTypes.xml
+..\Code\Core\Windows\FileWin.cpp
+GRTest\errors.log
 GRTest\test.xml
-..\Code\Tests\GRTest.cpp
+..\Code\Core\AssertGR.h
 ..\Code\Libs\Reflection\Reflection.h
 ..\Code\Libs\Reflection\Reflection.cpp
+..\Code\info.log
+..\Code\Core\Log.cpp
+Todo.txt
 DEBUG: 0 0 0 0 3 0 gdb
 printf
 strcpy

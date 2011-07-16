@@ -88,13 +88,11 @@ TEST(ReflectionTest, TestFinalization) {
     testFinalization.baseUint32Test   = s_uint32Value;
     testFinalization.baseFloat32Test  = s_float32Value;
 
-    IStructuredTextStream * testStream = StreamCreateXML(L"testFinalization.xml");
+    IStructuredTextStreamPtr testStream = StreamCreateXML(L"testFinalization.xml");
     ASSERT_TRUE(testStream != NULL);
     bool result = ReflLibrary::Serialize(testStream, &testFinalization);
     EXPECT_EQ(true, result);
     testStream->Save();
-    delete testStream;
-    testStream = NULL;
 
     testStream = StreamOpenXML(L"testFinalization.xml");
     ASSERT_TRUE(testStream != NULL);

@@ -157,7 +157,6 @@ private:
 
 REFL_IMPL_CLASS_BEGIN(BaseBaseClass2, BaseClass2);
     REFL_ADD_PARENT(BaseBaseClass2);
-    REFL_MEMBER(basebase2i32test);
     REFL_MEMBER(base2i32test);
     REFL_MEMBER(base2f32test);
     REFL_MEMBER(base2u16test);
@@ -235,7 +234,7 @@ public:
 
 //REFL_DEFINE_USER_TYPE(NonreflectedClass);
 
-class Dummy : public BaseClass, public BaseClass2 {
+class Dummy : public BaseClass, public BaseClass2, public RefCounted {
 public:
     REFL_DEFINE_CLASS(Dummy);
     Dummy() :
@@ -434,11 +433,9 @@ void TestCastingFromMultipleBases() {
     testCasting.derivedInt16Test    = 1600;
     testCasting.derivedInt16Test2   = 1601;
 
-    IStructuredTextStream * testStream = StreamCreateXML(L"testComplexMultipleInheritanceCasting.xml");
+    IStructuredTextStreamPtr testStream = StreamCreateXML(L"testComplexMultipleInheritanceCasting.xml");
     bool result = ReflLibrary::Serialize(testStream, static_cast<SimpleCastBaseClass *>(&testCasting));
     testStream->Save();
-    delete testStream;
-    testStream = NULL;
 
     testStream = StreamOpenXML(L"testComplexMultipleInheritanceCasting.xml");
 
@@ -526,11 +523,9 @@ void TestCastingWVirtualsInBase() {
     testCasting.derivedInt16Test    = 17000;
     testCasting.derivedInt16Test2   = 17001;
 
-    IStructuredTextStream * testStream = StreamCreateXML(L"testCastingWVirtualBase.xml");
+    IStructuredTextStreamPtr testStream = StreamCreateXML(L"testCastingWVirtualBase.xml");
     bool result = ReflLibrary::Serialize(testStream, &testCasting);
     testStream->Save();
-    delete testStream;
-    testStream = NULL;
 
     testStream = StreamOpenXML(L"testCastingWVirtualBase.xml");
 
@@ -578,11 +573,9 @@ void TestCastingWVirtualsNonreflectedBase() {
     testCasting.derivedInt16Test    = 18000;
     testCasting.derivedInt16Test2   = 18001;
 
-    IStructuredTextStream * testStream = StreamCreateXML(L"testCastingWVirtualsNonreflectedBase.xml");
+    IStructuredTextStreamPtr testStream = StreamCreateXML(L"testCastingWVirtualsNonreflectedBase.xml");
     bool result = ReflLibrary::Serialize(testStream, &testCasting);
     testStream->Save();
-    delete testStream;
-    testStream = NULL;
 
     testStream = StreamOpenXML(L"testCastingWVirtualsNonreflectedBase.xml");
 
@@ -638,11 +631,9 @@ void TestCastingWVirtualsIn2ndBase() {
     testCasting.derivedInt16Test    = 19000;
     testCasting.derivedInt16Test2   = 19001;
 
-    IStructuredTextStream * testStream = StreamCreateXML(L"testCastingWVirtual2ndBase.xml");
+    IStructuredTextStreamPtr testStream = StreamCreateXML(L"testCastingWVirtual2ndBase.xml");
     bool result = ReflLibrary::Serialize(testStream, static_cast<VirtualBaseClass *>(&testCasting));
     testStream->Save();
-    delete testStream;
-    testStream = NULL;
 
     testStream = StreamOpenXML(L"testCastingWVirtual2ndBase.xml");
 
@@ -669,13 +660,16 @@ void TestCastingWVirtualsIn2ndBase() {
     actual = NULL;
 }
 
+DECLARE_SMARTPTR(Dummy);
+
 int main(int argc,  char * argv[]) {
    InitializeObjects();
 
+   LogInit();
    ReflInitialize();
 
-/*    
-    IStructuredTextStream * testStream = StreamCreateXML(L"test.xml");
+//*    
+    IStructuredTextStreamPtr testStream = StreamCreateXML(L"test.xml");
 
     Dummy testClass;
  
@@ -690,16 +684,20 @@ int main(int argc,  char * argv[]) {
    TestCastingWVirtualsInBase();    
    TestCastingFromMultipleBases();
 
-//*
-    IStructuredTextStream * testStream = StreamOpenXML(L"test.xml");
+/*
+    IStructuredTextStreamPtr testStream = StreamOpenXML(L"test.xml");
 
     Dummy testClass;
     //testClass.Deserialize(testStream);
     ReflClass * inst = ReflLibrary::Deserialize(testStream, MemFlags(MEM_ARENA_DEFAULT, MEM_CAT_TEST));
-    Dummy * dummy             = ReflCast<Dummy>(inst);
+    DummyPtr dummy            = ReflCast<Dummy>(inst);
     BaseBaseClass2 * basebase = ReflCast<BaseBaseClass2>(inst);
     BaseClass * base          = ReflCast<BaseClass>(inst);
     BaseClass2 * base2        = ReflCast<BaseClass2>(inst);
+    dummy                     = ReflCast<Dummy>(base);
+
 //*/
     DestroyObjects();
+
+    LogClose();
 }

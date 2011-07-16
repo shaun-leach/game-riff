@@ -59,6 +59,10 @@ enum EMemCategory {
     MEM_CAT_XML,
 };
 
+enum EMemFlags {
+    MEM_FLAGS_NULL_HANDLED // calling code handles null memory allocation
+};
+
 class MemFlags {
 public:
     MemFlags(EMemArena arena, EMemCategory cat) :
@@ -76,6 +80,22 @@ public:
         m_OOMSafe(0),
         m_padding(0) 
     {
+    }
+
+    MemFlags(
+        EMemArena       arena, 
+        EMemCategory    cat, 
+        EMemAlignment   align, 
+        EMemFlags       flags
+    ) :
+        m_arena(arena),
+        m_align(align),
+        m_category(cat),
+        m_OOMSafe(0),
+        m_padding(0) 
+    {
+        if ((flags & MEM_FLAGS_NULL_HANDLED) == MEM_FLAGS_NULL_HANDLED) 
+            m_OOMSafe = true;
     }
 
     EMemArena GetArena() const {

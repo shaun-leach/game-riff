@@ -92,7 +92,7 @@ REFL_IMPL_CLASS_END(SimpleConversionClass);
 
 //====================================================
 TEST(ReflectionTest, TestSimpleConversion) {
-    IStructuredTextStream * testStream = StreamOpenXML(L"testSimpleConversion.xml");
+    IStructuredTextStreamPtr testStream = StreamOpenXML(L"testSimpleConversion.xml");
     ASSERT_TRUE(testStream != NULL);
 
     ReflClass * inst = ReflLibrary::Deserialize(testStream, MemFlags(MEM_ARENA_DEFAULT, MEM_CAT_TEST));
@@ -151,7 +151,7 @@ REFL_IMPL_CLASS_END(SimpleAliasingConversionClass);
 
 //====================================================
 TEST(ReflectionTest, TestSimpleConversionWithAliasing) {
-    IStructuredTextStream * testStream = StreamOpenXML(L"testSimpleConversionWithAliasing.xml");
+    IStructuredTextStreamPtr testStream = StreamOpenXML(L"testSimpleConversionWithAliasing.xml");
     ASSERT_TRUE(testStream != NULL);
 
     ReflClass * inst = ReflLibrary::Deserialize(testStream, MemFlags(MEM_ARENA_DEFAULT, MEM_CAT_TEST));
@@ -210,7 +210,7 @@ REFL_IMPL_CLASS_END(SimpleClassConversionClass);
 
 //====================================================
 TEST(ReflectionTest, TestClassConversion) {
-    IStructuredTextStream * testStream = StreamOpenXML(L"testClassConversion.xml");
+    IStructuredTextStreamPtr testStream = StreamOpenXML(L"testClassConversion.xml");
     ASSERT_TRUE(testStream != NULL);
 
     ReflClass * inst = ReflLibrary::Deserialize(testStream, MemFlags(MEM_ARENA_DEFAULT, MEM_CAT_TEST));

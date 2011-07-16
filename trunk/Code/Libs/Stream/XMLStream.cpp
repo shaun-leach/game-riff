@@ -64,7 +64,12 @@ public:
     EStreamError ReadNextNode();
     EStreamError ReadParentNode();
     EStreamError ReadNodeValue(chargr * value, unsigned len) const;
-    EStreamError ReadNodeAttribute(const chargr * name, chargr * value, unsigned len) const;
+    EStreamError ReadNodeAttribute(
+        const chargr  * name, 
+        unsigned        nameLen,
+        chargr        * value, 
+        unsigned        len
+    ) const;
     EStreamError ReadChildNode();
 
 private:
@@ -72,6 +77,7 @@ private:
     EStreamError DecodeTiXmlError();
 
 private:
+    chargr          m_name[256];
     TiXmlNode     * m_currentNode;
     TiXmlDocument * m_document;
 };
@@ -81,7 +87,7 @@ XMLTextStream::XMLTextStream() :
     m_document(NULL),
     m_currentNode(NULL)
 {
-
+    m_name[0] = L'\0';
 }
 
 //====================================================
@@ -89,6 +95,7 @@ XMLTextStream::XMLTextStream(const chargr * fileName) :
     m_document(NULL),
     m_currentNode(NULL)
 {
+    StrCopy(m_name, 256,fileName);
     charsys * sysfile = StrCreateUtf8(fileName, XML_MEM_FLAGS);
     m_document = new(XML_MEM_FLAGS) TiXmlDocument(sysfile);
     TiXmlDeclaration * decl = new(XML_MEM_FLAGS) TiXmlDeclaration("1.0", "", "");
@@ -106,8 +113,24 @@ XMLTextStream::~XMLTextStream() {
 }
 
 //====================================================
+void XMLTextStream::Close() {
+    if (m_document != NULL) {
+        delete m_document;
+        m_document = NULL;
+    }
+    m_currentNode = NULL;
+}
+
+//====================================================
+const chargr * XMLTextStream::GetName() const {
+    return m_name;
+}
+
+//====================================================
 EStreamError XMLTextStream::Open(const chargr *fileName) {
     EStreamError result = STREAM_ERROR_OK;
+
+    StrCopy(m_name, 256,fileName);
 
     m_document = new(XML_MEM_FLAGS) TiXmlDocument();
 
@@ -140,20 +163,6 @@ EStreamError XMLTextStream::Save() {
         result = STREAM_ERROR_FILEDOESNTEXIST;
 
     return result;
-}
-
-//====================================================
-void XMLTextStream::Close() {
-    if (m_document != NULL) {
-        delete m_document;
-        m_document = NULL;
-    }
-    m_currentNode = NULL;
-}
-
-//====================================================
-const chargr * XMLTextStream::GetName() const {
-    return L"";
 }
 
 //====================================================
@@ -293,7 +302,12 @@ EStreamError XMLTextStream::ReadNodeValue(chargr * value, unsigned len) const {
 }
 
 //====================================================
-EStreamError XMLTextStream::ReadNodeAttribute(const chargr * name, chargr * value, unsigned len) const {
+EStreamError XMLTextStream::ReadNodeAttribute(
+    const chargr  * name, 
+    unsigned        nameLen, 
+    chargr        * value, 
+    unsigned        valueLen
+) const {
     value[0] = L'\0';
 
     if (m_document == NULL || m_currentNode == NULL) 
@@ -304,10 +318,10 @@ EStreamError XMLTextStream::ReadNodeAttribute(const chargr * name, chargr * valu
     TiXmlElement * node = m_currentNode->ToElement();
 
     EStreamError result = STREAM_ERROR_OK;
-    StrStackConverter sysName(name);
+    StrStackConverter sysName(name, nameLen);
     const char * attr = node->Attribute(sysName);
     if (attr != NULL) 
-        StrUtf8ConvertToCharGr(attr, value, len);
+        StrUtf8ConvertToCharGr(attr, value, valueLen);
     else 
         result = STREAM_ERROR_BADDATA;
 
@@ -342,7 +356,7 @@ EStreamError XMLTextStream::DecodeTiXmlError() {
 //
 
 //====================================================
-IStructuredTextStream * StreamOpenXML(const chargr * fileName) {
+IStructuredTextStreamPtr StreamOpenXML(const chargr * fileName) {
 
     NSXMLStream::XMLTextStream * stream = new(XML_MEM_FLAGS) NSXMLStream::XMLTextStream();
     EStreamError result = stream->Open(fileName);
@@ -352,15 +366,15 @@ IStructuredTextStream * StreamOpenXML(const chargr * fileName) {
         stream = NULL;
     }
 
-    return stream;
+    return IStructuredTextStreamPtr(stream);
 }
 
 //====================================================
-IStructuredTextStream * StreamCreateXML(const chargr * fileName) {
+IStructuredTextStreamPtr StreamCreateXML(const chargr * fileName) {
 
     NSXMLStream::XMLTextStream * stream = new(XML_MEM_FLAGS) NSXMLStream::XMLTextStream(fileName);
 
-    return stream;
+    return IStructuredTextStreamPtr(stream);
 }
 
 

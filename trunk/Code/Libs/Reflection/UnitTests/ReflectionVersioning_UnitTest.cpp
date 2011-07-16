@@ -65,10 +65,10 @@ public:
     }
 
     static void VersioningFunc(
-        IStructuredTextStream * stream, 
-        ReflTypeDesc         * desc, 
-        unsigned                version, 
-        ReflClass             * inst
+        IStructuredTextStreamPtr    stream, 
+        ReflTypeDesc              * desc, 
+        unsigned                    version, 
+        ReflClass                 * inst
     ) {
         SimpleVersioningClass * versioning = ReflCast<SimpleVersioningClass>(inst);
         if (versioning != NULL) {
@@ -108,7 +108,7 @@ REFL_IMPL_CLASS_END(SimpleVersioningClass);
 
 //====================================================
 TEST(ReflectionTest, TestSimpleVersioning) {
-    IStructuredTextStream * testStream = StreamOpenXML(L"testSimpleVersioning.xml");
+    IStructuredTextStreamPtr testStream = StreamOpenXML(L"testSimpleVersioning.xml");
     ASSERT_TRUE(testStream != NULL);
 
     ReflClass * inst = ReflLibrary::Deserialize(testStream, MemFlags(MEM_ARENA_DEFAULT, MEM_CAT_TEST));
